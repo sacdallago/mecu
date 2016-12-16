@@ -1,0 +1,40 @@
+extends base
+
+block content
+    #full
+        if displayName
+            p
+                | Hello, 
+                span.green #{displayName}
+                |.
+            p
+                |You can 
+                a(href="/auth/logout").item logout
+                |  or 
+                a(href="/maps").item view the maps.
+            p
+                |You can also 
+                a(href="/search").item search
+                |  for proteins and visualize protein-centric information.
+        else
+            p
+                | Hello, 
+                span.green User
+                |.
+            p
+                | I suggest you to 
+                a(href="/auth/google").item login
+                |  so that your session will be saved.
+            p
+                | Otherwise you can view our publicly available data by  
+                a(href="/maps").item selecting a map.
+            p
+                |You can also 
+                a(href="/search").item search
+                |  for proteins and visualize protein-centric information.
+                
+    #title
+        a(href="/") CellMap
+        
+block scripts
+    - var delta = 50

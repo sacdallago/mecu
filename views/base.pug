@@ -1,0 +1,94 @@
+html
+  head
+    title= "CellMap - " + title
+    block preStyles
+    link(rel='stylesheet', href='/public/semantic/semantic.css')
+    link(rel='stylesheet', href='/public/style.css')
+    link(rel='stylesheet', href='/public/progress/progress.css')
+    link(rel='stylesheet', href='/public/onepage/onepage.css')
+    block postStyles
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    
+    //- Classic meta
+    meta(name="title", content="CellMap")
+    meta(name="description", content="Protein localization and protein-protein interaction visualizer.")
+    meta(name="keywords", content="cell,map,protein,interactions,PPI,localization")
+    meta(name="author", content="Christian Dallago")
+    meta(name="copyright", content="Christian Dallago 2016")
+    meta(http-equiv="Reply-to", content="code@dallago.us")
+    meta(http-equiv="content-language", content="en")
+    meta(http-equiv="Content-Type", content="text/html; iso-8859-1")
+    meta(name="ROBOTS", content="INDEX,FOLLOW")
+    meta(name="creation_Date", content="06/27/2016")
+    meta(name="revisit-after", content="7 days")
+    
+    meta(name="fragment", content="!")
+    
+    //- Open Graph Meta Tags
+    meta(property="og:type", content="website")
+    meta(property="og:title", content="CellMap")
+    meta(property="og:description", content="Protein localization and protein-protein interaction visualizer.")
+    meta(property="og:site_name", content="CellMap")
+    meta(property="og:url", content="http://cell.dallago.us/")
+    meta(property="og:locale", content="en_US")
+    
+    //- Twitter Card Meta Tags
+    meta(name="twitter:card", content="summary")
+    meta(name="twitter:title", content="CellMap")
+    meta(name="twitter:description", content="Protein localization and protein-protein interaction visualizer.")
+  body
+    #progressBarContainer
+    .wrapper
+        .main
+            block fistContent
+            section
+                .page_container
+                    div(style="height: 100%;")
+                        .ui.main.container
+                            block content
+                            .ui.inverted.vertical.footer.segment
+                                        
+
+    script(type="text/javascript", src="/public/jquery/jquery.js")
+    script(type="text/javascript", src="/public/jquery/jquery.css")
+    script(type="text/javascript", src="/public/urlRewrite.js")
+    script(type="text/javascript", src="/public/semantic/semantic.js")
+    script(type="text/javascript", src='/public/progress/progress.js')
+    script(type="text/javascript", src='/public/onepage/onepage.js')
+    if scripts
+        each s in scripts
+            script(type="text/javascript", src=s)
+    block scripts
+    
+    if analytics
+        script.
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+                ga('create', '#{analytics}', 'auto');
+                ga('send', 'pageview');
+    //- Delta is defined in all pages not implementing leaflet (eg index.pug, about.pug) in the scripts block
+    if delta
+        script.
+            onePageScroll(".main", {
+                sectionContainer : "section",
+                loop : true,
+                updateURL: false,
+                pagination: false,
+                responsiveFallback : false,
+                delta: !{delta},
+                // This will avoid nasty behaviours on mobile on non-map pages
+                element: document.getElementById('progressBarContainer')
+            });
+    else
+        script.
+            onePageScroll(".main", {
+                sectionContainer : "section",
+                loop : true,
+                updateURL: false,
+                pagination: false,
+                responsiveFallback : false
+            });

@@ -1,0 +1,46 @@
+{
+    "name": "mecu",
+    "version": "0.0.1",
+    "description": "Mecu framework",
+    "main": "app.js",
+    "author": "Christian Dallago",
+    "license": "GPLv3",
+    "private": true,
+    "homepage": "htts://dallago.us",
+    "bugs": {
+        "url": "https://github.com/sacdallago/mecu/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sacdallago/mecu.git"
+    },
+    "engines": {
+        "node": ">= 0.10.0"
+    },
+    "dependencies": {
+        "q": "latest",
+        "pg": "latest",
+        "pg-hstore": "latest",
+        "sequelize": "latest",
+        "console-stamp": "latest",
+        "express": "latest",
+        "compression": "latest",
+        "pug": "latest",
+        "node-watch": "latest",
+        "gridfs-stream": "latest",
+        "formidable": "latest",
+        "passport": "latest",
+        "passport-google-oauth2": "latest",
+        "cookie-parser": "latest",
+        "universal-analytics": "latest",
+        "express-session": "latest",
+        "connect-session-sequelize": "latest",
+        "node-uuid": "latest",
+        "serve-favicon": "latest"
+    },
+    "devDependencies": {
+    },
+    "scripts": {
+        "start": "node app.js"
+    }
+}

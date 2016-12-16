@@ -1,0 +1,8 @@
+if displayName
+    .full
+        | Hello, #{displayName}. You can 
+        a(href="/auth/logout").item logout
+        | or
+        a(href="/maps").item view the maps.
+else
+    a(href="/auth/google").item Login

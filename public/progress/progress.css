@@ -1,0 +1,57 @@
+#progressBarContainer {
+    margin: auto;
+    position: absolute;
+    z-index: 99999;
+    width:100%;
+    display: hidden;
+}
+
+#progressBar {
+    background: linear-gradient(270deg, #e0f49d, #d8eaff, #4191e6, #1486ff, #b0c0d1, #06e7ff, #9bebba, #f78bfc);
+    background-size: 400% 400%;
+    height: 4px;
+    width: 100%;
+    -webkit-animation: progress 4000ms ease;
+    -moz-animation: progress 4000ms ease;
+    animation: progress 4000ms ease;
+}
+
+@keyframes progress {
+    0% {
+        width: 0%;
+        background-position:0% 50%;
+    }
+    50% {
+        background-position:100% 50%;
+    }
+    100% {
+        width: 100%;
+        background-position:0% 50%;
+    }
+}
+@-webkit-keyframes progress {
+    0% {
+        width: 0%;
+        background-position:0% 50%;
+    }
+    50% {
+        background-position:100% 50%;
+    }
+    100% {
+        width: 100%;
+        background-position:0% 50%;
+    }
+}
+@-moz-keyframes progress {
+    0% {
+        width: 0%;
+        background-position:0% 50%;
+    }
+    50% {
+        background-position:100% 50%;
+    }
+    100% {
+        width: 100%;
+        background-position:0% 50%;
+    }
+}

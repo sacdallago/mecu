@@ -1,0 +1,56 @@
+extends base
+
+block preStyles
+    link(rel='stylesheet', href='/public/leaflet/style.css')
+
+block content
+    #spacedText
+        h1 !{protein.uniprotId}
+        if protein.entryName
+            p Uniprot entry name: !{protein.entryName}
+        if protein.proteinName
+            p Uniprot protein name: !{protein.proteinName}
+        if protein.geneName
+            p Parimary gene name: !{protein.geneName}
+        if protein.origin
+            p Data origin: !{protein.origin}
+        if protein.localizations && protein.localizations.localizations && protein.localizations.localizations.length > 0
+            h3 Localizations
+            #locMap
+            a(href="/map?p=" + protein.uniprotId) Expand
+            ul
+            for loc in protein.localizations.localizations
+                li= loc
+            if protein.localizations.notes
+                br
+                p Notes: !{protein.localizations.notes}
+            
+        if protein.interactions && protein.interactions.partners && protein.interactions.partners.length > 0
+            h3 Partners
+            #interMap
+            - var link = (function(){ var l = "p=" + protein.uniprotId; protein.interactions.partners.forEach(function(partner){l += "&p=" + partner.interactor}); return l;})();
+            a(href="/ppi?" + link) Expand
+            if protein.interactions.notes
+                br
+                p Notes: !{protein.interactions.notes}
+            .ui.label.locButton
+            .space
+            .grid
+    #title
+        a(href="/") CellMap
+        
+
+block scripts
+    script(type="text/javascript", src="/public/leaflet/script.js")
+    script(type="text/javascript", src="/public/leaflet.TextPath/leaflet.TextPath.js")
+    script(type="text/javascript", src="/public/isotope/isotope.js")
+    script(type="text/javascript", src="/public/isotope/packery.js")
+    script(type="text/javascript", src="/public/easy-button/easy-button.js")
+    script(type="text/javascript", src="/public/regression.js")
+    script(type="text/javascript", src="/public/utilities.js")
+    
+    script().
+        var protein = !{JSON.stringify(protein)};
+        var partners = !{JSON.stringify(partners)};
+        var localizations = initializeLocalizations(!{JSON.stringify(localizations)});
+    script(type="text/javascript", src="/public/protein.js")
