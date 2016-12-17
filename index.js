@@ -40,7 +40,7 @@ module.exports = {
                 module: function(moduleName) {
                     if (!context[componentName][moduleName]) {
                         console.log('Loading component ' + componentName);
-                        context[componentName][moduleName] = require(path.join(__dirname, componentName, moduleName))(context,
+                        context[componentName][moduleName] = require(path.join(__dirname, "app", componentName, moduleName))(context,
                                                                                                                       componentName, moduleName);
                         console.log('LOADED ' + componentName + '.' + moduleName);
                     }

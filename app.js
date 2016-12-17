@@ -81,15 +81,15 @@ if (cluster.isMaster) {
 
         // Express configuration
         app.set('port', process.env.PORT || 3000);
-        app.set('views', path.join(__dirname, "views"));
+        app.set('views', path.join(__dirname, "frontend", "views"));
         app.set('view engine', 'pug');
 
         // Use
         app.use(compression());
 
         // Export static folders
-        app.use("/public", express.static(path.join(__dirname, "public")));
-        app.use(favicon(path.join(__dirname, "public", "cell.ico")));
+        app.use("/public", express.static(path.join(__dirname, "frontend", "public")));
+        app.use(favicon(path.join(__dirname, "frontend", "public", "images", "cell.ico")));
 
         app.use(cookieParser());
         app.use(session({
