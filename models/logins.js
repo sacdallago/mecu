@@ -4,9 +4,9 @@
  * Created by Christian Dallago on 20160626 .
  */
 
-const usersModel = context.component('models').module('users');
-
 module.exports = function(context) {
+    
+    const usersModel = context.component('models').module('users');
 
     return context.sequelize.define('login', {
         id: {
@@ -27,7 +27,7 @@ module.exports = function(context) {
                 deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE
             },
             expires: {
-                type: Sequelize.DATE,
+                type: context.Sequelize.DATE,
                 defaultValue: function(){
                     return Date.now() + (7 * 24 * 60 * 60 * 1000);
                 }

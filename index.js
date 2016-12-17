@@ -96,7 +96,10 @@ module.exports = {
                 return callback(context);
         })
             .catch(function (err) {
-                console.log('Unable to connect to the database:', err);
+                // Logs all application errors that happen after succesful db test OR error in connecting to DB
+            
+                console.error(err.code);
+                console.error(err);
                 return process.exit(1);
         });
     }
