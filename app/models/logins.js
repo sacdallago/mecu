@@ -25,12 +25,12 @@ module.exports = function(context) {
 
                 // This declares when to check the foreign key constraint. PostgreSQL only.
                 deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE
-            },
-            expires: {
-                type: context.Sequelize.DATE,
-                defaultValue: function(){
-                    return Date.now() + (7 * 24 * 60 * 60 * 1000);
-                }
+            }
+        },
+        expires: {
+            type: context.Sequelize.DATE,
+            defaultValue: function(){
+                return Date.now() + (7 * 24 * 60 * 60 * 1000);
             }
         }
     });

@@ -36,7 +36,8 @@
         "express-session": "latest",
         "connect-session-sequelize": "latest",
         "node-uuid": "latest",
-        "serve-favicon": "latest"
+        "serve-favicon": "latest",
+        "webpack": "latest"
     },
     "devDependencies": {
     },

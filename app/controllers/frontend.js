@@ -45,7 +45,6 @@ module.exports = function(context) {
                 proteinsDao.findProteinNames(queryString).then(function(proteins){
                     return response.render('search', {
                         title: 'Search for proteins',
-                        localizations: context.constants.localizations,
                         proteins: proteins
                     });
                 }, function(error){
@@ -57,8 +56,7 @@ module.exports = function(context) {
                 });
             } else {
                 return response.render('search', {
-                    title: 'Search for proteins',
-                    localizations: context.constants.localizations
+                    title: 'Search for proteins'
                 });
             }
         },
@@ -68,19 +66,9 @@ module.exports = function(context) {
 
             return proteinsDao.findByUniprotId(uniprotId).then(function(requestProtein){
                 if(requestProtein) {
-                    return proteinsDao.getPartners(requestProtein).then(function(partners){
-                        return response.render('protein', {
-                            title: uniprotId,
-                            localizations: context.constants.localizations,
-                            protein: requestProtein,
-                            partners: partners
-                        });
-                    }, function(error){
-                        return response.render('error', {
-                            title: 'Error',
-                            message: "Unable to retrieve protein interacitons data",
-                            error: error
-                        });
+                    return response.render('protein', {
+                        title: uniprotId,
+                        protein: requestProtein
                     });
                 } else {
                     return response.render('404', {
@@ -89,7 +77,6 @@ module.exports = function(context) {
                         error: "No protein by that name"
                     });
                 }
-
             }, function(error){
                 return response.render('error', {
                     title: 'Error',
@@ -97,7 +84,6 @@ module.exports = function(context) {
                     error: error
                 });
             });
-
         }
     }
 }

@@ -1,11 +1,46 @@
 'use strict';
 
 // Parallelize
-const numCPUs = require('os').cpus().length;
-const cluster = require('cluster');
-const consoleStamp = require('console-stamp');
+const numCPUs           = require('os').cpus().length;
+const cluster           = require('cluster');
+const consoleStamp      = require('console-stamp');
+const path              = require('path');
 
 if (cluster.isMaster) {
+    // Build frontend js dependencies and look for changes to rebuild
+    // Run on master to avoid doing this x times
+    let webpack = require("webpack");
+
+    let compiler = webpack({
+        entry: path.join(__dirname, 'frontend', 'libs', '*.js'),
+        output: {
+             path: path.join(__dirname, 'frontend', 'public'),
+             filename: 'app.js',
+             libraryTarget: 'var',
+             library: 'Mecu'
+        }
+    });
+
+    compiler.watch({ // watch options:
+        aggregateTimeout: 300, // wait so long for more changes
+        poll: true // use polling instead of native watchers
+        // pass a number to set the polling interval
+    }, function(err, stats) {
+        // ...
+    });
+
+    compiler.run(function(err, stats) {
+        // ...
+    });
+// or
+    compiler.watch({ // watch options:
+        aggregateTimeout: 300, // wait so long for more changes
+        poll: true // use polling instead of native watchers
+        // pass a number to set the polling interval
+    }, function(err, stats) {
+        // ...
+    });
+
     // Setup timestamps for logging
     consoleStamp(console,{
         metadata: function () {
@@ -24,8 +59,8 @@ if (cluster.isMaster) {
         console.log("Spwaning worker " + worker.id);
     }
 
-    cluster.on('exit', (worker, code, signal) => {
-        console.log(`worker ${worker.process.pid} died`);
+    cluster.on('exit', function(worker, code, signal) {
+        console.log("worker " + worker.process.pid + " died");
         var newWorker = cluster.fork();
         console.log("Spwaning worker " + newWorker.id);
     });
@@ -34,7 +69,6 @@ if (cluster.isMaster) {
     // Spawn various workers to listen and answer requests
     const express           = require('express');
     const cookieParser      = require('cookie-parser')
-    const path              = require('path');
     const compression       = require('compression');
     const watch             = require('node-watch');
     const passport          = require('passport');
@@ -228,14 +262,12 @@ if (cluster.isMaster) {
     // Watch in case of file changes, restart worker (basically can keep up server running forever)
     watch([
         //path.join(__dirname, "views"),
-        path.join(__dirname, "services"),
-        path.join(__dirname, "controllers"),
-        path.join(__dirname, "daos"),
-        path.join(__dirname, "models"),
+        path.join(__dirname, "app/*/*.js"),
+        path.join(__dirname, "app/*.js"),
         path.join(__dirname, "app.js"),
-        path.join(__dirname, "index.js"),
+        path.join(__dirname, "index.js")
     ], function(filename) {
         console.log('File changed. Worker is gonna perform harakiri.');
-        cluster.worker.kill();
+        cluster.worker.kill(0);
     });
 }
