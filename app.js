@@ -17,7 +17,7 @@ if (cluster.isMaster) {
              path: path.join(__dirname, 'frontend', 'public'),
              filename: 'app.js',
              libraryTarget: 'var',
-             library: 'Mecu'
+             library: 'mecu'
         }
     });
 
@@ -30,7 +30,6 @@ if (cluster.isMaster) {
     });
 
     compiler.run(function(err, stats) {
-        // ...
     });
 // or
     compiler.watch({ // watch options:
@@ -68,7 +67,7 @@ if (cluster.isMaster) {
 } else {
     // Spawn various workers to listen and answer requests
     const express           = require('express');
-    const cookieParser      = require('cookie-parser')
+    const cookieParser      = require('cookie-parser');
     const compression       = require('compression');
     const watch             = require('node-watch');
     const passport          = require('passport');

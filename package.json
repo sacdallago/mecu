@@ -37,7 +37,8 @@
         "connect-session-sequelize": "latest",
         "node-uuid": "latest",
         "serve-favicon": "latest",
-        "webpack": "latest"
+        "webpack": "latest",
+        "mecu-parser": "git@github.com:sacdallago/mecu-parser.git"
     },
     "devDependencies": {
     },

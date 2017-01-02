@@ -11,6 +11,11 @@ module.exports = function(context) {
             // allowNull: false,
             // unique: true,
             primaryKey: true
+        },
+        primaryGene: {
+            type: context.Sequelize.STRING,
+            allowNull: false,
+            unique: 'primaryGene'
         }
     });
 };
