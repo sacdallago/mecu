@@ -35,7 +35,7 @@ module.exports = function(context) {
                 onDelete: "CASCADE"
             }
         },
-        protein: {
+        uniprotId: {
             type: context.Sequelize.STRING,
             unique: '_id',
             allowNull: false,

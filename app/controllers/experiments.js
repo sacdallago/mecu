@@ -11,8 +11,7 @@ module.exports = function(context) {
                 // Need to implement the storage of file xyz and then render home
 
                 form.parse(request, function(error, fields, files) {
-                    const data = files.data;
-                    const experiment = fields.experiment;
+                    var data = files.data;
                     const inVivo = fields.in_vivo;
                     const cellLine = fields.cellLine;
 
@@ -36,18 +35,61 @@ module.exports = function(context) {
                     
                     return context.fs.readFile(data.path, 'utf8', function (error, data) {
                         if(error){
-                            response.status(500).render('error', {
+                            return response.status(500).render('error', {
                                 title: 'Error',
                                 message: "Unable to read file",
                                 error: error
                             });
-                            return;
                         }
                         
-                        data = context.mecuParser.parse(data)
-                        var entries = mecu.parse(data);
+                        let newExperiment = {
+                            inVivo: inVivo,
+                            cellLine: cellLine
+                        }
                         
-                        return response.status(201).send(entries);
+                        return experimentsDao.create(newExperiment)
+                            .then(function(experiment){
+                                data = context.mecuParser.parse(data);
+                        
+                                let proteins = data.map(function(element){
+                                    return {
+                                        uniprotId: element.uniprotId,
+                                        primaryGene: element.primaryGene
+                                    }
+                                });
+
+                                let proteinReads = data.map(function(element){
+                                    return {
+                                        uniprotId: element.uniprotId,
+                                        experiment: experiment._id,
+                                        peptides: element.peptides,
+                                        psms: element.psms,
+                                        totalExpt: element.totalExpt
+                                    }
+                                });
+                                
+                                let meltingReads = data
+                                    .map(function(element){
+                                        return element.reads.map(function(tempRead){
+                                            tempRead.uniprotId= element.uniprotId;
+                                        tempRead.experiment= experiment._id;
+                                            return tempRead;
+                                        });
+                                    })
+                                    .reduce(function(elements,element){
+                                        return elements.concat(element);
+                                    });
+
+
+                                return response.status(201).send(data);
+                            })
+                            .catch(function(error){
+                                return response.status(500).render('error', {
+                                    title: 'Error',
+                                    message: "Unable to create experiment",
+                                    error: error
+                                });
+                            });
                     });
                 });
             } else {

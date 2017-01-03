@@ -19,5 +19,9 @@ module.exports = function(context) {
             type: context.Sequelize.STRING,
             allowNull: false
         },
+        createdAt: {
+            type: context.Sequelize.DATE,
+            defaultValue: context.Sequelize.NOW
+        }
     });
 };

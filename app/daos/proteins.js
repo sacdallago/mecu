@@ -11,17 +11,11 @@ module.exports = function(context) {
 
     return {
         create: function(item) {
-            var deferred = context.promises.defer();
-
-            proteinsModel.create(item, function(error, insertedItem) {
-                if (error) {
-                    console.error(error);
-                    deferred.reject(error);
-                }
-                deferred.resolve(insertedItem);
-            });
-
-            return deferred.promise;
+            return proteinsModel.create(item);
+        },
+        
+        bulkCreate: function(items) {
+            return proteinsModel.bulkCreate(items, {ignoreDuplicates: true});
         },
         
         update: function(item) {
@@ -79,26 +73,6 @@ module.exports = function(context) {
                 }
             });
 
-            return deferred.promise;
-        },
-        
-        getPartners: function(protein){
-            var deferred = context.promises.defer();
-            
-            proteinsModel.find({
-                uniprotId: {
-                    $in: protein.interactions.partners.map(function(interaction){return interaction.interactor})
-                }
-            })
-                .exec(function(error, results) {
-                if (error) {
-                    console.error(error);
-                    deferred.reject(error);
-                } else {
-                    deferred.resolve(results);
-                }
-            });
-            
             return deferred.promise;
         }
     };
