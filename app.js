@@ -7,38 +7,40 @@ const consoleStamp      = require('console-stamp');
 const path              = require('path');
 
 if (cluster.isMaster) {
+    
+    // TODO - Implement webpack bundle of globals!
     // Build frontend js dependencies and look for changes to rebuild
     // Run on master to avoid doing this x times
-    let webpack = require("webpack");
-
-    let compiler = webpack({
-        entry: path.join(__dirname, 'frontend', 'libs', '*.js'),
-        output: {
-             path: path.join(__dirname, 'frontend', 'public'),
-             filename: 'app.js',
-             libraryTarget: 'var',
-             library: 'mecu'
-        }
-    });
-
-    compiler.watch({ // watch options:
-        aggregateTimeout: 300, // wait so long for more changes
-        poll: true // use polling instead of native watchers
-        // pass a number to set the polling interval
-    }, function(err, stats) {
-        // ...
-    });
-
-    compiler.run(function(err, stats) {
-    });
-// or
-    compiler.watch({ // watch options:
-        aggregateTimeout: 300, // wait so long for more changes
-        poll: true // use polling instead of native watchers
-        // pass a number to set the polling interval
-    }, function(err, stats) {
-        // ...
-    });
+//    let webpack = require("webpack");
+//
+//    let compiler = webpack({
+//        entry: path.join(__dirname, 'frontend', 'libs', '*.js'),
+//        output: {
+//             path: path.join(__dirname, 'frontend', 'public'),
+//             filename: 'app.js',
+//             libraryTarget: 'var',
+//             library: 'mecu'
+//        }
+//    });
+//
+//    compiler.watch({ // watch options:
+//        aggregateTimeout: 300, // wait so long for more changes
+//        poll: true // use polling instead of native watchers
+//        // pass a number to set the polling interval
+//    }, function(err, stats) {
+//        // ...
+//    });
+//
+//    compiler.run(function(err, stats) {
+//    });
+//// or
+//    compiler.watch({ // watch options:
+//        aggregateTimeout: 300, // wait so long for more changes
+//        poll: true // use polling instead of native watchers
+//        // pass a number to set the polling interval
+//    }, function(err, stats) {
+//        // ...
+//    });
 
     // Setup timestamps for logging
     consoleStamp(console,{
@@ -121,15 +123,20 @@ if (cluster.isMaster) {
         app.use(compression());
 
         // Export static folders
+        app.use("/public/js", express.static(path.join(__dirname, "frontend", "js")));
+        app.use("/public/css", express.static(path.join(__dirname, "frontend", "css")));
+        app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
         app.use("/public", express.static(path.join(__dirname, "frontend", "public")));
         app.use(favicon(path.join(__dirname, "frontend", "public", "images", "cell.ico")));
 
         app.use(cookieParser());
+        
+        // TODO - session and user management
         app.use(session({
-            secret: context.config.sessionSecret || 'catLolLog',
+            secret: context.config.sessionSecret || 'mecuSecret',
             store: new SequelizeStore({
                 db: context.sequelize,
-                table: 'login',
+                //table: 'logins',
             }),
             resave: true,
             saveUninitialized: true,
@@ -207,17 +214,20 @@ if (cluster.isMaster) {
         context.router = new express.Router();
         context.api = new express.Router();
 
-        app.use(function(request, response, next) {
-            if (request.method === 'GET') {
-                return next();
-            } else {
-                response.status(403).render('error', {
-                    title: 'Error',
-                    message: "Can only GET",
-                    error: "Can only GET"
-                });
-            }
-        });
+        // TODO - implement security layer
+        if(process.env.NODE_ENV == 'production'){
+            app.use(function(request, response, next) {
+                if (request.method === 'GET') {
+                    return next();
+                } else {
+                    response.status(403).render('error', {
+                        title: 'Error',
+                        message: "Can only GET",
+                        error: "Can only GET"
+                    });
+                }
+            });
+        }
 
         // Router listens on / and /api
         app.use('/api', function(request, response, next) {
@@ -250,18 +260,25 @@ if (cluster.isMaster) {
 
         // Load all routes
         context.component('.').module('routes');
-
-        // Make the server listen
-        app.listen(app.get('port'), function(){
-            console.log("Express server listening on port ", app.get('port'));
-            console.log("According to your configuration, the application is reachable at", address);
+        
+        // Sync the database --> Write table definitions
+        context.sequelize.sync().then(function() {
+            // Make the process listen to incoming requests
+            app.listen(app.get('port'), function(){
+                console.log("Express server listening on port ", app.get('port'));
+                console.log("According to your configuration, the webapp is reachable at", address);
+            });
+        }).catch(function(error) {
+            console.error("There was an error while syncronizing the tables between the application and the database.");
+            console.error(error);
+            process.exit(2);
         });
     });
 
     // Watch in case of file changes, restart worker (basically can keep up server running forever)
     watch([
         //path.join(__dirname, "views"),
-        path.join(__dirname, "app/*/*.js"),
+        path.join(__dirname, "app/**.js"),
         path.join(__dirname, "app/*.js"),
         path.join(__dirname, "app.js"),
         path.join(__dirname, "index.js")

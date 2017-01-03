@@ -9,7 +9,6 @@ module.exports = function(context) {
         googleId: {
             type: context.Sequelize.STRING,
             allowNull: false,
-            unique: true,
             primaryKey: true
         },
         displayName:  {
