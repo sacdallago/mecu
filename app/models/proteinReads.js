@@ -13,7 +13,6 @@ module.exports = function(context) {
         // don't delete database entries but set the newly added attribute deletedAt
         // to the current date (when deletion was done). paranoid will only work if
         // timestamps are enabled
-        paranoid: true,
         experiment: {
             type: context.Sequelize.UUID,
             unique: '_id',
@@ -35,18 +34,13 @@ module.exports = function(context) {
             type: context.Sequelize.STRING,
             unique: '_id',
             allowNull: false,
-            references: {
-                // This is a reference to another model
-                model: proteinsModel,
-
-                // This is the column name of the referenced model
-                key: 'uniprotId',
-
-                // This declares when to check the foreign key constraint. Postgres SQL only.
-                deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE,
-                
-                onDelete: "CASCADE"
-            }
+//            TODO - Reference can be used when postgres ignore duplicate will be implemented, follow https://github.com/sequelize/sequelize/pull/6325
+//            references: {
+//                model: proteinsModel,
+//                key: 'uniprotId',
+//                deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE,
+//                onDelete: "CASCADE"
+//            }
         },
 
         peptides: {

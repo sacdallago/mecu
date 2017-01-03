@@ -2,6 +2,8 @@ module.exports = function(context) {
 
     // Imports
     const experimentsDao = context.component('daos').module('experiments');
+    const temperatureReadsDao = context.component('daos').module('temperatureReads');
+    const proteinReadsDao = context.component('daos').module('proteinReads');
 
     return {
         uploadExperiment: function(request, response) {
@@ -15,7 +17,7 @@ module.exports = function(context) {
                     const inVivo = fields.in_vivo;
                     const cellLine = fields.cellLine;
 
-                    if(error || data === undefined || experiment === undefined || inVivo === undefined || cellLine === undefined){
+                    if(error || data === undefined || inVivo === undefined || cellLine === undefined){
                         response.render('error', {
                             title: 'Error',
                             message: "Unable to post request",
@@ -32,7 +34,7 @@ module.exports = function(context) {
                         });
                         return;
                     }
-                    
+
                     return context.fs.readFile(data.path, 'utf8', function (error, data) {
                         if(error){
                             return response.status(500).render('error', {
@@ -41,22 +43,23 @@ module.exports = function(context) {
                                 error: error
                             });
                         }
-                        
+
                         let newExperiment = {
                             inVivo: inVivo,
                             cellLine: cellLine
                         }
-                        
-                        return experimentsDao.create(newExperiment)
-                            .then(function(experiment){
+
+                        return context.sequelize.transaction(function(transaction){
+                            return experimentsDao.create(newExperiment, {transaction: transaction}).then(function(experiment){
                                 data = context.mecuParser.parse(data);
-                        
-                                let proteins = data.map(function(element){
-                                    return {
-                                        uniprotId: element.uniprotId,
-                                        primaryGene: element.primaryGene
-                                    }
-                                });
+
+                                // TODO - this can be implemented as a view if sequelize ever supports this, or once the Postgres equivalent of ON DUPLICATE IGNORE will be approved in sequelize https://github.com/sequelize/sequelize/pull/6325
+//                                let proteins = data.map(function(element){
+//                                    return {
+//                                        uniprotId: element.uniprotId,
+//                                        primaryGene: element.primaryGene
+//                                    }
+//                                });
 
                                 let proteinReads = data.map(function(element){
                                     return {
@@ -67,21 +70,28 @@ module.exports = function(context) {
                                         totalExpt: element.totalExpt
                                     }
                                 });
-                                
-                                let meltingReads = data
-                                    .map(function(element){
-                                        return element.reads.map(function(tempRead){
-                                            tempRead.uniprotId= element.uniprotId;
-                                        tempRead.experiment= experiment._id;
-                                            return tempRead;
+
+                                return proteinReadsDao.bulkCreate(proteinReads, {transaction: transaction}).then(function(){
+                                    let meltingReads = data
+                                        .map(function(element){
+                                            return element.reads.map(function(tempRead){
+                                                tempRead.uniprotId= element.uniprotId;
+                                                tempRead.experiment= experiment._id;
+                                                return tempRead;
+                                            });
+                                        })
+                                        .reduce(function(elements,element){
+                                            return elements.concat(element);
                                         });
-                                    })
-                                    .reduce(function(elements,element){
-                                        return elements.concat(element);
+
+                                    return temperatureReadsDao.bulkCreate(meltingReads, {transaction: transaction}).then(function(){
+                                        return true;
                                     });
-
-
-                                return response.status(201).send(data);
+                                });
+                            });
+                        })
+                            .then(function(result){
+                                return response.status(201).send({"status": "OK"});
                             })
                             .catch(function(error){
                                 return response.status(500).render('error', {

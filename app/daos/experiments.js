@@ -10,8 +10,8 @@ module.exports = function(context) {
     var experimentsModel = context.component('models').module('experiments');
 
     return {
-        create: function(item) {            
-            return experimentsModel.create(item);
+        create: function(item, options) {            
+            return experimentsModel.create(item, options);
         }
     };
 };

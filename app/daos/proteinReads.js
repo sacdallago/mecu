@@ -10,8 +10,8 @@ module.exports = function(context) {
     var proteinReadsModel = context.component('models').module('proteinReads');
 
     return {
-        bulkCreate: function(items) {
-            return proteinReadsModel.bulkCreate(items);
+        bulkCreate: function(items, options) {
+            return proteinReadsModel.bulkCreate(items, options);
         }
     };
 };

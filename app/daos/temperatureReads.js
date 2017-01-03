@@ -10,8 +10,8 @@ module.exports = function(context) {
     var temperatureReadsModel = context.component('models').module('temperatureReads');
 
     return {
-        bulkCreate: function(items) {
-            return temperatureReadsModel.bulkCreate(items);
+        bulkCreate: function(items, options) {
+            return temperatureReadsModel.bulkCreate(items, options);
         }
     };
 };
