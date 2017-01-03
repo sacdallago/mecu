@@ -89,7 +89,8 @@ module.exports = {
                 min: 0,
                 idle: 10000
             },
-            omitNull: true
+            // TODO - omitNull will avoid passing NULL values in create, but it doesn't fix the problem: how to assign default values?
+            // omitNull: true
         });
 
         return context.sequelize
