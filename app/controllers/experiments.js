@@ -64,7 +64,7 @@ module.exports = function(context) {
                                 let proteinReads = data.map(function(element){
                                     return {
                                         uniprotId: element.uniprotId,
-                                        experiment: experiment._id,
+                                        experiment: experiment.id,
                                         peptides: element.peptides,
                                         psms: element.psms,
                                         totalExpt: element.totalExpt
@@ -76,7 +76,7 @@ module.exports = function(context) {
                                         .map(function(element){
                                             return element.reads.map(function(tempRead){
                                                 tempRead.uniprotId= element.uniprotId;
-                                                tempRead.experiment= experiment._id;
+                                                tempRead.experiment= experiment.id;
                                                 return tempRead;
                                             });
                                         })

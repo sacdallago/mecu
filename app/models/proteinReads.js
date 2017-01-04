@@ -14,7 +14,7 @@ module.exports = function(context) {
         // to the current date (when deletion was done). paranoid will only work if
         // timestamps are enabled
         experiment: {
-            type: context.Sequelize.UUID,
+            type: context.Sequelize.INTEGER,
             unique: '_id',
             allowNull: false,
             references: {
@@ -22,7 +22,7 @@ module.exports = function(context) {
                 model: experimentsModel,
 
                 // This is the column name of the referenced model
-                key: '_id',
+                key: 'id',
 
                 // This declares when to check the foreign key constraint. PostgreSQL only.
                 deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE,

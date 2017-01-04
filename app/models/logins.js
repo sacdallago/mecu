@@ -9,11 +9,6 @@ module.exports = function(context) {
     const usersModel = context.component('models').module('users');
 
     return context.sequelize.define('login', {
-        _id: {
-            type: context.Sequelize.UUID,
-            default: context.Sequelize.UUIDV1,
-            primaryKey: true
-        },
         ref: {
             type: context.Sequelize.STRING,
             references: {
