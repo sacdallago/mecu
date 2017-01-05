@@ -2,10 +2,10 @@ html
   head
     title= "MeCu - " + title
     block preStyles
-    link(rel='stylesheet', href='/public/semantic/semantic.css')
-    link(rel='stylesheet', href='/public/style.css')
-    link(rel='stylesheet', href='/public/progress/progress.css')
-    link(rel='stylesheet', href='/public/onepage/onepage.css')
+    link(rel='stylesheet', href='/public/libs/semantic/semantic.css')
+    link(rel='stylesheet', href='/public/css/style.css')
+    link(rel='stylesheet', href='/public/libs/progress/progress.css')
+    link(rel='stylesheet', href='/public/libs/onepage/onepage.css')
     block postStyles
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
@@ -50,12 +50,12 @@ html
                             .ui.inverted.vertical.footer.segment
                                         
 
-    script(type="text/javascript", src="/public/jquery/jquery.js")
-    script(type="text/javascript", src="/public/jquery/jquery.css")
-    script(type="text/javascript", src="/public/urlRewrite.js")
-    script(type="text/javascript", src="/public/semantic/semantic.js")
-    script(type="text/javascript", src='/public/progress/progress.js')
-    script(type="text/javascript", src='/public/onepage/onepage.js')
+    script(type="text/javascript", src="/public/libs/jquery/jquery.js")
+    script(type="text/javascript", src="/public/libs/jquery/jquery.css")
+    script(type="text/javascript", src="/public/libs/urlRewrite.js")
+    script(type="text/javascript", src="/public/libs/semantic/semantic.js")
+    script(type="text/javascript", src='/public/libs/progress/progress.js')
+    script(type="text/javascript", src='/public/libs/onepage/onepage.js')
     if scripts
         each s in scripts
             script(type="text/javascript", src=s)

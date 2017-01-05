@@ -1,7 +1,5 @@
 $.fn.api.settings.api = {
-    'get from localizations': '/api/localizations/search/{query}',
-    'get from mappings': '/api/mappings/search/{query}',
-    'get from proteins': '/api/proteins/search/{query}',
+    'get from proteins': '/api/proteins/search/{query}'
 };
 
 

@@ -13,12 +13,9 @@ block content
         
 block scripts
     - var delta = 50
-    script(type="text/javascript", src="/public/isotope/isotope.js")
-    script(type="text/javascript", src="/public/isotope/packery.js")
-    script().
-        var localizations = initializeLocalizations(!{JSON.stringify(localizations)});
-
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
     if proteins
         script().    
             var queryProteins = !{JSON.stringify(proteins)};
-    script(type="text/javascript", src="/public/search.js")
+    script(type="text/javascript", src="/public/js/search.js")
