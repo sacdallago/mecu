@@ -128,7 +128,7 @@ $('.ui.search').search({
         var currentUri = URI(window.location.href);
         currentUri.search({'q': searchInput.val()});
 
-        window.history.replaceState({'q': searchInput.val()}, "CellMap", currentUri.resource());
+        window.history.replaceState({'q': searchInput.val()}, "MeCu", currentUri.resource());
 
         // Grid
         grid.empty();

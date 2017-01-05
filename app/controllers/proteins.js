@@ -2,6 +2,7 @@ module.exports = function(context) {
 
     // Imports
     var proteinsDao = context.component('daos').module('proteins');
+    var proteinReadsDao = context.component('daos').module('proteinReads');
 
     return {
         getProteins: function(request, response) {
@@ -10,14 +11,16 @@ module.exports = function(context) {
             if(identifier === undefined){
                 response.send([]);
             } else {
-                proteinsDao.findProteinNames(identifier).then(function(proteins){
-                    response.send(proteins);
-                }, function(error){
-                    response.status(500).send(error);
+                proteinReadsDao.findProteins(identifier)
+                    .then(function(proteins){
+                        response.send(proteins);
+                    })
+                    .catch(function(error){
+                        response.status(500).send(error);
                 });
             }
         },
-        getProteinByUniProtID: function(request, response) {
+        getProteinByUniProtId: function(request, response) {
             const identifier = request.params.id.toUpperCase();
 
             proteinsDao.findByUniprotId(identifier).then(function(protein){
@@ -29,7 +32,6 @@ module.exports = function(context) {
             }, function(error){
                 response.status(500).send(error);
             });
-
         }
     }
 }

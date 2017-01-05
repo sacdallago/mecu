@@ -12,6 +12,12 @@ module.exports = function(context) {
     return {
         create: function(item, options) {            
             return experimentsModel.create(item, options);
+        },
+
+        getExperiments: function(){
+            return experimentsModel.findAll({
+                attributes: ['id']
+            });
         }
     };
 };

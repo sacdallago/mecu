@@ -52,28 +52,5 @@ module.exports = function(context) {
 
             return deferred.promise;
         },
-        
-        findProteinNames: function(identifier) {
-            var deferred = context.promises.defer();
-
-            proteinsModel.find({
-                $or: [
-                    {uniprotId: {'$regex': identifier}},
-                    {entryName: {'$regex': identifier}},
-                    {geneName: {'$regex': identifier}}
-                ]
-            })
-                .limit(50)
-                .exec(function(error, results) {
-                if (error) {
-                    console.error(error);
-                    deferred.reject(error);
-                } else {
-                    deferred.resolve(results);
-                }
-            });
-
-            return deferred.promise;
-        }
     };
 };

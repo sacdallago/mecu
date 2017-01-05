@@ -12,6 +12,32 @@ module.exports = function(context) {
     return {
         bulkCreate: function(items, options) {
             return temperatureReadsModel.bulkCreate(items, options);
+        },
+
+        findByUniprotId: function(identifier, transaction) {
+            if (transaction){
+                return temperatureReadsModel.findAll({
+                        attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
+                        where: {
+                            uniprotId: {
+                                $like: identifier + "%"
+                            }
+                        },
+                        transaction: transaction
+                    }
+                );
+            } else {
+                return temperatureReadsModel.findAll({
+                        attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
+                        where: {
+                            uniprotId: {
+                                $like: identifier + "%"
+                            }
+                        }
+                    }
+                );
+            }
+
         }
     };
 };
