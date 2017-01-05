@@ -1,5 +1,6 @@
 $.fn.api.settings.api = {
-    'get from proteins': '/api/proteins/search/{query}'
+    'get from proteins': '/api/proteins/search/{query}',
+    'get from temperature reads': '/api/reads/temperature/search/{query}'
 };
 
 
@@ -43,13 +44,13 @@ grid.on('click', '.cube', function(event) {
     event.stopPropagation();
 
     // Filter only by selected localization type
-    grid.isotope({ filter: "." + $(this).data('localization') })
+    grid.isotope({ filter: "." + $(this).data('localization') });
 
     // Change button color, text
-    $('.locButton').text("Viewing: " + $(this).data('localization') + ", click to view all");
+    $('.clearButton').text("Viewing: " + $(this).data('localization') + ", click to view all");
 });
 
-$('.locButton').on('click', function(){
+$('.clearButton').on('click', function(){
     grid.isotope({ filter: "*"});
     $(this).text("");
 });
@@ -69,7 +70,7 @@ const searchInput = $('.prompt.inline');
 // If I have get proteins from the backend after sending the request, add them to grid
 var queryProteins = queryProteins || undefined;
 (function(){
-    if(queryProteins !== undefined){        
+    if(queryProteins !== undefined){
         // Grid
         grid.empty();
 
@@ -83,8 +84,8 @@ var queryProteins = queryProteins || undefined;
                     html += '<div class="grid-item ' + protein.localizations.localizations[0].replace(/\s|\//g, "_") + '" style="border-color:' + localizations[protein.localizations.localizations[0]].color + '"><p>' + protein.uniprotId + '</p><div class="cubescontainer">';
                 } else {
                     html += '<div class="grid-item ' + protein.localizations.localizations.map(function(localization){
-                        return localization.replace(/\s|\//g, "_")
-                    }).join(' ') + '"><p>' + protein.uniprotId + '</p><div class="cubescontainer">';
+                            return localization.replace(/\s|\//g, "_")
+                        }).join(' ') + '"><p>' + protein.uniprotId + '</p><div class="cubescontainer">';
                 }
 
                 protein.localizations.localizations.forEach(function(localization){
@@ -114,7 +115,7 @@ var queryProteins = queryProteins || undefined;
 
 $('.ui.search').search({
     apiSettings: {
-        action: 'get from proteins',
+        action: 'get from temperature reads',
 
     },
     minCharacters : 2,
@@ -138,28 +139,8 @@ $('.ui.search').search({
         response.forEach(function(protein){
             var html = '';
 
-            if(protein.localizations && protein.localizations.localizations && protein.localizations.localizations.length > 0){
-                if(!(protein.localizations.localizations.length > 1)){
-                    html += '<div class="grid-item ' + protein.localizations.localizations[0].replace(/\s|\//g, "_") + '" style="border-color:' + localizations[protein.localizations.localizations[0]].color + '"><p>' + protein.uniprotId + '</p><div class="cubescontainer">';
-                } else {
-                    html += '<div class="grid-item ' + protein.localizations.localizations.map(function(localization){
-                        return localization.replace(/\s|\//g, "_")
-                    }).join(' ') + '"><p>' + protein.uniprotId + '</p><div class="cubescontainer">';
-                }
-
-                protein.localizations.localizations.forEach(function(localization){
-                    html += '<div class="cube" data-localization="' + localization.replace(/\s|\//g, "_") + '" style="background-color:' + localizations[localization].color + ';"></div>';
-                });
-
-                html += '</div>';
-            } else {
-                html += '<div class="grid-item"><p>' + protein.uniprotId + '</p>'
-            }
-
-            if(protein.interactions && protein.interactions.partners && protein.interactions.partners.length > 0){
-                html += '<div class="interactionCount">' + protein.interactions.partners.length + '</div>'
-            }
-
+            html += '<div class="grid-item"><p>' + protein.uniprotId + '</p>';
+            html += '<div class="curvesCount">' + protein.reads.length + '</div>';
             html += '</div>';
 
             var element = $(html);

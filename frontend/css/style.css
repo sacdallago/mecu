@@ -109,23 +109,7 @@
     font-weight: bold;
 }
 
-.cubescontainer {
-    display: inline-flex;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-}
-
-.cube {
-    width: 2em;
-    height: 2em;
-    margin-right: 2px;
-    cursor: pointer;
-}
-
-.interactionCount {
+.curvesCount {
     position: absolute;
     bottom: 1px;
     right: 3px;
@@ -154,6 +138,6 @@
     min-height: 1em;
 }
 
-.locButton {
+.clearButton {
     cursor: pointer;
 }
