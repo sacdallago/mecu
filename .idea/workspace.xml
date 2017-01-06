@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="373c7af5-d2e0-4bd7-85bd-7f084f8ad9e2" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/temperatureReads.js" afterPath="$PROJECT_DIR$/app/controllers/temperatureReads.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frontend/css/style.css" afterPath="$PROJECT_DIR$/frontend/css/style.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/frontend.js" afterPath="$PROJECT_DIR$/app/controllers/frontend.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frontend/js/search.js" afterPath="$PROJECT_DIR$/frontend/js/search.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frontend/views/search.pug" afterPath="$PROJECT_DIR$/frontend/views/search.pug" />
     </list>
@@ -24,15 +23,13 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="search.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="search.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/frontend/js/search.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="59">
-              <caret line="130" column="0" lean-forward="true" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
+            <state relative-caret-position="1139">
+              <caret line="106" column="34" lean-forward="false" selection-start-line="106" selection-start-column="34" selection-end-line="106" selection-end-column="34" />
               <folding>
-                <marker date="1483693268000" expanded="true" signature="2363:2376" ph="..." />
-                <marker date="1483693268000" expanded="true" signature="3049:3108" ph="..." />
-                <marker date="1483693268000" expanded="true" signature="4618:4722" ph="..." />
+                <marker date="1483696331000" expanded="true" signature="2349:2453" ph="..." />
               </folding>
             </state>
           </provider>
@@ -41,14 +38,34 @@
       <file leaf-file-name="search.pug" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/views/search.pug">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="26" lean-forward="false" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
+            <state relative-caret-position="254">
+              <caret line="18" column="63" lean-forward="false" selection-start-line="18" selection-start-column="63" selection-end-line="18" selection-end-column="63" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="style.css" pinned="false" current-in-tab="true">
+      <file leaf-file-name="frontend.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/frontend.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="75">
+              <caret line="30" column="10" lean-forward="true" selection-start-line="30" selection-start-column="10" selection-end-line="30" selection-end-column="10" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="temperatureReads.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/temperatureReads.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="510">
+              <caret line="45" column="62" lean-forward="true" selection-start-line="45" selection-start-column="62" selection-end-line="45" selection-end-column="62" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="style.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/css/style.css">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="152">
@@ -95,7 +112,6 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/frontend/views/protein.pug" />
-        <option value="$PROJECT_DIR$/app/controllers/frontend.js" />
         <option value="$PROJECT_DIR$/config.js" />
         <option value="$PROJECT_DIR$/app/models/proteins.js" />
         <option value="$PROJECT_DIR$/app/models/meltingRead.js" />
@@ -120,9 +136,10 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/app/controllers/temperatureReads.js" />
-        <option value="$PROJECT_DIR$/frontend/js/search.js" />
-        <option value="$PROJECT_DIR$/frontend/views/search.pug" />
         <option value="$PROJECT_DIR$/frontend/css/style.css" />
+        <option value="$PROJECT_DIR$/app/controllers/frontend.js" />
+        <option value="$PROJECT_DIR$/frontend/views/search.pug" />
+        <option value="$PROJECT_DIR$/frontend/js/search.js" />
       </list>
     </option>
   </component>
@@ -301,12 +318,12 @@
       <workItem from="1483612769043" duration="10427000" />
       <workItem from="1483677219920" duration="598000" />
       <workItem from="1483679304287" duration="2880000" />
-      <workItem from="1483690676458" duration="4309000" />
+      <workItem from="1483690676458" duration="5241000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27570000" />
+    <option name="totallyTimeSpent" value="28502000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -543,13 +560,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/frontend.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-390">
-          <caret line="8" column="28" lean-forward="false" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/services/frontend.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
@@ -664,26 +674,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/temperatureReads.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-106">
-          <caret line="45" column="62" lean-forward="true" selection-start-line="45" selection-start-column="62" selection-end-line="45" selection-end-column="62" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/js/search.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="59">
-          <caret line="130" column="0" lean-forward="true" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
-          <folding>
-            <marker date="1483693268000" expanded="true" signature="2363:2376" ph="..." />
-            <marker date="1483693268000" expanded="true" signature="3049:3108" ph="..." />
-            <marker date="1483693268000" expanded="true" signature="4618:4722" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/frontend/views/error.pug">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
@@ -696,14 +686,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/views/search.pug">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="26" lean-forward="false" selection-start-line="10" selection-start-column="26" selection-end-line="10" selection-end-column="26" />
           <folding />
         </state>
       </provider>
@@ -721,6 +703,40 @@
         <state relative-caret-position="152">
           <caret line="61" column="30" lean-forward="false" selection-start-line="61" selection-start-column="30" selection-end-line="61" selection-end-column="30" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/temperatureReads.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="45" column="62" lean-forward="true" selection-start-line="45" selection-start-column="62" selection-end-line="45" selection-end-column="62" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/frontend.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="30" column="10" lean-forward="true" selection-start-line="30" selection-start-column="10" selection-end-line="30" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/views/search.pug">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="18" column="63" lean-forward="false" selection-start-line="18" selection-start-column="63" selection-end-line="18" selection-end-column="63" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/js/search.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1139">
+          <caret line="106" column="34" lean-forward="false" selection-start-line="106" selection-start-column="34" selection-end-line="106" selection-end-column="34" />
+          <folding>
+            <marker date="1483696331000" expanded="true" signature="2349:2453" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>

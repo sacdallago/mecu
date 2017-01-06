@@ -48,60 +48,6 @@ $('.clearButton').on('click', function(){
 // Get the searchInput element: used to read the value of it later and reset the URI with the right query
 const searchInput = $('.prompt.inline');
 
-// Set val of searchInput equal to query element, if any
-(function(){
-    const currentUri = URI(window.location.href);
-    const query = currentUri.search(true);
-    if(query && query.q){
-        searchInput.val(query.q);
-    }
-})();
-
-// If I have get proteins from the backend after sending the request, add them to grid
-var queryProteins = queryProteins || undefined;
-(function(){
-    if(queryProteins !== undefined){
-        // Grid
-        grid.empty();
-
-        var items = [];
-
-        queryProteins.forEach(function(protein){
-            var html = '';
-
-            if(protein.localizations && protein.localizations.localizations && protein.localizations.localizations.length > 0){
-                if(!(protein.localizations.localizations.length > 1)){
-                    html += '<div class="grid-item ' + protein.localizations.localizations[0].replace(/\s|\//g, "_") + '" style="border-color:' + localizations[protein.localizations.localizations[0]].color + '"><p>' + protein.uniprotId + '</p><div class="cubescontainer">';
-                } else {
-                    html += '<div class="grid-item ' + protein.localizations.localizations.map(function(localization){
-                            return localization.replace(/\s|\//g, "_")
-                        }).join(' ') + '"><p>' + protein.uniprotId + '</p><div class="cubescontainer">';
-                }
-
-                protein.localizations.localizations.forEach(function(localization){
-                    html += '<div class="cube" data-localization="' + localization.replace(/\s|\//g, "_") + '" style="background-color:' + localizations[localization].color + ';"></div>';
-                });
-
-                html += '</div>';
-            } else {
-                html += '<div class="grid-item"><p>' + protein.uniprotId + '</p>'
-            }
-
-            if(protein.interactions && protein.interactions.partners && protein.interactions.partners.length > 0){
-                html += '<div class="interactionCount">' + protein.interactions.partners.length + '</div>'
-            }
-
-            html += '</div>';
-
-            var element = $(html);
-            element.data("protein", protein);
-            items.push(element[0]);
-        });
-
-        grid.isotope('insert', items);
-    }
-})();
-
 
 $('.ui.search').search({
     apiSettings: {
@@ -151,3 +97,13 @@ $('.ui.search').search({
         return false;
     },
 });
+
+// Set val of searchInput equal to query element, if any
+(function(){
+    const currentUri = URI(window.location.href);
+    const query = currentUri.search(true);
+    if(query && query.q){
+        searchInput.val(query.q);
+        searchInput.trigger('focus');
+    }
+})();
