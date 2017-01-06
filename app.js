@@ -125,6 +125,7 @@ if (cluster.isMaster) {
         // Export static folders
         app.use("/public/js", express.static(path.join(__dirname, "frontend", "js")));
         app.use("/public/css", express.static(path.join(__dirname, "frontend", "css")));
+        app.use("/public/libs/mecu-viz", express.static(require.resolve("mecu-viz")));
         app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
         app.use("/public", express.static(path.join(__dirname, "frontend", "public")));
         app.use(favicon(path.join(__dirname, "frontend", "public", "images", "cell.ico")));

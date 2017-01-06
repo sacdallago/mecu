@@ -38,7 +38,8 @@
         "node-uuid": "latest",
         "serve-favicon": "latest",
         "webpack": "latest",
-        "mecu-parser": "git@github.com:sacdallago/mecu-parser.git"
+        "mecu-parser": "git@github.com:sacdallago/mecu-parser.git",
+        "mecu-viz": "git@github.com:sacdallago/mecu-viz.git"
     },
     "devDependencies": {
     },

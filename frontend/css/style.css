@@ -97,8 +97,8 @@
 
 .grid-item {
     text-align: center;
-    min-height: 10em;
-    min-width: 10em;
+    min-height: 15em;
+    min-width: 15em;
     border: 2px solid rgba(66, 66, 66, 0.57);
     cursor: pointer;
 }

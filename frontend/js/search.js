@@ -139,7 +139,7 @@ $('.ui.search').search({
         response.forEach(function(protein){
             var html = '';
 
-            html += '<div class="grid-item"><p>' + protein.uniprotId + '</p>';
+            html += '<div class="grid-item" id="' + protein.uniprotId + '"><p>' + protein.uniprotId + '</p>';
             html += '<div class="curvesCount">' + protein.reads.length + '</div>';
             html += '</div>';
 
@@ -149,6 +149,11 @@ $('.ui.search').search({
         });
 
         grid.isotope('insert', items);
+
+        response.forEach(function(protein){
+            var testCurve = new Mecu({element: "#"+protein.uniprotId, width:"150", height:"150"});
+            testCurve.add(protein.reads);
+        });
 
         return false;
     },
