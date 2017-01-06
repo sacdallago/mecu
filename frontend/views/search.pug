@@ -1,15 +1,16 @@
 extends base
 
 block content
-    #spacedText
-        .ui.label.clearButton
-        .ui.input.search
-            input(type="text", name="prot", placeholder="Search protein").prompt.inline
-        .space
-        .grid
-
     #title
         a(href="/") MeCu
+
+    #spacedText
+        .text-center
+            .ui.input.search
+                input(type="text", name="prot", placeholder="Search protein").prompt.inline
+        .ui.label.attached.clearButton
+        .space
+        .grid
         
 block scripts
     - var delta = 50

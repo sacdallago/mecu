@@ -19,21 +19,11 @@ const modal = function(protein){
     // '<i class="close icon"></i>';
     html += '<div class="header">' + protein.uniprotId + '</div>';
     html += '<div class="content">';
-    html += '<p><strong>Primary gene:</strong> ' + protein.geneName + '</p>';
-    if(protein.proteinName){
-        html += '<p><strong>Protein name:</strong> ' + protein.proteinName + '</p>';
-    }
-    if(protein.localizations && protein.localizations.localizations && protein.localizations.localizations.length > 0){
-        html += '<p><strong>Localizations:</strong> ' + protein.localizations.localizations.map(function(element){return element + " "}) + '</p>';
-    }
-    if(protein.interactions && protein.interactions.partners && protein.interactions.partners.length > 0){
-        html += '<p><strong>Interaction partners:</strong> ' + protein.interactions.partners.map(function(element){return element.interactor + " "}) + '</p>';
-    }
     html += '</div>';
     html += '<div class="actions"><a href="/protein/' + protein.uniprotId + '" class="ui approve button">Go to protein page</a></div>';
     html += '</div>';
     $(html).modal('show');
-}
+};
 
 grid.on('click', '.grid-item', function() {
     modal($(this).data('protein'));
@@ -139,7 +129,10 @@ $('.ui.search').search({
         response.forEach(function(protein){
             var html = '';
 
-            html += '<div class="grid-item" id="' + protein.uniprotId + '"><p>' + protein.uniprotId + '</p>';
+            html += '<div class="grid-item"' + protein.reads.map(function(expRead){
+                    return (expRead.experiment + "").replace(/\s|\//g, "_")
+                }).join(' ') + ' id="' + protein.uniprotId + '">';
+            html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
             html += '<div class="curvesCount">' + protein.reads.length + '</div>';
             html += '</div>';
 
@@ -151,7 +144,7 @@ $('.ui.search').search({
         grid.isotope('insert', items);
 
         response.forEach(function(protein){
-            var testCurve = new Mecu({element: "#"+protein.uniprotId, width:"150", height:"150"});
+            var testCurve = new Mecu({element: "#"+protein.uniprotId, width:"200", height:"200"});
             testCurve.add(protein.reads);
         });
 

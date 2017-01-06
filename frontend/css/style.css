@@ -1,74 +1,27 @@
+body {
+    background-color: #fbfbfb;
+}
+
 .ui.main.container {
     padding-bottom: 1em;
-    padding-top: 10rem;
+    padding-top: 5rem;
     height: 100%;
-}
-
-#map {
-    width: 100%;
-    height: 100%;
-}
-
-#locMap {
-    width: 100%;
-    height: 200px;
-}
-
-#interMap {
-    width: 100%;
-    height: 200px;
 }
 
 #title {
-    position: relative;
     font-size: 5rem;
-    width:5rem;
     color: rgba(165, 61, 61, 0.81);
-    -ms-transform: rotate(270deg); /* IE 9 */
-    -webkit-transform: rotate(270deg); /* Chrome, Safari, Opera */
-    transform: rotate(270deg);
-    bottom: 1.7rem;
     text-decoration: underline;
+    text-align: center;
+    height: 5rem;
 }
 
 #title > a {
     color: inherit;
 }
 
-.card {
-    background-color: rgba(0,0,0,.6);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow:hidden
-}
-
-.card > img {
-    flex-shrink:0;
-    min-width:100%;
-    min-height:100%
-}
-
 #spacedText {
-    margin-left: 8rem;
     min-height: 16rem;
-}
-
-#full {
-    margin-left: 8rem;
-    line-height: 3rem;
-    font-size: 3rem;
-    min-height: 16rem;
-}
-#full > p {
-    margin-bottom: 1rem;
-    line-height: 3rem;
-    text-align: justify;
-}
-
-#full > a {
-    color: black;
-    text-decoration: underline;
 }
 
 .gigantic {
@@ -79,26 +32,14 @@
     color: rgba(75, 208, 106, 0.66);
 }
 
-
-.leaflet-container {
-    background: #fff;
-}
-
-
-/* Fade of image */
-
-.leaflet-image-layer {
-    -webkit-transition: opacity 0.5s ease-in-out;
-    -moz-transition: opacity 0.5s ease-in-out;
-    transition: opacity 0.5s ease-in-out;
-}
-
 /* grid */
 
 .grid-item {
     text-align: center;
-    min-height: 15em;
-    min-width: 15em;
+    min-height: 200px;
+    min-width: 200px;
+    font-size: 0.2em;
+    padding:0;
     border: 2px solid rgba(66, 66, 66, 0.57);
     cursor: pointer;
 }
@@ -117,17 +58,10 @@
     opacity: .7;
 }
 
-.interactionStrength {
-    position: absolute;
-    bottom: 1px;
-    left: 3px;
-    font-size: 13pt;
-}
-
 .prompt.inline {
-    border: 0 !important;
+    border: .0001em solid #999 !important;
     font-size: 2em !important;
-    padding: 0 !important;
+    padding: 0.1em !important;
     border-radius: 0 !important;
     opacity: 1 !important;
     color: black !important;
@@ -140,4 +74,8 @@
 
 .clearButton {
     cursor: pointer;
+}
+
+.text-center {
+    text-align: center;
 }

@@ -23,24 +23,28 @@ module.exports = function(context) {
                                     uniprotId: uniprotId.get("uniprotId")
                                 };
 
-                                element.reads = experimentIds.map(function(experimentId) {
-                                    let e = {
-                                        experiment: experimentId.get('id')
-                                    };
+                                element.reads = experimentIds
+                                    .map(function(experimentId) {
+                                        let e = {
+                                            experiment: experimentId.get('id')
+                                        };
 
-                                    e.reads = reads
-                                        .filter(function (tempReads) {
-                                            return tempReads.uniprotId == element.uniprotId && tempReads.experiment == e.experiment;
-                                        })
-                                        .map(function(fullObj) {
-                                            return {
-                                                t: fullObj.temperature,
-                                                r: fullObj.ratio,
-                                            }
-                                        });
+                                        e.reads = reads
+                                            .filter(function (tempReads) {
+                                                return tempReads.uniprotId == element.uniprotId && tempReads.experiment == e.experiment;
+                                            })
+                                            .map(function(fullObj) {
+                                                return {
+                                                    t: fullObj.temperature,
+                                                    r: fullObj.ratio,
+                                                }
+                                            });
 
-                                    return e;
-                                });
+                                        return e;
+                                    })
+                                    .filter(function(experimentRelativeReads){
+                                        return experimentRelativeReads.reads.length > 0;
+                                    });
 
                                 return element;
                             });
