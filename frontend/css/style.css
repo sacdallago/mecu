@@ -58,6 +58,13 @@ body {
     opacity: .7;
 }
 
+.experimentNumber {
+    position: absolute;
+    bottom: 1px;
+    right: 3px;
+    font-size: 13pt;
+}
+
 .prompt.inline {
     border: .0001em solid #999 !important;
     font-size: 2em !important;

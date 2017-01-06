@@ -3,6 +3,7 @@ $.fn.api.settings.api = {
     'get from temperature reads': '/api/reads/temperature/search/{query}'
 };
 
+let aggregate = true;
 
 const grid = $('.grid').isotope({
     // main isotope options
@@ -13,6 +14,8 @@ const grid = $('.grid').isotope({
         gutter: 10
     }
 });
+
+curves = [];
 
 const modal = function(protein){
     var html = '<div class="ui modal">';
@@ -63,35 +66,83 @@ $('.ui.search').search({
 
         // Update URL query
         var currentUri = URI(window.location.href);
-        currentUri.search({'q': searchInput.val()});
+        let query = {'q': searchInput.val()};
+        if(aggregate === false){
+            query.a = false;
+        }
+        currentUri.search(query);
 
-        window.history.replaceState({'q': searchInput.val()}, "MeCu", currentUri.resource());
+        window.history.replaceState(query, "MeCu", currentUri.resource());
 
         // Grid
         grid.empty();
 
+        // Curves
+        curves = [];
+
         var items = [];
 
-        response.forEach(function(protein){
-            var html = '';
+        response.forEach(function(responseProtein){
+            let proteins = [];
 
-            html += '<div class="grid-item"' + protein.reads.map(function(expRead){
-                    return (expRead.experiment + "").replace(/\s|\//g, "_")
-                }).join(' ') + ' id="' + protein.uniprotId + '">';
-            html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-            html += '<div class="curvesCount">' + protein.reads.length + '</div>';
-            html += '</div>';
+            if(aggregate){
+                proteins.push(responseProtein);
+            } else {
+                responseProtein.reads.forEach(function(read){
+                    proteins.push({
+                        uniprotId: responseProtein.uniprotId,
+                        reads: [read]
+                    });
+                });
+            }
 
-            var element = $(html);
-            element.data("protein", protein);
-            items.push(element[0]);
+
+            proteins.forEach(function(protein) {
+                var html = '';
+
+                html += '<div class="grid-item"' + protein.reads.map(function(expRead){
+                        return (expRead.experiment + "").replace(/\s|\//g, "_")
+                    }).join('E') + ' id="' + protein.uniprotId + protein.reads.map(function(expRead){
+                        return (expRead.experiment + "").replace(/\s|\//g, "_")
+                    }).join('E') + '">';
+
+                html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
+                if(protein.reads.length > 1){
+                    // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
+                } else {
+                    html += '<div class="experimentNumber">' + protein.reads[0].experiment + '</div>';
+                }
+                html += '</div>';
+
+                var element = $(html);
+                element.data("protein", protein);
+                items.push(element[0]);
+            });
         });
 
         grid.isotope('insert', items);
 
-        response.forEach(function(protein){
-            var testCurve = new Mecu({element: "#"+protein.uniprotId, width:"200", height:"200"});
-            testCurve.add(protein.reads);
+        response.forEach(function(responseProtein){
+            let proteins = [];
+
+            if(aggregate){
+                proteins.push(responseProtein);
+            } else {
+                responseProtein.reads.forEach(function(read){
+                    proteins.push({
+                        uniprotId: responseProtein.uniprotId,
+                        reads: [read]
+                    });
+                });
+            }
+
+            proteins.forEach(function(protein) {
+                let curve = new Mecu({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
+                    return (expRead.experiment + "").replace(/\s|\//g, "_")
+                }).join('E'), width:"200", height:"200"});
+                curve.add(protein.reads);
+                curves.push(curve);
+            });
         });
 
         return false;
@@ -104,6 +155,9 @@ $('.ui.search').search({
     const query = currentUri.search(true);
     if(query && query.q){
         searchInput.val(query.q);
+        if(query.a){
+            aggregate = false;
+        }
         searchInput.trigger('focus');
     }
 })();
