@@ -140,7 +140,7 @@ $('.ui.search').search({
                 let curve = new Mecu({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
                     return (expRead.experiment + "").replace(/\s|\//g, "_")
                 }).join('E'), width:"200", height:"200"});
-                curve.add(protein.reads);
+                curve.add(protein);
                 curves.push(curve);
             });
         });
