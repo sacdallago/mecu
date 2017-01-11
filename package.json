@@ -39,7 +39,8 @@
         "serve-favicon": "latest",
         "webpack": "latest",
         "mecu-parser": "git@github.com:sacdallago/mecu-parser.git",
-        "mecu-viz": "git@github.com:sacdallago/mecu-viz.git"
+        "mecu-viz": "git@github.com:sacdallago/mecu-viz.git",
+	"mecu-graph": "git@github.com:sacdallago/mecu-graph.git"
     },
     "devDependencies": {
     },

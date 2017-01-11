@@ -17,19 +17,22 @@ const grid = $('.grid').isotope({
 
 curves = [];
 
-const modal = function(protein){
-    var html = '<div class="ui modal">';
-    // '<i class="close icon"></i>';
-    html += '<div class="header">' + protein.uniprotId + '</div>';
-    html += '<div class="content">';
-    html += '</div>';
-    html += '<div class="actions"><a href="/protein/' + protein.uniprotId + '" class="ui approve button">Go to protein page</a></div>';
-    html += '</div>';
-    $(html).modal('show');
-};
-
-grid.on('click', '.grid-item', function() {
-    modal($(this).data('protein'));
+grid.on('click', '.grid-item', function(){
+    let self = this;
+    return StorageManager.toggle($(this).data('protein'), function(inStorage, added, removed) {
+        if(added === 0){
+            $(self).removeClass('inStore');
+        } else if(removed === 0) {
+            $(self).addClass('inStore');
+        } else {
+            if ($(self).hasClass('inStore')){
+                $(self).removeClass('inStore');
+            }
+            if (!$(self).hasClass('partiallyInStore')){
+                $(self).addClass('partiallyInStore');
+            }
+        }
+    });
 });
 
 grid.on('click', '.cube', function(event) {
@@ -116,6 +119,13 @@ $('.ui.search').search({
 
                 var element = $(html);
                 element.data("protein", protein);
+                StorageManager.has(protein, function(storage, hasCount) {
+                    if(hasCount === protein.reads.length){
+                        element.addClass('inStore');
+                    } else if(hasCount > 0) {
+                        element.addClass('partiallyInStore');
+                    }
+                });
                 items.push(element[0]);
             });
         });
@@ -140,6 +150,7 @@ $('.ui.search').search({
                 let curve = new Mecu({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
                     return (expRead.experiment + "").replace(/\s|\//g, "_")
                 }).join('E'), width:"200", height:"200"});
+
                 curve.add(protein);
                 curves.push(curve);
             });

@@ -41,7 +41,8 @@ body {
     min-width: 200px;
     font-size: 0.2em;
     padding:0;
-    border: 2px solid rgba(66, 66, 66, 0.57);
+    border: 1em solid rgba(66, 66, 66, 0.57);
+    transition: border-color 1000ms ease;
     cursor: pointer;
 }
 
@@ -49,6 +50,14 @@ body {
     line-height: 10em;
     margin: 0;
     font-weight: bold;
+}
+
+.inStore {
+    border-color: rgba(41, 151, 56, 1);
+}
+
+.partiallyInStore {
+    border-color: rgba(180, 174, 52, 1);
 }
 
 .curvesCount {
@@ -86,4 +95,9 @@ body {
 
 .text-center {
     text-align: center;
+}
+
+#graph {
+    width: 100%;
+    height: 300px;
 }
