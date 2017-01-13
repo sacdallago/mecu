@@ -30,6 +30,12 @@ module.exports = function(context) {
             });
         },
 
+        curves: function(request, response) {
+            return response.render('curves', {
+                title: 'My Selected curves'
+            });
+        },
+
         protein: function(request, response) {
             const uniprotId = request.params.uniprotId;
 

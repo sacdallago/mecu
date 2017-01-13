@@ -172,3 +172,24 @@ $('.ui.search').search({
         searchInput.trigger('focus');
     }
 })();
+
+
+$('.item.filterExperiments').on('click', function(event){
+    event.preventDefault();
+
+    // Update URL query
+    var currentUri = URI(window.location.href);
+    let query = currentUri.search(true);
+    if(aggregate === false){
+        query.a = false;
+        aggregate = true;
+    } else {
+        delete query.a;
+        aggregate = false;
+    }
+    currentUri.search(query);
+
+    window.history.replaceState(query, "MeCu", currentUri.resource());
+
+    searchInput.trigger('focus');
+});

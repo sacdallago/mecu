@@ -1,0 +1,23 @@
+extends base
+
+block content
+    .ui.vertically.divided.grid
+        .two.column.row
+            .column
+                #curvesGraph
+            .column
+                #nodesGraph
+    .space
+    .isoGrid
+
+block settings
+    .item
+        a(href='/') Search
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/libs/mecu-viz")
+    script(type="text/javascript", src="/public/libs/mecu-graph")
+    script(type="text/javascript", src="/public/js/curves.js")
