@@ -1,6 +1,7 @@
 extends base
 
 block content
+    h1 Global View
     .ui.vertically.divided.grid
         .two.column.row
             .column
@@ -8,7 +9,9 @@ block content
             .column
                 #nodesGraph
     .space
+    h1 Selected Proteins
     .isoGrid
+    .space
 
 block settings
     .item
@@ -18,6 +21,7 @@ block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/libs/mecu-viz")
+    script(type="text/javascript", src="/public/libs/mecu-line")
     script(type="text/javascript", src="/public/libs/mecu-graph")
+    script(type="text/javascript", src="/public/libs/mecu-utils")
     script(type="text/javascript", src="/public/js/curves.js")

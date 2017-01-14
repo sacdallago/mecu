@@ -77,7 +77,7 @@ function loadProteins() {
     grid.isotope('insert', items);
 
     proteins.forEach(function(protein) {
-        let curve = new Mecu({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
+        let curve = new MecuLine({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
             return (expRead.experiment + "").replace(/\s|\//g, "_")
         }).join('E'), width:"200", height:"200"});
 
@@ -88,7 +88,7 @@ function loadProteins() {
 
 function populateGlobalsGraphs(){
     let proteins = StorageManager.get();
-    let curve = new Mecu({element: "#curvesGraph", axes: true});
+    let curve = new MecuLine({element: "#curvesGraph", axes: true});
     curve.add(proteins);
 
     let graph = new MecuGraph({element: "#nodesGraph"});

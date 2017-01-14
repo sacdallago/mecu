@@ -147,7 +147,7 @@ $('.ui.search').search({
             }
 
             proteins.forEach(function(protein) {
-                let curve = new Mecu({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
+                let curve = new MecuLine({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
                     return (expRead.experiment + "").replace(/\s|\//g, "_")
                 }).join('E'), width:"200", height:"200"});
 
