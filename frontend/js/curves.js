@@ -98,16 +98,3 @@ function populateGlobalsGraphs(){
 populateGlobalsGraphs();
 
 loadProteins();
-
-// Set val of searchInput equal to query element, if any
-(function(){
-    const currentUri = URI(window.location.href);
-    const query = currentUri.search(true);
-    if(query && query.q){
-        searchInput.val(query.q);
-        if(query.a){
-            aggregate = false;
-        }
-        searchInput.trigger('focus');
-    }
-})();
