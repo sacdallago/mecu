@@ -129,6 +129,7 @@ if (cluster.isMaster) {
         app.use("/public/libs/mecu-graph", express.static(require.resolve("mecu-graph")));
         app.use("/public/libs/mecu-utils", express.static(require.resolve("mecu-utils")));
         app.use("/public/libs/mecu-line", express.static(require.resolve("mecu-line")));
+        app.use("/public/libs/disi", express.static(require.resolve("disi")));
 
         app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
         app.use("/public", express.static(path.join(__dirname, "frontend", "public")));

@@ -40,7 +40,8 @@
         "webpack": "latest",
         "mecu-utils": "git@github.com:sacdallago/mecu-utils.git",
         "mecu-line": "git@github.com:sacdallago/mecu-line.git",
-        "mecu-graph": "git@github.com:sacdallago/mecu-graph.git"
+        "mecu-graph": "git@github.com:sacdallago/mecu-graph.git",
+        "disi": "latest"
     },
     "devDependencies": {
     },

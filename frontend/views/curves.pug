@@ -8,14 +8,18 @@ block content
                 #curvesGraph
             .column
                 #nodesGraph
+                .space
+                .ui.button.manhattan Manhattan
+                .ui.button.euclidian Euclidian
+                .ui.button.minkowski Minkowski
     .space
     h1 Selected Proteins
     .isoGrid
     .space
 
 block settings
-    .item
-        a(href='/') Search
+    .section
+    .item.changeDistanceMetric Change Distance Metric
 
 block scripts
     - var delta = 50
@@ -24,4 +28,5 @@ block scripts
     script(type="text/javascript", src="/public/libs/mecu-line")
     script(type="text/javascript", src="/public/libs/mecu-graph")
     script(type="text/javascript", src="/public/libs/mecu-utils")
+    script(type="text/javascript", src="/public/libs/disi")
     script(type="text/javascript", src="/public/js/curves.js")

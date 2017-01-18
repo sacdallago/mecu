@@ -12,6 +12,23 @@ const grid = $('.isoGrid').isotope({
     }
 });
 
+const changeDistanceModal = function(){
+    var html = '<div class="ui modal">';
+    html += '<div class="content">';
+    html += '<div class="ui  button">Manhattan</div>';
+    html += '<div class="ui  button">Euclidian</div>';
+    html += '<div class="ui  button">Minkowski</div>';
+    html += '</div>';
+    html += '</div>';
+    $(html).modal('show');
+};
+
+$('.item.changeDistanceMetric').on('click', function(event){
+    event.preventDefault();
+
+    changeDistanceModal();
+});
+
 curves = [];
 
 grid.on('click', '.grid-item', function(){
@@ -86,15 +103,48 @@ function loadProteins() {
     });
 };
 
+let globalCurve;
+let globalGraph;
+
 function populateGlobalsGraphs(){
     let proteins = StorageManager.get();
-    let curve = new MecuLine({element: "#curvesGraph", axes: true});
-    curve.add(proteins);
+    globalCurve = new MecuLine({element: "#curvesGraph", axes: true});
+    globalCurve.add(proteins);
 
-    let graph = new MecuGraph({element: "#nodesGraph"});
-    graph.add(proteins);
+    globalGraph = new MecuGraph({element: "#nodesGraph"});
+    globalGraph.add(proteins);
 }
 
 populateGlobalsGraphs();
 
 loadProteins();
+
+// Change Distance Metrics logic
+
+$('.ui.button.manhattan').on('click', function(event){
+    event.preventDefault();
+
+    globalGraph.changeDistanceMetric(Disi.manhattan);
+});
+
+$('.ui.button.euclidian').on('click', function(event){
+    event.preventDefault();
+
+    globalGraph.changeDistanceMetric(Disi.euclidian);
+});
+
+$('.ui.button.minkowski').on('click', function(event){
+    event.preventDefault();
+
+    var html = '<div class="ui modal small">';
+    html += '<div class="actions">' +
+        '<div class="ui input"><input type="number" placeholder="rank"></div>' +
+        '<div class="ui approve button">Apply</div>' +
+        '</div>';
+    html += '</div>';
+    $(html).modal('show');
+
+    globalGraph.changeDistanceMetric(function(A,B) {
+        return Disi.minkowski(A,B,3);
+    });
+});
