@@ -75,6 +75,28 @@ body {
     font-size: 13pt;
 }
 
+.cube {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 100%;
+    background-color: transparent;
+    transition: background-color 1000ms ease;
+}
+
+.partiallyInStore > .cube {
+    background-color: rgba(180, 174, 52, 1);
+}
+
+.inStore > .cube {
+    background-color: rgba(41, 151, 56, 1);
+}
+
+
+/* Search */
+
 .prompt.inline {
     border: .0001em solid #999 !important;
     font-size: 2em !important;
@@ -95,11 +117,6 @@ body {
 
 .text-center {
     text-align: center;
-}
-
-#graph {
-    width: 100%;
-    height: 300px;
 }
 
 /* curves */

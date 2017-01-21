@@ -108,7 +108,7 @@ let globalGraph;
 
 function populateGlobalsGraphs(){
     let proteins = StorageManager.get();
-    globalCurve = new MecuLine({element: "#curvesGraph", axes: true});
+    globalCurve = new MecuLine({element: "#curvesGraph", minTemp: 37, maxTemp: 64 , axes: true});
     globalCurve.add(proteins);
 
     globalGraph = new MecuGraph({element: "#nodesGraph"});

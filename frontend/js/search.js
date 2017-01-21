@@ -67,6 +67,8 @@ $('.ui.search').search({
     },
     onResults: function(response) {
 
+        //renderProgress();
+
         // Update URL query
         var currentUri = URI(window.location.href);
         let query = {'q': searchInput.val()};
@@ -110,10 +112,12 @@ $('.ui.search').search({
                     }).join('E') + '">';
 
                 html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-                if(protein.reads.length > 1){
-                    // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
-                } else {
-                    html += '<div class="experimentNumber">' + protein.reads[0].experiment + '</div>';
+                html += '<div class="cube"></div>';
+                if(protein.reads.length == 1){
+                    html += '<div class="experimentNumber">E' + protein.reads[0].experiment + '</div>';
+                } else if(protein.reads.length > 5) {
+                    let notShowing = protein.reads.length - 5;
+                    html += '<div class="experimentNumber">+' + notShowing + '</div>';
                 }
                 html += '</div>';
 
@@ -147,9 +151,15 @@ $('.ui.search').search({
             }
 
             proteins.forEach(function(protein) {
-                let curve = new MecuLine({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
-                    return (expRead.experiment + "").replace(/\s|\//g, "_")
-                }).join('E'), width:"200", height:"200"});
+                let curve = new MecuLine({
+                    element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
+                        return (expRead.experiment + "").replace(/\s|\//g, "_")
+                    }).join('E'), width:"200", height:"200",
+                    limit: 5,
+                    maxTemp: 74,
+                    minRatio: 0,
+                    maxRatio: 1
+                });
 
                 curve.add(protein);
                 curves.push(curve);
