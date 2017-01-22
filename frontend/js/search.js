@@ -156,9 +156,10 @@ $('.ui.search').search({
                         return (expRead.experiment + "").replace(/\s|\//g, "_")
                     }).join('E'), width:"200", height:"200",
                     limit: 5,
-                    maxTemp: 74,
-                    minRatio: 0,
-                    maxRatio: 1
+                    minTemp: 41,
+                    maxTemp: 71,
+                    minRatio: 0.1,
+                    //maxRatio: 1
                 });
 
                 curve.add(protein);

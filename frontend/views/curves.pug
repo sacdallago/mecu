@@ -11,7 +11,18 @@ block content
                 .space
                 .ui.button.manhattan Manhattan
                 .ui.button.euclidian Euclidian
-                .ui.button.minkowski Minkowski
+                .ui.top.right.search.pointing.dropdown.button.minkowski Minkowski
+                    .menu
+                        .item
+                            .ui.input
+                                input(type="number", name="rank", placeholder="3")
+                        .item
+                            .ui.attached.button.submit Save
+
+                .ui.button.supremum Supremum
+                .ui.button.tanimmoto Tanimoto
+                .ui.button.dice Dice coefficient
+                .ui.button.cosine Cosine
     .space
     h1 Selected Proteins
     .isoGrid

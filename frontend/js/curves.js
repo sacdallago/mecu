@@ -108,7 +108,7 @@ let globalGraph;
 
 function populateGlobalsGraphs(){
     let proteins = StorageManager.get();
-    globalCurve = new MecuLine({element: "#curvesGraph", minTemp: 37, maxTemp: 64 , axes: true});
+    globalCurve = new MecuLine({element: "#curvesGraph", minTemp: 37, maxTemp: 65 , axes: true});
     globalCurve.add(proteins);
 
     globalGraph = new MecuGraph({element: "#nodesGraph"});
@@ -133,18 +133,36 @@ $('.ui.button.euclidian').on('click', function(event){
     globalGraph.changeDistanceMetric(Disi.euclidian);
 });
 
-$('.ui.button.minkowski').on('click', function(event){
+$('.ui.button.supremum').on('click', function(event){
     event.preventDefault();
 
-    var html = '<div class="ui modal small">';
-    html += '<div class="actions">' +
-        '<div class="ui input"><input type="number" placeholder="rank"></div>' +
-        '<div class="ui approve button">Apply</div>' +
-        '</div>';
-    html += '</div>';
-    $(html).modal('show');
+    globalGraph.changeDistanceMetric(Disi.supremum);
+});
+
+$('.ui.button.tanimoto').on('click', function(event){
+    event.preventDefault();
 
     globalGraph.changeDistanceMetric(function(A,B) {
-        return Disi.minkowski(A,B,3);
+        return 10*(1-Disi.tanimoto(A,B));
     });
+});
+
+$('.ui.button.dice').on('click', function(event){
+    event.preventDefault();
+
+    globalGraph.changeDistanceMetric(function(A,B) {
+        return 10*(1-Disi.dice(A,B));
+    });
+});
+
+$('.ui.button.cosine').on('click', function(event){
+    event.preventDefault();
+
+    globalGraph.changeDistanceMetric(function(A,B) {
+        return 20*(1-Disi.cosine(A,B));
+    });
+});
+
+$('.ui.dropdown.button.minkowski').dropdown({
+    action: 'nothing'
 });
