@@ -1,0 +1,23 @@
+extends base
+
+block content
+    h1 Submit a new experiment
+    form.ui.form
+        .field
+            label Cell line
+            input(type="text", name="cellLine")
+        .field
+            label Source
+            input(type="file", name="source")
+        .field
+            .ui.slider.checkbox
+                input(type="checkbox", tabindex="0", name="inVivo").hidden
+                label In vivo?
+        .field
+            //input(type=)
+        .ui.button.submit Validate
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/mecu-utils")
+    script(type="text/javascript", src="/public/js/experimentUpload.js")

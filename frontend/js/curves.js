@@ -12,21 +12,28 @@ const grid = $('.isoGrid').isotope({
     }
 });
 
-const changeDistanceModal = function(){
-    var html = '<div class="ui modal">';
-    html += '<div class="content">';
-    html += '<div class="ui  button">Manhattan</div>';
-    html += '<div class="ui  button">Euclidian</div>';
-    html += '<div class="ui  button">Minkowski</div>';
-    html += '</div>';
-    html += '</div>';
-    $(html).modal('show');
-};
-
-$('.item.changeDistanceMetric').on('click', function(event){
+$('.item.proteins').on('click', function(event){
     event.preventDefault();
 
-    changeDistanceModal();
+    var html = '<div class="ui modal">';
+    html += '<div class="header">Selected proteins</div>';
+    html += '<div class="content">';
+    html += '<div class="ui form">';
+    html += '<div class="field">';
+    html += '<textarea class="">';
+    StorageManager.get().forEach(function(protein){
+        html += protein.uniprotId + ", ";
+    });
+    html += '</textarea>';
+    html += '</div>';
+    html += '<div class="field">';
+    html += '<div class="ui submit button">Load proteins</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+
+    $(html).modal('show');
 });
 
 curves = [];

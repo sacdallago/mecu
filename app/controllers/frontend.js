@@ -36,6 +36,12 @@ module.exports = function(context) {
             });
         },
 
+        uploadExperiment: function(request, response) {
+            return response.render('experimentUpload', {
+                title: 'Upload'
+            });
+        },
+
         protein: function(request, response) {
             const uniprotId = request.params.uniprotId;
 

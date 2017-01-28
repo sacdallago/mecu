@@ -6,5 +6,6 @@ module.exports = function(context) {
         //.get('/search', frontendController.search)
         .get('/protein/:uniprotId', frontendController.protein)
         .get('/about', frontendController.about)
+        .get('/upload', frontendController.uploadExperiment)
         .get('/curves', frontendController.curves);
 }
