@@ -3,8 +3,6 @@ module.exports = function(context) {
     context.router
         .get('/', frontendController.search)
         .get('/error', frontendController.error)
-        //.get('/search', frontendController.search)
-        .get('/protein/:uniprotId', frontendController.protein)
         .get('/about', frontendController.about)
         .get('/upload', frontendController.uploadExperiment)
         .get('/curves', frontendController.curves);

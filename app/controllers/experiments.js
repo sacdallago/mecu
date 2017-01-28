@@ -47,7 +47,7 @@ module.exports = function(context) {
                         let newExperiment = {
                             inVivo: inVivo,
                             cellLine: cellLine
-                        }
+                        };
 
                         return context.sequelize.transaction(function(transaction){
                             return experimentsDao.create(newExperiment, {transaction: transaction}).then(function(experiment){

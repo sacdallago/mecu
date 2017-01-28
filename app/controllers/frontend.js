@@ -40,31 +40,6 @@ module.exports = function(context) {
             return response.render('experimentUpload', {
                 title: 'Upload'
             });
-        },
-
-        protein: function(request, response) {
-            const uniprotId = request.params.uniprotId;
-
-            return proteinsDao.findByUniprotId(uniprotId).then(function(requestProtein){
-                if(requestProtein) {
-                    return response.render('protein', {
-                        title: uniprotId,
-                        protein: requestProtein
-                    });
-                } else {
-                    return response.render('404', {
-                        title: 'No protein',
-                        message: "No protein by that name",
-                        error: "No protein by that name"
-                    });
-                }
-            }, function(error){
-                return response.render('error', {
-                    title: 'Error',
-                    message: "Unable to retrieve protein data",
-                    error: error
-                });
-            });
         }
     }
 }

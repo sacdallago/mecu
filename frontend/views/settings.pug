@@ -1,9 +1,18 @@
 //
    Created by chdallago on 1/6/17.
 
-.ui.dropdown.icon.button
+.ui.dropdown.icon.button(style="position: relative; top: -13em;")
     i.angle.down.icon
     .menu
-        .item Profile
-        a(href="/upload").item Upload experiment
+        if user
+            -
+                var name = user.get('displayName');
+                name = name.length > 20 ? name.substr(0.15) + "..." : name;
+            .item= name
+            a(href="/upload").item Upload experiment
+            a(href="/auth/logout").item Logout
+        else
+            a(href="/auth/google").item Login
         block settings
+        .divider
+        a(href="/about").item About

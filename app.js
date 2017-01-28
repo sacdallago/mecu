@@ -7,41 +7,6 @@ const consoleStamp      = require('console-stamp');
 const path              = require('path');
 
 if (cluster.isMaster) {
-    
-    // TODO - Implement webpack bundle of globals!
-    // Build frontend js dependencies and look for changes to rebuild
-    // Run on master to avoid doing this x times
-//    let webpack = require("webpack");
-//
-//    let compiler = webpack({
-//        entry: path.join(__dirname, 'frontend', 'libs', '*.js'),
-//        output: {
-//             path: path.join(__dirname, 'frontend', 'public'),
-//             filename: 'app.js',
-//             libraryTarget: 'var',
-//             library: 'mecu'
-//        }
-//    });
-//
-//    compiler.watch({ // watch options:
-//        aggregateTimeout: 300, // wait so long for more changes
-//        poll: true // use polling instead of native watchers
-//        // pass a number to set the polling interval
-//    }, function(err, stats) {
-//        // ...
-//    });
-//
-//    compiler.run(function(err, stats) {
-//    });
-//// or
-//    compiler.watch({ // watch options:
-//        aggregateTimeout: 300, // wait so long for more changes
-//        poll: true // use polling instead of native watchers
-//        // pass a number to set the polling interval
-//    }, function(err, stats) {
-//        // ...
-//    });
-
     // Setup timestamps for logging
     consoleStamp(console,{
         metadata: function () {
@@ -65,7 +30,6 @@ if (cluster.isMaster) {
         var newWorker = cluster.fork();
         console.log("Spwaning worker " + newWorker.id);
     });
-
 } else {
     // Spawn various workers to listen and answer requests
     const express           = require('express');
@@ -133,16 +97,15 @@ if (cluster.isMaster) {
 
         app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
         app.use("/public", express.static(path.join(__dirname, "frontend", "public")));
-        app.use(favicon(path.join(__dirname, "frontend", "public", "images", "cell.ico")));
+        app.use(favicon(path.join(__dirname, "frontend", "public", "images", "mecu.ico")));
 
         app.use(cookieParser());
-        
+
         // TODO - session and user management
         app.use(session({
             secret: context.config.sessionSecret || 'mecuSecret',
             store: new SequelizeStore({
-                db: context.sequelize,
-                //table: 'logins',
+                db: context.sequelize
             }),
             resave: true,
             saveUninitialized: true,
@@ -158,7 +121,6 @@ if (cluster.isMaster) {
 
         // Configure passport
         const usersDao = context.component('daos').module('users');
-        const loginsDao = context.component('daos').module('logins');
 
         const google = new googleStrategy({
             clientID            : context.config.passport.google.clientId,
@@ -168,45 +130,34 @@ if (cluster.isMaster) {
         }, function(request, accessToken, refreshToken, profile, done) {
             usersDao.findOrCreate({ googleId: profile.id, displayName: profile.displayName })
                 .then(function(user){
-                loginsDao.login(user._id).then(function(loginId){
-                    return done(null, loginId);
+                    // ATTENTION - Seems like sequelize returns an array for findOrCreate!
+                    return done(null, user[0]);
                 }, function(error){
+                    console.error(error);
                     return done(error, null);
                 });
-            }, function(error){
-                return done(error, null);
-            });
         });
 
         passport.use(google);
 
         app.get('/auth/logout', function(request, response){
-            loginsDao.logout(request.user._id).then(function(){
-                request.logout();
-                return response.redirect('/');
+            request.session.destroy(function (err) {
+                response.redirect('/'); //Inside a callback… bulletproof!
             });
         });
 
-        passport.deserializeUser(function(loginId, done) {
-            loginsDao.findById(loginId)
-                .then(function(userId){
-                usersDao.findById(userId).then(function(user){
-                    return done(null, user);
-                }, function(error){
-                    return done(error, null);
+        passport.serializeUser(function(user, done) {
+            done(null, user.get("googleId"));
+        });
+
+        passport.deserializeUser(function(googleId, done) {
+            usersDao.findById(googleId)
+                .then(function(user) {
+                    done(null, user);
+                })
+                .error(function(err) {
+                    done(err, null);
                 });
-            }, function(error){
-                // Means login has expired!
-                if(error == "No open session"){
-                    done(null, null);
-                } else {
-                    return done(error, null);
-                }
-            });
-        });
-
-        passport.serializeUser(function(loginId, done) {
-            done(null, loginId);
         });
 
         app.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
@@ -244,13 +195,12 @@ if (cluster.isMaster) {
 
         app.use('/', function(request, response, next) {
             if(request.user){
-                response.locals.displayName = request.user.displayName;
+                response.locals.user = request.user;
             }
 
             if(context.config.analytics && context.config.analytics.google && context.config.analytics.google.trackingId){
                 response.locals.analytics = context.config.analytics.google.trackingId;
             }
-
 
             return next();
         }, context.router);
@@ -266,7 +216,7 @@ if (cluster.isMaster) {
 
         // Load all routes
         context.component('.').module('routes');
-        
+
         // Sync the database --> Write table definitions
         context.sequelize.sync().then(function() {
             // Make the process listen to incoming requests
