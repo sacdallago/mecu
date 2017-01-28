@@ -44,7 +44,6 @@ cache/*
 
 config.json
 config.js
-config.js*
 
 .idea/
 .DS_Store
