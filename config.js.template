@@ -1,39 +1,5 @@
 module.exports = {
     "database" : {
-        "username": process.env.databaseuser || "",
-        "password": process.env.databasepassword || "",
-        "port": process.env.databaseport || "",
-        "uri": process.env.databaseuri || "",
-        "collection": process.env.databasecollection || ""
-    },
-    "passport" : {
-        "google" : {
-            "clientId": process.env.googleclientid || "",
-            "clientSecret": process.env.googleclientsecret || ""
-        }
-    },
-    "application" : {
-        "protocol": process.env.applicationprotocol || "http",
-        "hostname" : process.env.applicationhostname || "",
-        "port": process.env.applicationport
-    },
-    "analytics" : {
-        "google" : {
-            "trackingId": process.env.googletrackingid || ""
-        }
-    },
-    "sessionSecret" : process.env.sessionsecret || "test"
-};
-
-module.exports = {
-    "database" : {
-        "username": "postgres",
-        "password": "postgres",
-        "port": "32768",
-        "uri": "localhost",
-        "collection": "mecu"
-    },
-    "database" : {
             "username": process.env.databaseuser || "mecuser",
             "password": process.env.databasepassword || "password",
             "port": process.env.databaseport || "",
