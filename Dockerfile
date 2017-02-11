@@ -10,6 +10,8 @@ COPY . /usr/src/app
 # Use defaults or ENV file
 RUN mv config.js.template config.js
 
+RUN npm install -g webpack
+
 RUN npm install
 
 EXPOSE 3000
