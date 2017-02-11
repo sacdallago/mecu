@@ -38,9 +38,9 @@
         "node-uuid": "latest",
         "serve-favicon": "latest",
         "webpack": "latest",
-        "mecu-utils": "git@github.com:sacdallago/mecu-utils.git",
-        "mecu-line": "git@github.com:sacdallago/mecu-line.git",
-        "mecu-graph": "git@github.com:sacdallago/mecu-graph.git",
+        "mecu-utils": "git@github.com:tpca/mecu-utils.git",
+        "mecu-line": "git@github.com:tpca/mecu-line.git",
+        "mecu-graph": "git@github.com:tpca/mecu-graph.git",
         "disi": "latest"
     },
     "devDependencies": {

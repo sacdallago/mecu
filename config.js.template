@@ -24,3 +24,32 @@ module.exports = {
     },
     "sessionSecret" : process.env.sessionsecret || "test"
 };
+
+module.exports = {
+    "database" : {
+        "username": "postgres",
+        "password": "postgres",
+        "port": "32768",
+        "uri": "localhost",
+        "collection": "mecu"
+    },
+    "database" : {
+            "username": process.env.databaseuser || "mecuser",
+            "password": process.env.databasepassword || "password",
+            "port": process.env.databaseport || "",
+            "uri": process.env.databaseuri || "",
+            "collection": process.env.databasecollection || "mecu"
+        },
+    "passport" : {
+            "google" : {
+                "clientId": process.env.googleclientid || "",
+                "clientSecret": process.env.googleclientsecret || ""
+            }
+        },
+    "analytics" : {
+        "google" : {
+            "trackingId": process.env.googletrackingid || ""
+        }
+    },
+    "sessionSecret" : process.env.sessionsecret || "test"
+};
