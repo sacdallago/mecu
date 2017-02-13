@@ -43,7 +43,7 @@ module.exports = {
                     if (!context[componentName][moduleName]) {
                         console.log('Loading component ' + componentName);
                         context[componentName][moduleName] = require(path.join(__dirname, "app", componentName, moduleName))(context,
-                                                                                                                      componentName, moduleName);
+                            componentName, moduleName);
                         console.log('LOADED ' + componentName + '.' + moduleName);
                     }
 
@@ -74,15 +74,34 @@ module.exports = {
         };
 
 
-        if (databaseParams.username && databaseParams.password  && databaseParams.username.length > 0 && databaseParams.password.length > 0) {
-            dbConnection += databaseParams.username + ":" + databaseParams.password + "@";
-
+        if(databaseParams.username  && databaseParams.username.length > 0){
+            dbConnection += databaseParams.username;
             configDB.user = databaseParams.username;
+        }
+
+        if (databaseParams.username  && databaseParams.username.length > 0 && databaseParams.password && databaseParams.password.length > 0) {
+            dbConnection += ":" + databaseParams.password;
             configDB.password = databaseParams.password;
         }
-        dbConnection += databaseParams.uri + ":" + databaseParams.port + "/" + databaseParams.collection;
+
+        if (databaseParams.username  && databaseParams.username.length > 0) {
+            dbConnection += "@";
+        }
+
+        dbConnection += databaseParams.uri;
+
+        if(databaseParams.port !== undefined && databaseParams.port !== ""){
+
+            dbConnection += ":" + databaseParams.port;
+        }
+
+        if(databaseParams.collection !== undefined && databaseParams.collection !== ""){
+
+            dbConnection += "/" + databaseParams.collection;
+        }
 
         context.pgConnectionString = dbConnection;
+        console.log("CONNECTING TO " + dbConnection);
         context.sequelize = new context.Sequelize(dbConnection, {
             pool: {
                 max: 5,
@@ -98,13 +117,13 @@ module.exports = {
             .then(function(err) {
                 console.log('Connection has been established successfully.');
                 return callback(context);
-        })
+            })
             .catch(function (err) {
                 // Logs all application errors that happen after succesful db test OR error in connecting to DB
-            
+
                 console.error(err.code);
                 console.error(err);
                 return process.exit(1);
-        });
+            });
     }
 }
