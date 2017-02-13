@@ -4,8 +4,6 @@
 
 
 module.exports = function(context) {
-    const usersDao = context.component('users').module('users');
-
     return {
         allowedPostRequests: function(request, response, next){
             if(request.user.get("allowPost") == true){
