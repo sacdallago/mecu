@@ -171,21 +171,6 @@ if (cluster.isMaster) {
         context.router = new express.Router();
         context.api = new express.Router();
 
-        // TODO - implement security layer
-        if(process.env.NODE_ENV == 'production'){
-            app.use(function(request, response, next) {
-                if (request.method === 'GET') {
-                    return next();
-                } else {
-                    response.status(403).render('error', {
-                        title: 'Error',
-                        message: "Can only GET",
-                        error: "Can only GET"
-                    });
-                }
-            });
-        }
-
         // Router listens on / and /api
         app.use('/api', function(request, response, next) {
             // Send API request to google analytics

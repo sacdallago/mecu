@@ -13,6 +13,11 @@ module.exports = function(context) {
         },
         displayName:  {
             type: context.Sequelize.STRING
+        },
+        allowPost: {
+            type: context.Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
         }
     });
 }
