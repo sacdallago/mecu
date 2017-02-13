@@ -1,9 +1,9 @@
 module.exports = {
     "database" : {
             "username": process.env.databaseuser || "mecuser",
-            "password": process.env.databasepassword || "password",
-            "port": process.env.databaseport || "",
-            "uri": process.env.databaseuri || "",
+            "password": process.env.databasepassword,
+            "port": process.env.databaseport,
+            "uri": process.env.databaseuri,
             "collection": process.env.databasecollection || "mecu"
         },
     "passport" : {
