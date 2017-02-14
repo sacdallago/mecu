@@ -1,17 +1,22 @@
 module.exports = {
     "database" : {
-            "username": process.env.databaseuser || "mecuser",
-            "password": process.env.databasepassword,
-            "port": process.env.databaseport,
-            "uri": process.env.databaseuri,
-            "collection": process.env.databasecollection || "mecu"
-        },
+        "username": process.env.databaseuser || "mecuser",
+        "password": process.env.databasepassword,
+        "port": process.env.databaseport,
+        "uri": process.env.databaseuri,
+        "collection": process.env.databasecollection || "mecu"
+    },
     "passport" : {
-            "google" : {
-                "clientId": process.env.googleclientid || "",
-                "clientSecret": process.env.googleclientsecret || ""
-            }
-        },
+        "google" : {
+            "clientId": process.env.googleclientid || "",
+            "clientSecret": process.env.googleclientsecret || ""
+        }
+    },
+    "application" : {
+        "protocol": process.env.applicationprotocol,
+        "hostname" : process.env.applicationhostname,
+        "port": process.env.applicationport
+    },
     "analytics" : {
         "google" : {
             "trackingId": process.env.googletrackingid || ""
