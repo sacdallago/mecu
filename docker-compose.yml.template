@@ -1,0 +1,17 @@
+pg:
+  image: 'tpca/postgres:latest'
+mecu:
+  links:
+    - pg
+  environment:
+    - googleclientid=<GOOGLE-CLIENT-ID>
+    - googleclientsecret=<GOOGLE-CLIENT-SECRET>
+    - googletrackingid=<GOOGLE-ANALYTICS-ID>
+    - databaseuri=pg
+    - applicationprotocol=<HTTP-OR-HTTPS>
+    - applicationhostname=<SUBDOMAIN.DOMAIN.COM>
+    - sessionsecret=<SOME-SUPERSECRET-SECRET>
+    - port=3989
+  image: 'sacdallago/mecu:latest'
+  ports:
+    - '6787:3000'
