@@ -14,14 +14,19 @@ module.exports = function(context) {
 
                 form.parse(request, function(error, fields, files) {
                     var data = files.data;
-                    const inVivo = fields.in_vivo;
+                    const inVivo = function(){
+                        if(fields.inVivo !== undefined){
+                            return fields.inVivo == "on";
+                        }
+                        return false
+                    }();
                     const cellLine = fields.cellLine;
 
                     if(error || data === undefined || inVivo === undefined || cellLine === undefined){
-                        response.render('error', {
+                        response.status(403).render('error', {
                             title: 'Error',
                             message: "Unable to post request",
-                            error: error || "Some fields were missing!"
+                            error: error || "Some fields are missing!"
                         });
                         return;
                     }
@@ -30,7 +35,7 @@ module.exports = function(context) {
                         response.status(500).render('error', {
                             title: 'Error',
                             message: "Unable to post request",
-                            error: "Allowed calls include:\n - multipart/form-data\n With attributes 'data' in text/plain format"
+                            error: "Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format"
                         });
                         return;
                     }
@@ -91,7 +96,10 @@ module.exports = function(context) {
                             });
                         })
                             .then(function(result){
-                                return response.status(201).send({"status": "OK"});
+                                return response.status(201).render('success', {
+                                    title: 'Success',
+                                    message: "Your data has been added to the database!"
+                                });
                             })
                             .catch(function(error){
                                 return response.status(500).render('error', {
@@ -106,7 +114,7 @@ module.exports = function(context) {
                 response.status(403).render('error', {
                     title: 'Error',
                     message: "Unable to post request",
-                    error: "Allowed calls include:\n - multipart/form-data\n With attributes 'data' in text/plain format"
+                    error: "Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format"
                 });
             }
         }

@@ -10,18 +10,33 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
     window.location.replace('/');
 }
 
+let previewDiv = document.getElementById('preview');
+
+function readMultipleFiles(evt) {
+    //Retrieve all the files from the FileList object
+    var files = evt.target.files;
+
+    if (files !== undefined && files.length > 0) {
+        let file = files[0];
+        let fileReader = new FileReader();
+        fileReader.onload = function(element) {
+            let contents = element.target.result;
+            let jsonRepresentation = MecuUtils.parse(contents);
+            previewDiv.innerHTML = JSON.stringify(jsonRepresentation[0]) + "\n and " + (jsonRepresentation.length -1) + " more...";
+        };
+        fileReader.readAsText(file);
+    } else {
+        alert("Failed to load file");
+    }
+}
+
+document.getElementById('data').addEventListener('change', readMultipleFiles, false);
+
 $('.ui.form').form({
     fields: {
         cellLine : 'empty',
-        source   : 'empty'
-    },
-    onSuccess: function(fields){
-        console.log(fields);
-        console.log(this);
-        return false;
+        data     : 'empty'
     }
 });
 
-$('.ui.checkbox')
-    .checkbox()
-;
+$('.ui.checkbox').checkbox();

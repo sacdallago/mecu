@@ -33,6 +33,14 @@ body {
     color: rgba(75, 208, 106, 0.66);
 }
 
+.blue {
+    color: rgba(83, 162, 208, 0.66);
+}
+
+.red {
+    color: rgba(208, 54, 64, 0.66);
+}
+
 /* grid */
 
 .grid-item {
