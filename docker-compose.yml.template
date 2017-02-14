@@ -1,17 +1,40 @@
-pg:
-  image: 'tpca/postgres:latest'
-mecu:
-  links:
-    - pg
-  environment:
-    - googleclientid=<GOOGLE-CLIENT-ID>
-    - googleclientsecret=<GOOGLE-CLIENT-SECRET>
-    - googletrackingid=<GOOGLE-ANALYTICS-ID>
-    - databaseuri=pg
-    - applicationprotocol=<HTTP-OR-HTTPS>
-    - applicationhostname=<SUBDOMAIN.DOMAIN.COM>
-    - sessionsecret=<SOME-SUPERSECRET-SECRET>
-    - port=3989
-  image: 'sacdallago/mecu:latest'
-  ports:
-    - '6787:3000'
+version: '2'
+volumes:
+  certs-volume:
+services:
+    lse:
+      image: jrcs/letsencrypt-nginx-proxy-companion
+      container_name: lse
+      volumes_from: ["nginx-proxy"]
+      volumes:
+        - certs-volume:/etc/nginx/certs:rw
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+    nginx-proxy:
+      image: jwilder/nginx-proxy
+      container_name: nginx-proxy
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+        - /usr/share/nginx/html
+        - /etc/nginx/vhost.d
+        - certs-volume:/etc/nginx/certs:ro
+    pg:
+      image: 'tpca/postgres:latest'
+      container_name: pg
+    mecu:
+      container_name: mecu
+      links:
+        - pg
+      environment:
+        - googleclientid=<GOOGLE-CLIENT-ID>
+        - googleclientsecret=<GOOGLE-CLIENT-SECRET>
+        - googletrackingid=<GOOGLE-ANALYTICS-ID>
+        - databaseuri=pg
+        - applicationprotocol=<HTTP-OR-HTTPS>
+        - applicationhostname=<SUBDOMAIN.DOMAIN.COM>
+        - VIRTUAL_HOST=<SUBDOMAIN.DOMAIN.COM>
+        - sessionsecret=<SOME-SUPERSECRET-SECRET>
+        - port=3989
+      image: 'sacdallago/mecu:latest'
