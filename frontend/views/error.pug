@@ -1,13 +1,10 @@
 extends base
 
 block content
-    #spacedText    
-        h1.ui.header= title
-        p= message
-        p For the geek in you, the error returned from the server is:
-        code= error
-    #title 
-        a(href="/") CellMap
+    h1.ui.header= title
+    p= message
+    p For the geek in you, the error returned from the server is:
+    code= error
 
 block scripts
     - var delta = 50
