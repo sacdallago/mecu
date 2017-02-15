@@ -173,6 +173,11 @@ if (cluster.isMaster) {
 
         // Router listens on / and /api
         app.use('/api', function(request, response, next) {
+            // Add the user info, if the user is logged in
+            if(request.user){
+                response.locals.user = request.user;
+            }
+
             // Send API request to google analytics
             request.visitor.pageview(request.path).send();
             return next();
