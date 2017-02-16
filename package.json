@@ -38,9 +38,9 @@
         "node-uuid": "latest",
         "serve-favicon": "latest",
         "webpack": "latest",
-        "mecu-utils": "https://github.com/tpca/mecu-utils.git",
-        "mecu-line": "https://github.com/tpca/mecu-line.git",
-        "mecu-graph": "https://github.com/tpca/mecu-graph.git",
+        "mecu-utils": "latest",
+        "mecu-line": "latest",
+        "mecu-graph": "latest",
         "disi": "latest"
     },
     "devDependencies": {
