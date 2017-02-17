@@ -90,6 +90,10 @@ module.exports = function(context) {
             return temperatureReadsDao.findByUniprotIdAndExperiment(uniprotId, experimentId)
                 .then(function(temperatureReads) {
 
+                    if(temperatureReads.length < 1){
+                        return response.status(200).send([]);
+                    }
+
                     temperatureReads = temperatureReads.map(function(read) {
                         return {
                             experiment : read.get('experiment'),
