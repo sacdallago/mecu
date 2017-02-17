@@ -38,6 +38,7 @@
         "node-uuid": "latest",
         "serve-favicon": "latest",
         "webpack": "latest",
+        "json2csv": "latest",
         "mecu-utils": "latest",
         "mecu-line": "latest",
         "mecu-graph": "latest",

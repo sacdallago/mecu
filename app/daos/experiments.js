@@ -18,6 +18,18 @@ module.exports = function(context) {
             return experimentsModel.findAll({
                 attributes: ['id', 'inVivo', 'cellLine', 'uploader']
             });
+        },
+
+        getRawData: function(id){
+            if(id !== undefined) {
+                return experimentsModel.findById(id, {
+                    attributes: ['rawData']
+                });
+            } else {
+                return experimentsModel.findAll({
+                    attributes: ['rawData']
+                });
+            }
         }
     };
 };

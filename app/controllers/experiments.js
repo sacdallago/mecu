@@ -5,6 +5,11 @@ module.exports = function(context) {
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
     const proteinReadsDao = context.component('daos').module('proteinReads');
 
+    // External imports
+    const json2csv = require('json2csv');
+    const mecuUtils = require('mecu-utils');
+
+
     return {
         uploadExperiment: function(request, response) {
             if(request.is('multipart/form-data')) {
@@ -49,7 +54,7 @@ module.exports = function(context) {
                         }
 
                         // Transform TSV into JSON data
-                        data = context.mecuUtils.parse(data);
+                        data = mecuUtils.parse(data);
 
                         let newExperiment = {
                             inVivo: inVivo,
@@ -126,6 +131,66 @@ module.exports = function(context) {
             experimentsDao.getExperiments()
                 .then(function(experiments){
                     return response.status(200).send(experiments);
+                })
+                .catch(function(error){
+                    console.error(error);
+                    return response.status(500).send(error);
+                });
+        },
+
+        getRawData: function(request, response) {
+            let identifier;
+            const format = request.query.format;
+
+            try {
+                identifier = request.params.id;
+            } catch (error){
+                console.error(error);
+                return response.status(400).send(error);
+            }
+
+            experimentsDao.getRawData(identifier)
+                .then(function(rawData){
+                    if (rawData.constructor !== Array) {
+                        rawData = [rawData];
+                    }
+                    rawData = rawData
+                        .map(function(experiment){
+                            //return JSON.parse(experiment.get('rawData'));
+                            return experiment.get('rawData');
+                        })
+                        .reduce(function(previous, current){
+                            return previous.concat(current);
+                        }, []);
+
+                    let fields = Object.keys(rawData[0]);
+
+                    fields.splice(fields.indexOf("reads"), 1);
+
+                    switch(format){
+                        case "csv":
+                            rawData = json2csv({
+                                data: rawData,
+                                quotes: '',
+                                flatten: true,
+                                fields: fields
+                            });
+                            break;
+                        case "tsv":
+                            rawData = json2csv({
+                                data: rawData,
+                                quotes: '',
+                                del: '\t',
+                                fields: fields
+                            });
+                            break;
+                        default:
+                            rawData = JSON.stringify(rawData);
+                            break;
+                    }
+
+                    response.set('Content-Type', 'text/plain');
+                    return response.status(200).send(new Buffer(rawData));
                 })
                 .catch(function(error){
                     console.error(error);

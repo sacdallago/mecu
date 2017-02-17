@@ -1,8 +1,4 @@
 module.exports = function(context) {
-
-    // Imports
-    var proteinsDao = context.component('daos').module('proteins');
-
     return {
         index: function(request, response) {
             return response.render('index', {

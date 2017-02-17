@@ -18,7 +18,6 @@ module.exports = {
         const q                 = require('q');
         const formidable        = require('formidable');
         const Sequelize         = require('sequelize');
-        const mecuUtils         = require('mecu-utils');
 
         // Initialize the context
         context = {
@@ -28,7 +27,6 @@ module.exports = {
             promises        : q,
             formidable      : formidable,
             Sequelize       : Sequelize,
-            mecuUtils       : mecuUtils,
             constants       : {}
         };
 

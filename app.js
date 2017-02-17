@@ -43,7 +43,6 @@ if (cluster.isMaster) {
     const SequelizeStore    = require('connect-session-sequelize')(session.Store);
     const favicon           = require('serve-favicon');
 
-
     consoleStamp(console, {
         metadata: function () {
             return ("[Worker " + cluster.worker.id + "]");
