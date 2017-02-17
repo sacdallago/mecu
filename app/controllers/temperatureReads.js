@@ -91,7 +91,7 @@ module.exports = function(context) {
                 .then(function(temperatureReads) {
 
                     if(temperatureReads.length < 1){
-                        return response.status(200).send([]);
+                        return response.status(200).send();
                     }
 
                     temperatureReads = temperatureReads.map(function(read) {
