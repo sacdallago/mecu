@@ -120,6 +120,17 @@ module.exports = function(context) {
                     error: "Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format"
                 });
             }
+        },
+
+        getExperiments: function(request, response) {
+            experimentsDao.getExperiments()
+                .then(function(experiments){
+                    return response.status(200).send(experiments);
+                })
+                .catch(function(error){
+                    console.error(error);
+                    return response.status(500).send(error);
+                });
         }
     }
 };
