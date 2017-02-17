@@ -9,7 +9,6 @@ module.exports = function(context) {
     const json2csv = require('json2csv');
     const mecuUtils = require('mecu-utils');
 
-
     return {
         uploadExperiment: function(request, response) {
             if(request.is('multipart/form-data')) {
@@ -156,8 +155,10 @@ module.exports = function(context) {
                     }
                     rawData = rawData
                         .map(function(experiment){
-                            //return JSON.parse(experiment.get('rawData'));
-                            return experiment.get('rawData');
+                            return experiment.get('rawData').map(function(proteinData) {
+                                proteinData.experiment = experiment.get('id');
+                                return proteinData;
+                            });
                         })
                         .reduce(function(previous, current){
                             return previous.concat(current);

@@ -23,11 +23,11 @@ module.exports = function(context) {
         getRawData: function(id){
             if(id !== undefined) {
                 return experimentsModel.findById(id, {
-                    attributes: ['rawData']
+                    attributes: ['rawData', 'id']
                 });
             } else {
                 return experimentsModel.findAll({
-                    attributes: ['rawData']
+                    attributes: ['rawData', 'id']
                 });
             }
         }

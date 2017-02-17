@@ -1,0 +1,61 @@
+extends base
+
+block content
+    .space
+    .space
+    .space
+    table.ui.celled.table
+        thead
+            tr
+                th Experiment ID
+                th Cell Line
+                th In Vivo?
+                th Uploader
+                th Downloads
+        tbody
+            each experiment in experiments
+                tr
+                    td= experiment.id
+                    td= experiment.cellLine
+                    td= experiment.inVivo
+                    td
+                        a(href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
+                    td
+                        ul(style="margin: 0")
+                            li
+                                | [SUGGESTED]&nbsp;
+                                a(href="/api/experiment/" + experiment.id) JSON data (Protein + melting curves)
+                            li
+                                |
+                                a(href="/api/experiment/" + experiment.id + "?format=tsv") TSV data (Protein)
+                                |  and&nbsp;
+                                a(href="/api/reads/temperatures?e=" + experiment.id + "&format=tsv") TSV data (Melting curves)
+                            li
+                                |
+                                a(href="/api/experiment/" + experiment.id + "?format=csv") CSV data (Protein)
+                                |  and&nbsp;
+                                a(href="/api/reads/temperatures?e=" + experiment.id + "&format=csv") CSV data (Melting curves)
+            tr(style="background: #f1f6f8")
+                td All
+                td --
+                td --
+                td --
+                td
+                    ul(style="margin: 0")
+                        li
+                            | [SUGGESTED]&nbsp;
+                            a(href="/api/experiment/") JSON data (Protein + melting curves)
+                        li
+                            |
+                            a(href="/api/experiment/?format=tsv") TSV data (Protein)
+                            |  and&nbsp;
+                            a(href="/api/reads/temperatures?format=tsv") TSV data (Melting curves)
+                        li
+                            |
+                            a(href="/api/experiment/?format=csv") CSV data (Protein)
+                            |  and&nbsp;
+                            a(href="/api/reads/temperatures?format=csv") CSV data (Melting curves)
+
+    .space
+    p You can download the data by right clicking on the link and selecting the option "Save as" or "Download Linked file As".
+    .space

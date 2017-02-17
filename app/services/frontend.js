@@ -5,5 +5,6 @@ module.exports = function(context) {
         .get('/error', frontendController.error)
         .get('/about', frontendController.about)
         .get('/upload', frontendController.uploadExperiment)
+        .get('/downloads', frontendController.downloads)
         .get('/curves', frontendController.curves);
 }

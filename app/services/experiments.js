@@ -3,6 +3,7 @@ module.exports = function(context) {
     const securityController = context.component('controllers').module('securityLayer');
 
     context.api
+        .get('/experiment', experimentsController.getRawData)
         .get('/experiment/:id', experimentsController.getRawData)
         .post('/experiment',securityController.loggedIn, securityController.allowedPostRequests, experimentsController.uploadExperiment)
         .get('/experiments', experimentsController.getExperiments);
