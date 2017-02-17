@@ -4,7 +4,8 @@ module.exports = {
         "password": process.env.databasepassword,
         "port": process.env.databaseport,
         "uri": process.env.databaseuri,
-        "collection": process.env.databasecollection || "mecu"
+        "collection": process.env.databasecollection || "mecu",
+        "logging": process.env.databaselogging || false,
     },
     "passport" : {
         "google" : {
