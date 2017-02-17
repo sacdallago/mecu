@@ -10,7 +10,6 @@ module.exports = function(context) {
             if(request.is('multipart/form-data')) {
                 const formidable = context.formidable;
                 const form = new formidable.IncomingForm();
-                // Need to implement the storage of file xyz and then render home
 
                 form.parse(request, function(error, fields, files) {
                     var data = files.data;
@@ -49,14 +48,18 @@ module.exports = function(context) {
                             });
                         }
 
+                        // Transform TSV into JSON data
+                        data = context.mecuUtils.parse(data);
+
                         let newExperiment = {
                             inVivo: inVivo,
-                            cellLine: cellLine
+                            cellLine: cellLine,
+                            rawData: data,
+                            uploader: request.user.get('googleId')
                         };
 
                         return context.sequelize.transaction(function(transaction){
                             return experimentsDao.create(newExperiment, {transaction: transaction}).then(function(experiment){
-                                data = context.mecuUtils.parse(data);
 
                                 // TODO - this can be implemented as a view if sequelize ever supports this, or once the Postgres equivalent of ON DUPLICATE IGNORE will be approved in sequelize https://github.com/sequelize/sequelize/pull/6325
 //                                let proteins = data.map(function(element){
@@ -119,4 +122,4 @@ module.exports = function(context) {
             }
         }
     }
-}
+};
