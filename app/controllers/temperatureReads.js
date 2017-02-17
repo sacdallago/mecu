@@ -4,9 +4,13 @@
 
 module.exports = function(context) {
 
+    // Imports
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
     const proteinReadsDao = context.component('daos').module('proteinReads');
     const experimentsDao = context.component('daos').module('experiments');
+
+    // External imports
+    const json2csv = require('json2csv');
 
     return {
         searchByUniprotId: function(request, response) {
@@ -66,6 +70,66 @@ module.exports = function(context) {
                         return response.status(500).send(error);
                     });
             }
+        },
+
+        getTemperatures: function(request, response) {
+            let experimentId;
+
+            if(request.query.e !== undefined){
+                try{
+                    experimentId = parseInt(request.query.e);
+                } catch (error){
+                    console.error(error);
+                    return response.status(400).send(error);
+                }
+            }
+
+            const uniprotId = request.query.p;
+            const format = request.query.format;
+
+            return temperatureReadsDao.findByUniprotIdAndExperiment(uniprotId, experimentId)
+                .then(function(temperatureReads) {
+
+                    temperatureReads = temperatureReads.map(function(read) {
+                        return {
+                            experiment : read.get('experiment'),
+                            uniprotId : read.get('uniprotId'),
+                            temperature : read.get('temperature'),
+                            ratio : read.get('ratio')
+                        }
+                    });
+
+                    let fields = Object.keys(temperatureReads[0]);
+
+                    switch(format){
+                        case "csv":
+                            temperatureReads = json2csv({
+                                data: temperatureReads,
+                                quotes: '',
+                                fields: fields
+                            });
+                            break;
+                        case "tsv":
+                            temperatureReads = json2csv({
+                                data: temperatureReads,
+                                quotes: '',
+                                del: '\t',
+                                fields: fields
+                            });
+                            break;
+                        default:
+                            temperatureReads = JSON.stringify(temperatureReads);
+                            break;
+                    }
+
+                    response.set('Content-Type', 'text/plain');
+                    return response.status(200).send(new Buffer(temperatureReads));
+                })
+                .catch(function(error){
+                    console.error(error);
+                    return response.status(500).send(error);
+                });
+
         }
     }
 }

@@ -37,7 +37,21 @@ module.exports = function(context) {
                     }
                 );
             }
+        },
 
+        findByUniprotIdAndExperiment: function(uniprotId, experimentId) {
+            let where = {};
+            if(uniprotId !== undefined){
+                where.uniprotId = uniprotId;
+            }
+            if(experimentId !== undefined){
+                where.experiment = experimentId;
+            }
+            return temperatureReadsModel.findAll({
+                    attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
+                    where: where
+                }
+            );
         }
     };
 };
