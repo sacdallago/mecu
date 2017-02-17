@@ -172,7 +172,6 @@ module.exports = function(context) {
                             rawData = json2csv({
                                 data: rawData,
                                 quotes: '',
-                                flatten: true,
                                 fields: fields
                             });
                             break;
