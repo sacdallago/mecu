@@ -72,24 +72,24 @@ function loadProteins() {
     proteins.forEach(function(protein) {
         var html = '';
 
-        html += '<div class="grid-item"' + protein.reads.map(function(expRead){
+        html += '<div class="grid-item"' + protein.experiments.map(function(expRead){
                 return (expRead.experiment + "").replace(/\s|\//g, "_")
-            }).join('E') + ' id="' + protein.uniprotId + protein.reads.map(function(expRead){
+            }).join('E') + ' id="' + protein.uniprotId + protein.experiments.map(function(expRead){
                 return (expRead.experiment + "").replace(/\s|\//g, "_")
             }).join('E') + '">';
 
         html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-        if(protein.reads.length > 1){
+        if(protein.experiments.length > 1){
             // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
         } else {
-            html += '<div class="experimentNumber">' + protein.reads[0].experiment + '</div>';
+            html += '<div class="experimentNumber">' + protein.experiments[0].experiment + '</div>';
         }
         html += '</div>';
 
         var element = $(html);
         element.data("protein", protein);
         StorageManager.has(protein, function(storage, hasCount) {
-            if(hasCount === protein.reads.length){
+            if(hasCount === protein.experiments.length){
                 element.addClass('inStore');
             } else if(hasCount > 0) {
                 element.addClass('partiallyInStore');
@@ -101,7 +101,7 @@ function loadProteins() {
     grid.isotope('insert', items);
 
     proteins.forEach(function(protein) {
-        let curve = new MecuLine({element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
+        let curve = new MecuLine({element: "#"+protein.uniprotId+protein.experiments.map(function(expRead){
             return (expRead.experiment + "").replace(/\s|\//g, "_")
         }).join('E'), width:"200", height:"200"});
 
