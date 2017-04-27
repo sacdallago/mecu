@@ -221,14 +221,12 @@ if (cluster.isMaster) {
     });
 
     // Watch in case of file changes, restart worker (basically can keep up server running forever)
-    watch([
-        //path.join(__dirname, "views"),
-        path.join(__dirname, "app/*/*.js"),
-        path.join(__dirname, "app/*.js"),
-        path.join(__dirname, "app.js"),
-        path.join(__dirname, "index.js")
-    ], function(filename) {
-        console.log('File changed. Worker is gonna perform harakiri.');
-        cluster.worker.kill(0);
+    watch(path.join(__dirname),{
+        recursive: true
+    }, function(filename) {
+        if (!/node_modules/.test(filename) && /\.js$/.test(filename)) {
+            console.log(filename + ' changed. Worker is gonna perform harakiri.');
+            cluster.worker.kill(0);
+        }
     });
 }

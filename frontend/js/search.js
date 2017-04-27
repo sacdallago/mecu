@@ -93,10 +93,10 @@ $('.ui.search').search({
             if(aggregate){
                 proteins.push(responseProtein);
             } else {
-                responseProtein.reads.forEach(function(read){
+                responseProtein.experiments.forEach(function(experiment){
                     proteins.push({
                         uniprotId: responseProtein.uniprotId,
-                        reads: [read]
+                        experiments: [experiment]
                     });
                 });
             }
@@ -105,18 +105,18 @@ $('.ui.search').search({
             proteins.forEach(function(protein) {
                 var html = '';
 
-                html += '<div class="grid-item"' + protein.reads.map(function(expRead){
+                html += '<div class="grid-item"' + protein.experiments.map(function(expRead){
                         return (expRead.experiment + "").replace(/\s|\//g, "_")
-                    }).join('E') + ' id="' + protein.uniprotId + protein.reads.map(function(expRead){
+                    }).join('E') + ' id="' + protein.uniprotId + protein.experiments.map(function(expRead){
                         return (expRead.experiment + "").replace(/\s|\//g, "_")
                     }).join('E') + '">';
 
                 html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
                 html += '<div class="cube"></div>';
-                if(protein.reads.length == 1){
-                    html += '<div class="experimentNumber">E' + protein.reads[0].experiment + '</div>';
-                } else if(protein.reads.length > 5) {
-                    let notShowing = protein.reads.length - 5;
+                if(protein.experiments.length == 1){
+                    html += '<div class="experimentNumber">E' + protein.experiments[0].experiment + '</div>';
+                } else if(protein.experiments.length > 5) {
+                    let notShowing = protein.experiments.length - 5;
                     html += '<div class="experimentNumber">+' + notShowing + '</div>';
                 }
                 html += '</div>';
@@ -124,7 +124,7 @@ $('.ui.search').search({
                 var element = $(html);
                 element.data("protein", protein);
                 StorageManager.has(protein, function(storage, hasCount) {
-                    if(hasCount === protein.reads.length){
+                    if(hasCount === protein.experiments.length){
                         element.addClass('inStore');
                     } else if(hasCount > 0) {
                         element.addClass('partiallyInStore');
@@ -142,17 +142,17 @@ $('.ui.search').search({
             if(aggregate){
                 proteins.push(responseProtein);
             } else {
-                responseProtein.reads.forEach(function(read){
+                responseProtein.epxeriments.forEach(function(experiment){
                     proteins.push({
                         uniprotId: responseProtein.uniprotId,
-                        reads: [read]
+                        experiments: [experiment]
                     });
                 });
             }
 
             proteins.forEach(function(protein) {
                 let curve = new MecuLine({
-                    element: "#"+protein.uniprotId+protein.reads.map(function(expRead){
+                    element: "#"+protein.uniprotId+protein.experiments.map(function(expRead){
                         return (expRead.experiment + "").replace(/\s|\//g, "_")
                     }).join('E'), width:"200", height:"200",
                     limit: 5,
@@ -163,6 +163,10 @@ $('.ui.search').search({
                 });
 
                 curve.add(protein);
+
+                if(protein.experiments.length > 1){
+                    curve.toggleAverage();
+                }
                 curves.push(curve);
             });
         });

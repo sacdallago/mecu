@@ -27,7 +27,7 @@ module.exports = function(context) {
                                     uniprotId: uniprotId.get("uniprotId")
                                 };
 
-                                element.reads = experimentIds
+                                element.experiments = experimentIds
                                     .map(function(experimentId) {
                                         let e = {
                                             experiment: experimentId.get('id')
@@ -133,7 +133,6 @@ module.exports = function(context) {
                     console.error(error);
                     return response.status(500).send(error);
                 });
-
         }
     }
-}
+};

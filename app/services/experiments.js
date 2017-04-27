@@ -7,4 +7,4 @@ module.exports = function(context) {
         .get('/experiment/:id', experimentsController.getRawData)
         .post('/experiment',securityController.loggedIn, securityController.allowedPostRequests, experimentsController.uploadExperiment)
         .get('/experiments', experimentsController.getExperiments);
-}
+};

@@ -11,25 +11,25 @@ StorageManager.add = function(proteins, callback) {
     let current = JSON.parse(window.localStorage.getItem('proteins')) || {};
 
     proteins.forEach(function(protein) {
-        if(typeof(protein.reads) === 'undefined' || protein.reads === null || typeof(protein.reads) !== 'object'){
+        if(typeof(protein.experiments) === 'undefined' || protein.experiments === null || typeof(protein.experiments) !== 'object'){
             throw "Protein " + protein.uniprotId + " has bad formatted reads.";
         }
-        if (protein.reads.constructor !== Array) {
-            protein.reads = [protein.reads];
+        if (protein.experiments.constructor !== Array) {
+            protein.experiments = [protein.experiments];
         }
 
-        protein.reads.forEach(function(read) {
-            let currentCurveId = protein.uniprotId+"-E"+read.experiment;
+        protein.experiments.forEach(function(experiment) {
+            let currentCurveId = protein.uniprotId+"-E"+experiment.experiment;
 
             if(current[currentCurveId] === undefined){
                 let newItem = (function(p) {
                     let t = {};
                     for(let k in p){
-                        if(k != "reads"){
+                        if(k != "experiments"){
                             t[k] = p.k;
                         }
                     }
-                    t.reads = [read];
+                    t.experiments = [experiment];
                     return t;
                 })(protein);
 
@@ -55,15 +55,15 @@ StorageManager.remove = function(proteins, callback) {
     let current = JSON.parse(window.localStorage.getItem('proteins')) || {};
 
     proteins.forEach(function(protein) {
-        if(typeof(protein.reads) === 'undefined' || protein.reads === null || typeof(protein.reads) !== 'object'){
+        if(typeof(protein.experiments) === 'undefined' || protein.experiments === null || typeof(protein.experiments) !== 'object'){
             throw "Protein " + protein.uniprotId + " has bad formatted reads.";
         }
-        if (protein.reads.constructor !== Array) {
-            protein.reads = [protein.reads];
+        if (protein.experiments.constructor !== Array) {
+            protein.experiments = [protein.experiments];
         }
 
-        protein.reads.forEach(function(read) {
-            let currentCurveId = protein.uniprotId+"-E"+read.experiment;
+        protein.experiments.forEach(function(experiment) {
+            let currentCurveId = protein.uniprotId+"-E"+experiment.experiment;
             delete current[currentCurveId];
         });
     });
@@ -87,22 +87,22 @@ StorageManager.toggle = function(proteins, callback) {
     let added = 0;
 
     proteins.forEach(function(protein) {
-        if(typeof(protein.reads) === 'undefined' || protein.reads === null || typeof(protein.reads) !== 'object'){
+        if(typeof(protein.experiments) === 'undefined' || protein.experiments === null || typeof(protein.experiments) !== 'object'){
             throw "Protein " + protein.uniprotId + " has bad formatted reads.";
         }
-        if (protein.reads.constructor !== Array) {
-            protein.reads = [protein.reads];
+        if (protein.experiments.constructor !== Array) {
+            protein.experiments = [protein.experiments];
         }
 
-        protein.reads.forEach(function(read) {
-            let currentCurveId = protein.uniprotId+"-E"+read.experiment;
+        protein.experiments.forEach(function(experiment) {
+            let currentCurveId = protein.uniprotId+"-E"+experiment.experiment;
 
             if(current[currentCurveId] === undefined){
                 let newItem = (function(p) {
                     let t = {
                         p: protein.uniprotId,
-                        e: read.experiment,
-                        r: read.reads
+                        e: experiment.experiment,
+                        r: experiment.reads
                     };
                     return t;
                 })(protein);
@@ -135,15 +135,15 @@ StorageManager.has = function(proteins, callback) {
     let hasNot = 0;
 
     proteins.forEach(function(protein) {
-        if(typeof(protein.reads) === 'undefined' || protein.reads === null || typeof(protein.reads) !== 'object'){
+        if(typeof(protein.experiments) === 'undefined' || protein.experiments === null || typeof(protein.experiments) !== 'object'){
             throw "Protein " + protein.uniprotId + " has bad formatted reads.";
         }
-        if (protein.reads.constructor !== Array) {
-            protein.reads = [protein.reads];
+        if (protein.experiments.constructor !== Array) {
+            protein.experiments = [protein.experiments];
         }
 
-        protein.reads.forEach(function(read) {
-            let currentCurveId = protein.uniprotId+"-E"+read.experiment;
+        protein.experiments.forEach(function(experiment) {
+            let currentCurveId = protein.uniprotId+"-E"+experiment.experiment;
 
             if(current[currentCurveId] === undefined){
                 hasNot++;
@@ -165,7 +165,7 @@ StorageManager.get = function() {
         let e = current[k];
         result.push({
             uniprotId: e.p,
-            reads: [{
+            experiments: [{
                 experiment: e.e,
                 reads: e.r
             }]
