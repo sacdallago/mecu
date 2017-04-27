@@ -4,6 +4,7 @@ $.fn.api.settings.api = {
 };
 
 let aggregate = true;
+let showMean = true;
 
 const grid = $('.grid').isotope({
     // main isotope options
@@ -75,6 +76,9 @@ $('.ui.search').search({
         if(aggregate === false){
             query.a = false;
         }
+        if(showMean === false){
+            query.m = false;
+        }
         currentUri.search(query);
 
         window.history.replaceState(query, "MeCu", currentUri.resource());
@@ -142,7 +146,7 @@ $('.ui.search').search({
             if(aggregate){
                 proteins.push(responseProtein);
             } else {
-                responseProtein.epxeriments.forEach(function(experiment){
+                responseProtein.experiments.forEach(function(experiment){
                     proteins.push({
                         uniprotId: responseProtein.uniprotId,
                         experiments: [experiment]
@@ -164,7 +168,8 @@ $('.ui.search').search({
 
                 curve.add(protein);
 
-                if(protein.experiments.length > 1){
+                // If not aggregated: not more then one curve per box; if no show mean --> no show mean. If only one curve, no mean needed
+                if(aggregate === true && showMean === true && protein.experiments.length > 1){
                     curve.toggleAverage();
                 }
                 curves.push(curve);
@@ -184,11 +189,14 @@ $('.ui.search').search({
         if(query.a){
             aggregate = false;
         }
+        if(query.m){
+            showMean = false;
+        }
         searchInput.trigger('focus');
     }
 })();
 
-
+// Aggregate or de-aggregate curves
 $('.item.filterExperiments').on('click', function(event){
     event.preventDefault();
 
@@ -203,6 +211,27 @@ $('.item.filterExperiments').on('click', function(event){
         aggregate = false;
     }
     currentUri.search(query);
+
+    window.history.replaceState(query, "MeCu", currentUri.resource());
+
+    searchInput.trigger('focus');
+});
+
+// Draw or don't draw means
+$('.item.showMean').on('click', function(event){
+    event.preventDefault();
+
+    // Update URL query
+    var currentUri = URI(window.location.href);
+    let query = currentUri.search(true);
+
+    if(showMean === false){
+        showMean = true;
+        delete query.m;
+    } else {
+        query.m = false;
+        showMean = false;
+    }
 
     window.history.replaceState(query, "MeCu", currentUri.resource());
 
