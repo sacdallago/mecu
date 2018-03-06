@@ -53,7 +53,7 @@ module.exports = function(context) {
         },
         totalExpt: {
             type: context.Sequelize.INTEGER,
-            allowNull: false
+            allowNull: true
         }
     });
 };

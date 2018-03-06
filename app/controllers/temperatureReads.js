@@ -10,7 +10,7 @@ module.exports = function(context) {
     const experimentsDao = context.component('daos').module('experiments');
 
     // External imports
-    const json2csv = require('json2csv');
+    const json2csv = require('json2csv').parse;
 
     return {
         searchByUniprotId: function(request, response) {

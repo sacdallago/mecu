@@ -4,8 +4,8 @@ block content
     h1 Submit a new experiment
     form.ui.form(method="post", action="/api/experiment", enctype="multipart/form-data")
         .field
-            label Cell line
-            input(type="text", name="cellLine")
+            label Description
+            input(type="text", name="description")
         .field
             label Source
             input(type="file", name="data", id="data")
@@ -14,8 +14,8 @@ block content
                 code#preview
         .field
             .ui.slider.checkbox
-                input(type="checkbox", tabindex="0", name="inVivo", value=false).hidden
-                label In vivo?
+                input(type="checkbox", tabindex="0", name="lysate", value=false).hidden
+                label Experiment on cell lysate? (Default: No)
         .ui.button.submit Upload
 
     .space

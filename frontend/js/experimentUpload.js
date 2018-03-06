@@ -34,7 +34,7 @@ document.getElementById('data').addEventListener('change', readMultipleFiles, fa
 
 $('.ui.form').form({
     fields: {
-        cellLine : 'empty',
+        description : 'empty',
         data     : 'empty'
     }
 });

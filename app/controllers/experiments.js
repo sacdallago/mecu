@@ -6,7 +6,7 @@ module.exports = function(context) {
     const proteinReadsDao = context.component('daos').module('proteinReads');
 
     // External imports
-    const json2csv = require('json2csv');
+    const json2csv = require('json2csv').parse;
     const mecuUtils = require('mecu-utils');
 
     return {
@@ -17,15 +17,15 @@ module.exports = function(context) {
 
                 form.parse(request, function(error, fields, files) {
                     var data = files.data;
-                    const inVivo = function(){
-                        if(fields.inVivo !== undefined){
-                            return fields.inVivo == "on";
+                    const lysate = function(){
+                        if(fields.lysate !== undefined){
+                            return fields.lysate == "on";
                         }
                         return false
                     }();
-                    const cellLine = fields.cellLine;
+                    const description = fields.description;
 
-                    if(error || data === undefined || inVivo === undefined || cellLine === undefined){
+                    if(error || data === undefined || lysate === undefined || description === undefined){
                         response.status(403).render('error', {
                             title: 'Error',
                             message: "Unable to post request",
@@ -56,8 +56,8 @@ module.exports = function(context) {
                         data = mecuUtils.parse(data);
 
                         let newExperiment = {
-                            inVivo: inVivo,
-                            cellLine: cellLine,
+                            lysate: lysate,
+                            description: description,
                             rawData: data,
                             uploader: request.user.get('googleId')
                         };
@@ -74,13 +74,16 @@ module.exports = function(context) {
 //                                });
 
                                 let proteinReads = data.map(function(element){
-                                    return {
+                                     result = {
                                         uniprotId: element.uniprotId,
                                         experiment: experiment.id,
                                         peptides: element.peptides,
                                         psms: element.psms,
-                                        totalExpt: element.totalExpt
-                                    }
+                                    };
+
+                                    result.totalExpt = isNaN(element.totalExpt) ? undefined : element.totalExpt;
+
+                                    return result;
                                 });
 
                                 return proteinReadsDao.bulkCreate(proteinReads, {transaction: transaction}).then(function(){
@@ -170,15 +173,13 @@ module.exports = function(context) {
 
                     switch(format){
                         case "csv":
-                            rawData = json2csv({
-                                data: rawData,
+                            rawData = json2csv(rawData, {
                                 quotes: '',
                                 fields: fields
                             });
                             break;
                         case "tsv":
-                            rawData = json2csv({
-                                data: rawData,
+                            rawData = json2csv(rawData, {
                                 quotes: '',
                                 del: '\t',
                                 fields: fields

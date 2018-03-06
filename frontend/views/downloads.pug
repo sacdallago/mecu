@@ -8,16 +8,16 @@ block content
         thead
             tr
                 th Experiment ID
-                th Cell Line
-                th In Vivo?
+                th Description
+                th Lysate
                 th Uploader
                 th Downloads
         tbody
             each experiment in experiments
                 tr
                     td= experiment.id
-                    td= experiment.cellLine
-                    td= experiment.inVivo
+                    td= experiment.description
+                    td= experiment.lysate
                     td
                         a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
                     td

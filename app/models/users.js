@@ -20,4 +20,4 @@ module.exports = function(context) {
             defaultValue: false
         }
     });
-}
+};

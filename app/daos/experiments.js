@@ -16,7 +16,7 @@ module.exports = function(context) {
 
         getExperiments: function(){
             return experimentsModel.findAll({
-                attributes: ['id', 'inVivo', 'cellLine', 'uploader']
+                attributes: ['id', 'lysate', 'description', 'uploader']
             });
         },
 

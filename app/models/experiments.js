@@ -8,11 +8,11 @@ module.exports = function(context) {
     const userModel = context.component('models').module('users');
 
     return context.sequelize.define('experiment', {
-        inVivo: {
+        lysate: {
             type: context.Sequelize.BOOLEAN,
             allowNull: false
         },
-        cellLine: {
+        description: {
             type: context.Sequelize.STRING,
             allowNull: false
         },
