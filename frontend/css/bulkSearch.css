@@ -1,0 +1,11 @@
+.maxWidth {
+    width: 100%
+}
+
+.textarea {
+    height: 6em;
+}
+
+.prompt.inline {
+    font-size: 1.2rem !important;
+}

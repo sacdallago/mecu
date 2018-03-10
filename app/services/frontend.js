@@ -6,5 +6,6 @@ module.exports = function(context) {
         .get('/about', frontendController.about)
         .get('/upload', frontendController.uploadExperiment)
         .get('/downloads', frontendController.downloads)
-        .get('/curves', frontendController.curves);
+        .get('/curves', frontendController.curves)
+        .get('/search', frontendController.bulkSearch);
 }

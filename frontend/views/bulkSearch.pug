@@ -1,0 +1,52 @@
+extends base
+
+block postStyles
+    link(rel='stylesheet', href='/public/css/bulkSearch.css')
+
+block content
+    h3 1. Select experiments
+    table.ui.celled.table
+        thead
+            tr
+                th Select
+                th Experiment ID
+                th Description
+                th Lysate
+                th Uploader
+        tbody
+            each experiment in experiments
+                tr
+                    td
+                        .ui.checkbox
+                            label
+                            input(type="checkbox", tabindex="0", class="hidden")
+                    td= experiment.id
+                    td= experiment.description
+                    td= experiment.lysate
+                    td
+                        a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
+    h3 2. Input proteins
+    .space
+    .text-center
+        .ui.input.search.maxWidth
+            textarea(name="prot", placeholder="P1234, P43244").inline.prompt.maxWidth.textarea
+    .space
+    .selectors
+        // .ui.label.clearButton clear
+    .space
+    .grid
+    .space
+
+
+block settings
+    .divider
+    .item.filterExperiments Filter experiments
+    .item.showMean Toggle means
+    a(href='/curves').item Selected Curves
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/libs/mecu-line")
+    script(type="text/javascript", src="/public/js/bulkSearch.js")

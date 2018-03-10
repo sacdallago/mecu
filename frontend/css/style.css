@@ -3,24 +3,6 @@ body {
     border-top: 1rem solid #E8E8E8;
 }
 
-.ui.main.container {
-    padding-bottom: 1em;
-    padding-top: 5rem;
-    height: 100%;
-}
-
-#title {
-    font-size: 5rem;
-    color: hsl(200,50%,40%);
-    text-decoration: underline;
-    text-align: center;
-    height: 5rem;
-}
-
-#title > a {
-    color: inherit;
-}
-
 #spacedText {
     min-height: 16rem;
 }
@@ -39,6 +21,34 @@ body {
 
 .red {
     color: rgba(208, 54, 64, 0.66);
+}
+
+/* base */
+
+.ui.main.container {
+    padding-bottom: 1em;
+    padding-top: 5rem;
+    height: 100%;
+}
+
+#title {
+    text-align: center;
+    max-height: 5em;
+}
+
+#title > a {
+    position: relative;
+    color: inherit;
+    height: 0;
+    top: -5em;
+    width: 20em;
+    overflow: visible;
+
+}
+
+a > .image {
+    width: inherit;
+    height: auto;
 }
 
 /* grid */

@@ -29,6 +29,23 @@ module.exports = function(context) {
             });
         },
 
+        bulkSearch: function(request, response) {
+            return experimentsDao.getExperiments()
+                .then(function(experiments) {
+                    return response.render('bulkSearch', {
+                        title: 'Search for proteins',
+                        experiments: experiments
+                    });
+                })
+                .catch(function(error) {
+                    return response.status(500).render('error', {
+                        title: 'Error!',
+                        message: "There was an unknown error with your request.",
+                        error: error
+                    });
+                });
+        },
+
         curves: function(request, response) {
             return response.render('curves', {
                 title: 'My Selected curves'
@@ -56,7 +73,6 @@ module.exports = function(context) {
                         error: error
                     });
                 });
-
         }
     }
-}
+};
