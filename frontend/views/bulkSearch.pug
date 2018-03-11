@@ -19,20 +19,25 @@ block content
                     td
                         .ui.checkbox
                             label
-                            input(type="checkbox", tabindex="0", class="hidden")
+                            input(type="checkbox", tabindex="0", class="hidden", data-id= experiment.id)
                     td= experiment.id
                     td= experiment.description
                     td= experiment.lysate
                     td
                         a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
     h3 2. Input proteins
-    .space
     .text-center
         .ui.input.search.maxWidth
             textarea(name="prot", placeholder="P1234, P43244").inline.prompt.maxWidth.textarea
+    .stats
+        span
+            strong 0
+        |  Protein identifiers matched by your input
     .space
-    .selectors
-        // .ui.label.clearButton clear
+    h3 3. Check statistics
+    .space
+    table.ui.celled.table.statistics
+        p Input at least one protein and select at least one experiment to get started.
     .space
     .grid
     .space
