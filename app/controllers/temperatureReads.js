@@ -20,7 +20,7 @@ module.exports = function(context) {
                 return response.send([]);
             } else {
                 return experimentsDao.getExperiments().then(function(experimentIds) {
-                    return proteinReadsDao.findUniprotIds(identifier).then(function(uniprotIds) {
+                    return proteinReadsDao.findUniprotIdsLike(identifier).then(function(uniprotIds) {
                         return temperatureReadsDao.findByUniprotId(identifier).then(function(reads){
                             let result = uniprotIds.map(function (uniprotId) {
                                 let element = {
@@ -129,6 +129,59 @@ module.exports = function(context) {
                     response.set('Content-Type', 'text/plain');
                     return response.status(200).send(new Buffer(temperatureReads));
                 })
+                .catch(function(error){
+                    console.error(error);
+                    return response.status(500).send(error);
+                });
+        },
+
+        getByUniProtIdsAndExerminets: function(request, response) {
+            const uniProtIds = request.body.proteins;
+            const experiments = request.body.experiments;
+
+            // TODO
+
+
+            return proteinReadsDao.findUniprotIds(uniProtIds).then(function(proteins) {
+                return temperatureReadsDao.findByUniprotIdAndExperiment(uniProtIds, experiments).then(function(reads){
+                    let result = uniprotIds.map(function (uniprotId) {
+                        let element = {
+                            uniprotId: uniprotId.get("uniprotId")
+                        };
+
+                        element.experiments = experimentIds
+                            .map(function(experimentId) {
+                                let e = {
+                                    experiment: experimentId.get('id')
+                                };
+
+                                e.reads = reads
+                                    .filter(function (tempReads) {
+                                        return tempReads.uniprotId == element.uniprotId && tempReads.experiment == e.experiment;
+                                    })
+                                    .map(function(fullObj) {
+                                        return {
+                                            t: fullObj.temperature,
+                                            r: fullObj.ratio,
+                                        }
+                                    });
+
+                                return e;
+                            })
+                            .filter(function(experimentRelativeReads){
+                                return experimentRelativeReads.reads.length > 0;
+                            });
+
+                        return element;
+                    });
+
+                    return response.send(result);
+                })
+                    .catch(function(error){
+                        console.error(error);
+                        return response.status(500).send(error);
+                    });
+            })
                 .catch(function(error){
                     console.error(error);
                     return response.status(500).send(error);

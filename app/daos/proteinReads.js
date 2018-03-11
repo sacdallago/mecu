@@ -40,7 +40,7 @@ module.exports = function(context) {
 
         },
 
-        findUniprotIds: function(identifier, transaction) {
+        findUniprotIdsLike: function(identifier, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({
                         attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
@@ -59,6 +59,27 @@ module.exports = function(context) {
                             uniprotId: {
                                 $like: identifier + "%"
                             }
+                        }
+                    }
+                );
+            }
+        },
+
+        findUniprotIds: function(uniprotIds, transaction) {
+            if(transaction){
+                return proteinReadsModel.findAll({
+                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        where: {
+                            uniprotId: uniprotIds
+                        },
+                        transaction: transaction
+                    }
+                );
+            } else {
+                return proteinReadsModel.findAll({
+                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        where: {
+                            uniprotId: uniprotIds
                         }
                     }
                 );

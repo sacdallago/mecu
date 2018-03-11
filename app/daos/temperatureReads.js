@@ -52,6 +52,21 @@ module.exports = function(context) {
                     where: where
                 }
             );
-        }
+        },
+
+        findByUniprotIdsAndExperiments: function(uniprotIds, experimentIds) {
+            let where = {};
+            if(uniprotId !== undefined){
+                where.uniprotId = uniprotIds;
+            }
+            if(experimentId !== undefined){
+                where.experiment = experimentIds;
+            }
+            return temperatureReadsModel.findAll({
+                    attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
+                    where: where
+                }
+            );
+        },
     };
 };
