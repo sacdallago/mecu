@@ -1,7 +1,7 @@
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
 let uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
-const matchCount = $('.stats > span > strong')
+const matchCount = $('.stats > span > strong');
 
 
 $('.ui.checkbox')
@@ -37,12 +37,19 @@ let fetchMeltingCurves = function(experiments, proteins){
     }
 
     fetch("/api/reads/temperature", {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
         method: 'POST',
         body: JSON.stringify({
             experiments: experiments,
             proteins: proteins
         })
     })
-        .then(data => console.log(data))
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+        })
         .catch(error => console.error(error))
 };

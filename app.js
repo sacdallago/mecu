@@ -34,6 +34,7 @@ if (cluster.isMaster) {
     // Spawn various workers to listen and answer requests
     const express           = require('express');
     const cookieParser      = require('cookie-parser');
+    const bodyParser        = require('body-parser');
     const compression       = require('compression');
     const watch             = require('node-watch');
     const passport          = require('passport');
@@ -99,6 +100,8 @@ if (cluster.isMaster) {
         app.use(favicon(path.join(__dirname, "frontend", "public", "images", "mecu.ico")));
 
         app.use(cookieParser());
+
+        app.use(bodyParser.json());
 
         // TODO - session and user management
         app.use(session({
@@ -221,9 +224,9 @@ if (cluster.isMaster) {
     });
 
     // Watch in case of file changes, restart worker (basically can keep up server running forever)
-    watch(path.join(__dirname),{
+    watch(path.join(__dirname, "app"),{
         recursive: true
-    }, function(filename) {
+    }, function(event, filename) {
         if (!/node_modules/.test(filename) && /\.js$/.test(filename)) {
             console.log(filename + ' changed. Worker is gonna perform harakiri.');
             cluster.worker.kill(0);

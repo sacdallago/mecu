@@ -35,7 +35,7 @@ module.exports = function(context) {
 
                                         e.reads = reads
                                             .filter(function (tempReads) {
-                                                return tempReads.uniprotId == element.uniprotId && tempReads.experiment == e.experiment;
+                                                return tempReads.uniprotId === element.uniprotId && tempReads.experiment === e.experiment;
                                             })
                                             .map(function(fullObj) {
                                                 return {
@@ -136,23 +136,21 @@ module.exports = function(context) {
         },
 
         getByUniProtIdsAndExerminets: function(request, response) {
-            const uniProtIds = request.body.proteins;
+            const uniprotIds = request.body.proteins;
             const experiments = request.body.experiments;
 
-            // TODO
+            return proteinReadsDao.findUniprotIds(uniprotIds).then(function(proteins) {
+                return temperatureReadsDao.findByUniprotIdAndExperiment(uniprotIds, experiments).then(function(reads){
 
-
-            return proteinReadsDao.findUniprotIds(uniProtIds).then(function(proteins) {
-                return temperatureReadsDao.findByUniprotIdAndExperiment(uniProtIds, experiments).then(function(reads){
-                    let result = uniprotIds.map(function (uniprotId) {
+                    let result = proteins.map(function (uniprotId) {
                         let element = {
                             uniprotId: uniprotId.get("uniprotId")
                         };
 
-                        element.experiments = experimentIds
+                        element.experiments = experiments
                             .map(function(experimentId) {
                                 let e = {
-                                    experiment: experimentId.get('id')
+                                    experiment: experimentId
                                 };
 
                                 e.reads = reads
