@@ -7,7 +7,8 @@
 module.exports = function(context) {
 
     // Imports
-    var temperatureReadsModel = context.component('models').module('temperatureReads');
+    const temperatureReadsModel = context.component('models').module('temperatureReads');
+    const Op = context.Sequelize.Op;
 
     return {
         bulkCreate: function(items, options) {
@@ -20,7 +21,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
                         where: {
                             uniprotId: {
-                                $like: identifier + "%"
+                                [Op.like]: identifier + "%"
                             }
                         },
                         transaction: transaction
@@ -31,7 +32,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
                         where: {
                             uniprotId: {
-                                $like: identifier + "%"
+                                [Op.like]: identifier + "%"
                             }
                         }
                     }
@@ -52,6 +53,21 @@ module.exports = function(context) {
                     where: where
                 }
             );
-        }
+        },
+
+        findByUniprotIdsAndExperiments: function(uniprotIds, experimentIds) {
+            let where = {};
+            if(uniprotId !== undefined){
+                where.uniprotId = uniprotIds;
+            }
+            if(experimentId !== undefined){
+                where.experiment = experimentIds;
+            }
+            return temperatureReadsModel.findAll({
+                    attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
+                    where: where
+                }
+            );
+        },
     };
 };

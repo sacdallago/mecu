@@ -7,7 +7,8 @@
 module.exports = function(context) {
 
     // Imports
-    var proteinReadsModel = context.component('models').module('proteinReads');
+    const proteinReadsModel = context.component('models').module('proteinReads');
+    const Op = context.Sequelize.Op;
 
     return {
         bulkCreate: function(items, options) {
@@ -20,7 +21,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
                         where: {
                             uniprotId: {
-                                $like: identifier + "%"
+                                [Op.like]: identifier + "%"
                             }
                         },
                         transaction: transaction
@@ -31,7 +32,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
                         where: {
                             uniprotId: {
-                                $like: identifier + "%"
+                                [Op.like]: identifier + "%"
                             }
                         }
                     }
@@ -40,13 +41,13 @@ module.exports = function(context) {
 
         },
 
-        findUniprotIds: function(identifier, transaction) {
+        findUniprotIdsLike: function(identifier, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({
                         attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
-                                $like: identifier + "%"
+                                [Op.like]: identifier + "%"
                             }
                         },
                         transaction: transaction
@@ -57,8 +58,29 @@ module.exports = function(context) {
                         attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
-                                $like: identifier + "%"
+                                [Op.like]: identifier + "%"
                             }
+                        }
+                    }
+                );
+            }
+        },
+
+        findUniprotIds: function(uniprotIds, transaction) {
+            if(transaction){
+                return proteinReadsModel.findAll({
+                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        where: {
+                            uniprotId: uniprotIds
+                        },
+                        transaction: transaction
+                    }
+                );
+            } else {
+                return proteinReadsModel.findAll({
+                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        where: {
+                            uniprotId: uniprotIds
                         }
                     }
                 );

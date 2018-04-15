@@ -52,5 +52,21 @@ module.exports = function(context) {
 
             return deferred.promise;
         },
+
+        findByUniprotIds: function(uniProtIds) {
+            var deferred = context.promises.defer();
+
+            proteinsModel.find({uniprotId:  uniProtIds})
+                .exec(function(error, result) {
+                    if (error) {
+                        console.error(error);
+                        deferred.reject(error);
+                    } else {
+                        deferred.resolve(result);
+                    }
+                });
+
+            return deferred.promise;
+        },
     };
 };
