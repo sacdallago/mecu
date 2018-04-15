@@ -1,8 +1,8 @@
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
-let uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
+const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
-
+const statsTable = $('pre.statistics');
 
 $('.ui.checkbox')
     .checkbox({
@@ -49,7 +49,20 @@ let fetchMeltingCurves = function(experiments, proteins){
     })
         .then(res => res.json())
         .then(data => {
-            console.log(data);
+            let statistics = "";
+            statistics += "UniprotId\t" + experiments.sort().join(" ") + "\n";
+            proteins.forEach(p => {
+                let e = data.find(protein => protein.uniprotId === p);
+
+                if(e){
+                    statistics += p + "\t\t"  + experiments.sort().map(exp => e.experiments.map(redu => redu.experiment).indexOf(exp) !== -1 ? "X" : "-").join(" ") + "\n";
+                } else {
+                    statistics += p + "\t\t"  + experiments.sort().map(_ => "-").join(" ") + "\n";
+                }
+
+            });
+
+            statsTable.text(statistics);
         })
         .catch(error => console.error(error))
 };
