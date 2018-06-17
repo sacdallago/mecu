@@ -31,22 +31,22 @@ $('textarea.inline.prompt.maxWidth.textarea')
         fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
     });
 
+
 let fetchMeltingCurves = function(experiments, proteins){
     if(experiments.length < 1 || proteins.length < 1){
         return;
     }
-
     fetch("/api/reads/temperature", {
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        method: 'POST',
-        body: JSON.stringify({
-            experiments: experiments,
-            proteins: proteins
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                experiments: experiments,
+                proteins: proteins
+            })
         })
-    })
         .then(res => res.json())
         .then(data => {
             let statistics = "";
@@ -55,14 +55,40 @@ let fetchMeltingCurves = function(experiments, proteins){
                 let e = data.find(protein => protein.uniprotId === p);
 
                 if(e){
-                    statistics += p + "\t\t"  + experiments.sort().map(exp => e.experiments.map(redu => redu.experiment).indexOf(exp) !== -1 ? "X" : "-").join(" ") + "\n";
+                    statistics += p + "\t\t"  +
+                    experiments.sort().map(exp => e.experiments.map(redu => redu.experiment).indexOf(exp) !== -1 ? "X" : "-").join(" ") + "\n";
                 } else {
                     statistics += p + "\t\t"  + experiments.sort().map(_ => "-").join(" ") + "\n";
                 }
 
             });
-
             statsTable.text(statistics);
+
+            // empty table and table head on change of input data
+            $('#result-table tbody').empty();
+            $('#result-table thead tr th:not(:first-child)').remove();
+
+
+            let header = [];
+            data.forEach(d => header.push(d.uniprotId));
+            header.forEach(d => $('#result-table thead tr').append('<th>'+d+'</th>'));
+
+            let tableData = [];
+            experiments.forEach(e => tableData.push({name: e, values: new Array(proteins.length).fill('no')}));
+
+            data.forEach(d => {
+                d.experiments.forEach(e => {
+                    tableData.find(d => d.name === e.experiment).values[header.indexOf(d.uniprotId)] = 'yes';
+                })
+            })
+
+            tableData.forEach(tr => {
+                let row = '<tr><td>'+tr.name+'</td>';
+                tr.values.forEach(v => row+=('<td>'+v+'</td>'));
+                row+='</tr>';
+                $('#result-table tbody').append(row);
+            })
+
         })
         .catch(error => console.error(error))
 };
