@@ -135,7 +135,8 @@ module.exports = function(context) {
                 });
         },
 
-        getByUniProtIdsAndExerminets: function(request, response) {
+        // P55072
+        getByUniProtIdsAndExperiments: function(request, response) {
             const uniprotIds = request.body.proteins;
             const experiments = request.body.experiments;
 

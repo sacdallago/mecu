@@ -7,6 +7,6 @@ module.exports = function(context) {
     context.api
         .get('/reads/temperature/search/:id', temperatureReadsController.searchByUniprotId)
         .get('/reads/temperatures', temperatureReadsController.getTemperatures)
-        .post('/reads/temperature', temperatureReadsController.getByUniProtIdsAndExerminets);
+        .post('/reads/temperature', temperatureReadsController.getByUniProtIdsAndExperiments);
 
 };
