@@ -45,8 +45,12 @@
         "universal-analytics": "latest",
         "webpack": "^4.1.0"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "synp": "^1.2.1"
+    },
     "scripts": {
-        "start": "node app.js"
+        "start": "node app.js",
+        "yarn-lock-to-npm": "synp --source-file ./yarn.lock",
+        "npm-lock-to-yarn": "synp --source-file package-lock.json"
     }
 }
