@@ -15,7 +15,7 @@ module.exports = function(context) {
     const experimentsModel = context.component('models').module('experiments');
     const proteinsModel = context.component('models').module('proteins');
 
-    return context.sequelize.define('temperatureRead', {
+    return context.dbConnection.define('temperatureRead', {
         // don't delete database entries but set the newly added attribute deletedAt
         // to the current date (when deletion was done). paranoid will only work if
         // timestamps are enabled

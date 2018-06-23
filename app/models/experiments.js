@@ -10,7 +10,7 @@ const sequelize = require('sequelize');
 module.exports = function(context) {
     const userModel = context.component('models').module('users');
 
-    return context.sequelize.define('experiment', {
+    return context.dbConnection.define('experiment', {
         lysate: {
             type: sequelize.BOOLEAN,
             allowNull: false

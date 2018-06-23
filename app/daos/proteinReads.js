@@ -45,7 +45,7 @@ module.exports = function(context) {
         findUniprotIdsLike: function(identifier, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
                                 [sequelize.Op.like]: identifier + "%"
@@ -56,7 +56,7 @@ module.exports = function(context) {
                 );
             } else {
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
                                 [sequelize.Op.like]: identifier + "%"
@@ -70,7 +70,7 @@ module.exports = function(context) {
         findUniprotIds: function(uniprotIds, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: uniprotIds
                         },
@@ -79,7 +79,7 @@ module.exports = function(context) {
                 );
             } else {
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: uniprotIds
                         }

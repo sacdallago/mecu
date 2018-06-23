@@ -63,7 +63,7 @@ module.exports = function(context) {
                             uploader: request.user.get('googleId')
                         };
 
-                        return context.sequelize.transaction(function(transaction){
+                        return context.dbConnection.transaction(function(transaction){
                             return experimentsDao.create(newExperiment, {transaction: transaction}).then(function(experiment){
 
                                 // TODO - this can be implemented as a view if sequelize ever supports this, or once the Postgres equivalent of ON DUPLICATE IGNORE will be approved in sequelize https://github.com/sequelize/sequelize/pull/6325

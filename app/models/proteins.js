@@ -8,7 +8,7 @@ const sequelize = require('sequelize');
 
 
 module.exports = function(context) {
-    return context.sequelize.define('protein', {
+    return context.dbConnection.define('protein', {
         uniprotId: {
             type: sequelize.STRING,
             // allowNull: false,

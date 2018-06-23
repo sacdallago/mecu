@@ -7,7 +7,7 @@
 const sequelize = require('sequelize');
 
 module.exports = function(context) {
-    return context.sequelize.define('user', {
+    return context.dbConnection.define('user', {
         googleId: {
             type: sequelize.STRING,
             allowNull: false,

@@ -89,8 +89,7 @@ module.exports = {
 
         context.pgConnectionString = dbConnection;
         console.log("CONNECTING TO " + dbConnection);
-        // TODO rename context.sequelize (dbConnection ?)
-        context.sequelize = new Sequelize(dbConnection, {
+        context.dbConnection = new Sequelize(dbConnection, {
             pool: {
                 max: 5,
                 min: 0,
@@ -101,7 +100,7 @@ module.exports = {
             //omitNull: true
         });
 
-        return context.sequelize
+        return context.dbConnection
             .authenticate()
             .then(function(err) {
                 console.log('Connection has been established successfully.');
