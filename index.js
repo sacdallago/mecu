@@ -5,6 +5,7 @@
  */
 
 const Sequelize = require('sequelize');
+const path = require('path');
 
 
 var context;
@@ -13,20 +14,8 @@ module.exports = {
     start: function(callback) {
         callback = callback || function(){};
 
-        // Imports
-        const pg                = require('pg');
-        const fs                = require('fs');
-        const path              = require('path');
-        const q                 = require('q');
-        const formidable        = require('formidable');
-
         // Initialize the context
         context = {
-            fs              : fs,
-            pg              : pg,
-            path            : path,
-            promises        : q,
-            formidable      : formidable,
             constants       : {}
         };
 
