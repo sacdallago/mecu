@@ -36,6 +36,10 @@ let fetchMeltingCurves = function(experiments, proteins){
     if(experiments.length < 1 || proteins.length < 1){
         return;
     }
+
+    experiments = experiments.sort();
+    proteins = proteins.sort();
+
     fetch("/api/reads/temperature", {
             headers: {
                 'Accept': 'application/json',
@@ -68,17 +72,26 @@ let fetchMeltingCurves = function(experiments, proteins){
             $('#result-table tbody').empty();
             $('#result-table thead tr th:not(:first-child)').remove();
 
-
             let header = [];
-            data.forEach(d => header.push(d.uniprotId));
+            experiments.forEach(d => header.push(d));
             header.forEach(d => $('#result-table thead tr').append('<th>'+d+'</th>'));
 
             let tableData = [];
-            experiments.forEach(e => tableData.push({name: e, values: new Array(proteins.length).fill('no')}));
+            let totalRow = {
+                name: 'Total',
+                values: new Array(experiments.length).fill(0),
+                rating: new Array(experiments.length).fill(0)
+            };
+            proteins.forEach(p => tableData.push({name: p, values: new Array(experiments.length).fill(0)}));
 
-            data.forEach(d => {
+            data.forEach((d, i, a) => {
+                let tableProt = tableData.find(td => td.name === d.uniprotId);
+
+
                 d.experiments.forEach(e => {
-                    tableData.find(d => d.name === e.experiment).values[header.indexOf(d.uniprotId)] = 'yes';
+                    let idx = experiments.indexOf(e.experiment);
+                    tableProt.values[idx] = 1;
+                    totalRow.values[idx] += 1;
                 })
             })
 
@@ -88,6 +101,15 @@ let fetchMeltingCurves = function(experiments, proteins){
                 row+='</tr>';
                 $('#result-table tbody').append(row);
             })
+
+            let summaryRow = '<td>Total</td>';
+            totalRow.values.forEach((v,i,a) => {
+                totalRow.rating[i] = v/proteins.length;
+                summaryRow += '<td>'+v+'/'+proteins.length
+                // +' ('+(totalRow.rating[i]*100).toFixed(2)+'%)' // can be omitted
+                +'</td>';
+            });
+            $('#result-table tbody').append(summaryRow);
 
         })
         .catch(error => console.error(error))
