@@ -4,11 +4,12 @@
  * Created by Christian Dallago on 20170103 .
  */
 
+const sequelize = require('sequelize');
+
 module.exports = function(context) {
 
     // Imports
     const proteinReadsModel = context.component('models').module('proteinReads');
-    const Op = context.Sequelize.Op;
 
     return {
         bulkCreate: function(items, options) {
@@ -21,7 +22,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         },
                         transaction: transaction
@@ -32,7 +33,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         }
                     }
@@ -47,7 +48,7 @@ module.exports = function(context) {
                         attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         },
                         transaction: transaction
@@ -58,7 +59,7 @@ module.exports = function(context) {
                         attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         }
                     }
