@@ -139,14 +139,11 @@ module.exports = function(context) {
         getByUniProtIdsAndExperiments: function(request, response) {
             const uniprotIds = request.body.proteins;
             const experiments = request.body.experiments;
-            console.log('inputs', uniprotIds, experiments);
 
             return Promise.all([
                 proteinReadsDao.findUniprotIds(uniprotIds),
                 temperatureReadsDao.findByUniprotIdAndExperiment(uniprotIds, experiments)
             ]).then(([proteins, reads]) => {
-                console.log('proteins_new', proteins[0], proteins.length);
-                console.log('reads_new', reads[0], reads.length);
 
                 let result = proteins.map((newUniProtId) => {
                     let element = {uniprotId: newUniProtId.get('uniprotId')};
