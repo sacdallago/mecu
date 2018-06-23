@@ -139,52 +139,40 @@ module.exports = function(context) {
         getByUniProtIdsAndExperiments: function(request, response) {
             const uniprotIds = request.body.proteins;
             const experiments = request.body.experiments;
+            console.log('inputs', uniprotIds, experiments);
 
-            return proteinReadsDao.findUniprotIds(uniprotIds).then(function(proteins) {
-                return temperatureReadsDao.findByUniprotIdAndExperiment(uniprotIds, experiments).then(function(reads){
+            return Promise.all([
+                proteinReadsDao.findUniprotIds(uniprotIds),
+                temperatureReadsDao.findByUniprotIdAndExperiment(uniprotIds, experiments)
+            ]).then(([proteins, reads]) => {
+                console.log('proteins_new', proteins[0], proteins.length);
+                console.log('reads_new', reads[0], reads.length);
 
-                    let result = proteins.map(function (uniprotId) {
-                        let element = {
-                            uniprotId: uniprotId.get("uniprotId")
-                        };
+                let result = proteins.map((newUniProtId) => {
+                    let element = {uniprotId: newUniProtId.get('uniprotId')};
 
-                        element.experiments = experiments
-                            .map(function(experimentId) {
-                                let e = {
-                                    experiment: experimentId
-                                };
+                    element.experiments = experiments.map((experimentId) => {
+                            let e = {experiment: experimentId};
 
-                                e.reads = reads
-                                    .filter(function (tempReads) {
-                                        return tempReads.uniprotId == element.uniprotId && tempReads.experiment == e.experiment;
-                                    })
-                                    .map(function(fullObj) {
-                                        return {
-                                            t: fullObj.temperature,
-                                            r: fullObj.ratio,
-                                        }
-                                    });
+                            e.reads = reads.filter(tempReads =>
+                                    tempReads.uniprotId == element.uniprotId &&
+                                    tempReads.experiment == e.experiment
+                                )
+                                .map(fullObj => ({t:fullObj.temperature, r: fullObj.ratio}));
 
-                                return e;
-                            })
-                            .filter(function(experimentRelativeReads){
-                                return experimentRelativeReads.reads.length > 0;
-                            });
+                            return e;
+                        })
+                        .filter(e => e.reads.length > 0);
 
-                        return element;
-                    });
-
-                    return response.send(result);
-                })
-                    .catch(function(error){
-                        console.error(error);
-                        return response.status(500).send(error);
-                    });
-            })
-                .catch(function(error){
-                    console.error(error);
-                    return response.status(500).send(error);
+                    return element;
                 });
+
+                return response.send(result);
+            })
+            .catch(function(error){
+                console.error(error);
+                return response.status(500).send(error);
+            });
         }
     }
 };
