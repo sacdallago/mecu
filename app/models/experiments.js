@@ -4,24 +4,27 @@
  * Created by Christian Dallago on 20161226 .
  */
 
+const sequelize = require('sequelize');
+
+
 module.exports = function(context) {
     const userModel = context.component('models').module('users');
 
     return context.sequelize.define('experiment', {
         lysate: {
-            type: context.Sequelize.BOOLEAN,
+            type: sequelize.BOOLEAN,
             allowNull: false
         },
         description: {
-            type: context.Sequelize.STRING,
+            type: sequelize.STRING,
             allowNull: false
         },
         rawData: {
-            type: context.Sequelize.JSONB,
+            type: sequelize.JSONB,
             allowNull: false
         },
         uploader: {
-            type: context.Sequelize.STRING,
+            type: sequelize.STRING,
             allowNull: false,
             onDelete: "CASCADE",
             onUpdate: "CASCADE",
@@ -33,7 +36,7 @@ module.exports = function(context) {
                 key: 'googleId',
 
                 // This declares when to check the foreign key constraint. PostgreSQL only.
-                deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE
+                deferrable: sequelize.Deferrable.INITIALLY_IMMEDIATE
             }
         },
     });
