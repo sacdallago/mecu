@@ -8,7 +8,7 @@ StorageManager.add = function(proteins, callback) {
         proteins = [proteins];
     }
 
-    let current = JSON.parse(window.localStorage.getItem('proteins')) || {};
+    let current = store.get('proteins') || {};
 
     proteins.forEach(function(protein) {
         if(typeof(protein.experiments) === 'undefined' || protein.experiments === null || typeof(protein.experiments) !== 'object'){
@@ -38,7 +38,7 @@ StorageManager.add = function(proteins, callback) {
         });
     });
 
-    window.localStorage.setItem('proteins', JSON.stringify(current));
+    store.set('proteins', current);
 
     callback(current);
     return current;
@@ -52,7 +52,7 @@ StorageManager.remove = function(proteins, callback) {
         proteins = [proteins];
     }
 
-    let current = JSON.parse(window.localStorage.getItem('proteins')) || {};
+    let current = store.get('proteins') || {};
 
     proteins.forEach(function(protein) {
         if(typeof(protein.experiments) === 'undefined' || protein.experiments === null || typeof(protein.experiments) !== 'object'){
@@ -68,7 +68,7 @@ StorageManager.remove = function(proteins, callback) {
         });
     });
 
-    window.localStorage.setItem('proteins', JSON.stringify(current));
+    store.set('proteins', current);
 
     callback(current);
     return current;
@@ -82,7 +82,7 @@ StorageManager.toggle = function(proteins, callback) {
         proteins = [proteins];
     }
 
-    let current = JSON.parse(window.localStorage.getItem('proteins')) || {};
+    let current = store.get('proteins') || {};
     let removed = 0;
     let added = 0;
 
@@ -116,7 +116,8 @@ StorageManager.toggle = function(proteins, callback) {
         });
     });
 
-    window.localStorage.setItem('proteins', JSON.stringify(current));
+    store.set('proteins', current);
+
     callback(current, added, removed);
 
     return current;
@@ -130,7 +131,7 @@ StorageManager.has = function(proteins, callback) {
         proteins = [proteins];
     }
 
-    let current = JSON.parse(window.localStorage.getItem('proteins')) || {};
+    let current = store.get('proteins') || {};
     let has = 0;
     let hasNot = 0;
 
@@ -159,7 +160,7 @@ StorageManager.has = function(proteins, callback) {
 };
 
 StorageManager.get = function() {
-    let current = JSON.parse(window.localStorage.getItem('proteins')) || {};
+    let current = store.get('proteins') || {};
     let result = [];
     for(let k in current){
         let e = current[k];
@@ -175,17 +176,17 @@ StorageManager.get = function() {
 };
 
 StorageManager.setMaxTemp = function(temp) {
-    return window.localStorage.setItem('maxTemp', JSON.stringify(parseFloat(temp)));
+    return store.set('maxTemp', parseFloat(temp));
 };
 StorageManager.setMinTemp = function(temp) {
-    return window.localStorage.setItem('minTemp', JSON.stringify(parseFloat(temp)));
+    return store.setItem('minTemp', parseFloat(temp));
 };
 
 StorageManager.getMaxTemp = function() {
-    let t = JSON.stringify(window.localStorage.getItem('maxTemp'));
+    let t = store.get('maxTemp');
     return (t != "NaN" ? t : undefined);
 };
 StorageManager.getMinTemp = function() {
-    let t = JSON.stringify(window.localStorage.getItem('minTemp'));
+    let t = store.get('minTemp');
     return (t != "NaN" ? t : undefined);
 };
