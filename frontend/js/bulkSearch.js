@@ -102,13 +102,14 @@ let fetchMeltingCurves = function(experiments, proteins){
                 $('#result-table tbody').append(row);
             })
 
-            let summaryRow = '<td>Total</td>';
+            let summaryRow = '<tr><td>Total</td>';
             totalRow.values.forEach((v,i,a) => {
                 totalRow.rating[i] = v/proteins.length;
                 summaryRow += '<td>'+v+'/'+proteins.length
                 // +' ('+(totalRow.rating[i]*100).toFixed(2)+'%)' // can be omitted
                 +'</td>';
             });
+            summaryRow += '</tr>';
             $('#result-table tbody').append(summaryRow);
 
         })
