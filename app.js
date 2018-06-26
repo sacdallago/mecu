@@ -107,7 +107,7 @@ if (cluster.isMaster) {
         app.use(session({
             secret: context.config.sessionSecret || 'mecuSecret',
             store: new SequelizeStore({
-                db: context.sequelize
+                db: context.dbConnection
             }),
             resave: true,
             saveUninitialized: true,
@@ -210,7 +210,7 @@ if (cluster.isMaster) {
         context.component('.').module('routes');
 
         // Sync the database --> Write table definitions
-        context.sequelize.sync().then(function() {
+        context.dbConnection.sync().then(function() {
             // Make the process listen to incoming requests
             app.listen(app.get('port'), function(){
                 console.log("Express server listening on port ", app.get('port'));

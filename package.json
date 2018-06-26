@@ -15,7 +15,7 @@
         "url": "https://github.com/sacdallago/mecu.git"
     },
     "engines": {
-        "node": ">= 0.10.0"
+        "node": "8.11.1"
     },
     "dependencies": {
         "body-parser": "^1.18.2",
@@ -39,7 +39,6 @@
         "pg": "latest",
         "pg-hstore": "latest",
         "pug": "^2.0.0",
-        "q": "latest",
         "sequelize": "^4.35.2",
         "serve-favicon": "latest",
         "universal-analytics": "latest",

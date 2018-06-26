@@ -4,6 +4,9 @@
  * Created by Christian Dallago on 20160416 .
  */
 
+const Sequelize = require('sequelize');
+const path = require('path');
+
 
 var context;
 
@@ -11,22 +14,8 @@ module.exports = {
     start: function(callback) {
         callback = callback || function(){};
 
-        // Imports
-        const pg                = require('pg');
-        const fs                = require('fs');
-        const path              = require('path');
-        const q                 = require('q');
-        const formidable        = require('formidable');
-        const Sequelize         = require('sequelize');
-
         // Initialize the context
         context = {
-            fs              : fs,
-            pg              : pg,
-            path            : path,
-            promises        : q,
-            formidable      : formidable,
-            Sequelize       : Sequelize,
             constants       : {}
         };
 
@@ -64,11 +53,11 @@ module.exports = {
         var dbConnection = "postgres://";
 
         var configDB = {
-            database: databaseParams.collection, //env var: PGDATABASE  
-            host: databaseParams.uri, // Server hosting the postgres database 
-            port: databaseParams.port, //env var: PGPORT 
-            max: 10, // max number of clients in the pool 
-            idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed 
+            database: databaseParams.collection, //env var: PGDATABASE
+            host: databaseParams.uri, // Server hosting the postgres database
+            port: databaseParams.port, //env var: PGPORT
+            max: 10, // max number of clients in the pool
+            idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed
         };
 
 
@@ -100,7 +89,7 @@ module.exports = {
 
         context.pgConnectionString = dbConnection;
         console.log("CONNECTING TO " + dbConnection);
-        context.sequelize = new context.Sequelize(dbConnection, {
+        context.dbConnection = new Sequelize(dbConnection, {
             pool: {
                 max: 5,
                 min: 0,
@@ -111,7 +100,7 @@ module.exports = {
             //omitNull: true
         });
 
-        return context.sequelize
+        return context.dbConnection
             .authenticate()
             .then(function(err) {
                 console.log('Connection has been established successfully.');

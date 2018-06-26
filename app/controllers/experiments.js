@@ -1,3 +1,9 @@
+// External imports
+const json2csv = require('json2csv').parse;
+const mecuUtils = require('mecu-utils');
+const fs = require('fs');
+const formidable        = require('formidable');
+
 module.exports = function(context) {
 
     // Imports
@@ -5,14 +11,9 @@ module.exports = function(context) {
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
     const proteinReadsDao = context.component('daos').module('proteinReads');
 
-    // External imports
-    const json2csv = require('json2csv').parse;
-    const mecuUtils = require('mecu-utils');
-
     return {
         uploadExperiment: function(request, response) {
             if(request.is('multipart/form-data')) {
-                const formidable = context.formidable;
                 const form = new formidable.IncomingForm();
 
                 form.parse(request, function(error, fields, files) {
@@ -43,7 +44,7 @@ module.exports = function(context) {
                         return;
                     }
 
-                    return context.fs.readFile(data.path, 'utf8', function (error, data) {
+                    return fs.readFile(data.path, 'utf8', function (error, data) {
                         if(error){
                             return response.status(500).render('error', {
                                 title: 'Error',
@@ -62,7 +63,7 @@ module.exports = function(context) {
                             uploader: request.user.get('googleId')
                         };
 
-                        return context.sequelize.transaction(function(transaction){
+                        return context.dbConnection.transaction(function(transaction){
                             return experimentsDao.create(newExperiment, {transaction: transaction}).then(function(experiment){
 
                                 // TODO - this can be implemented as a view if sequelize ever supports this, or once the Postgres equivalent of ON DUPLICATE IGNORE will be approved in sequelize https://github.com/sequelize/sequelize/pull/6325

@@ -4,11 +4,12 @@
  * Created by Christian Dallago on 20170103 .
  */
 
+const sequelize = require('sequelize');
+
 module.exports = function(context) {
 
     // Imports
     const proteinReadsModel = context.component('models').module('proteinReads');
-    const Op = context.Sequelize.Op;
 
     return {
         bulkCreate: function(items, options) {
@@ -21,7 +22,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         },
                         transaction: transaction
@@ -32,7 +33,7 @@ module.exports = function(context) {
                         attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         }
                     }
@@ -44,10 +45,10 @@ module.exports = function(context) {
         findUniprotIdsLike: function(identifier, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         },
                         transaction: transaction
@@ -55,10 +56,10 @@ module.exports = function(context) {
                 );
             } else {
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: {
-                                [Op.like]: identifier + "%"
+                                [sequelize.Op.like]: identifier + "%"
                             }
                         }
                     }
@@ -69,7 +70,7 @@ module.exports = function(context) {
         findUniprotIds: function(uniprotIds, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: uniprotIds
                         },
@@ -78,7 +79,7 @@ module.exports = function(context) {
                 );
             } else {
                 return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
+                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
                         where: {
                             uniprotId: uniprotIds
                         }

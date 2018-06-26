@@ -13,60 +13,38 @@ module.exports = function(context) {
         create: function(item) {
             return proteinsModel.create(item);
         },
-        
+
         bulkCreate: function(items) {
             return proteinsModel.bulkCreate(items, {ignoreDuplicates: true});
         },
-        
+
         update: function(item) {
-            var deferred = context.promises.defer();
-            
             item.updatedAt = Date.now();
 
-            proteinsModel.update({ "uniprotId": item.uniprotId }, item, {
-                upsert: true,
-                setDefaultsOnInsert : true
-            }, function(error, insertedItem) {
-                if (error) {
-                    console.error(error);
-                    deferred.reject(error);
-                }
-                deferred.resolve(insertedItem);
-            });
-
-            return deferred.promise;
+            return proteinsModel.update({ "uniprotId": item.uniprotId }, item, {
+                    upsert: true,
+                    setDefaultsOnInsert : true
+                })
+                .catch(err => {
+                    conole.error(error);
+                    return Promise.reject(error);
+                });
         },
-        
+
         findByUniprotId: function(identifier) {
-            var deferred = context.promises.defer();
-
-            proteinsModel.findOne({uniprotId:  identifier})
-                .exec(function(error, result) {
-                if (error) {
+            return proteinsModel.findOne({uniprotId:  identifier})
+                .catch(error => {
                     console.error(error);
-                    deferred.reject(error);
-                } else {
-                    deferred.resolve(result);
-                }
-            });
-
-            return deferred.promise;
+                    return Promise.reject(error);
+                });
         },
 
         findByUniprotIds: function(uniProtIds) {
-            var deferred = context.promises.defer();
-
-            proteinsModel.find({uniprotId:  uniProtIds})
-                .exec(function(error, result) {
-                    if (error) {
-                        console.error(error);
-                        deferred.reject(error);
-                    } else {
-                        deferred.resolve(result);
-                    }
+            return proteinsModel.find({uniprotId:  uniProtIds})
+                .catch(error => {
+                    console.error(error);
+                    return Promise.reject(error);
                 });
-
-            return deferred.promise;
-        },
+        }
     };
 };
