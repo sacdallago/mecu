@@ -1,8 +1,9 @@
 module.exports = function(context) {
 
     // Imports
-    var proteinsDao = context.component('daos').module('proteins');
-    var proteinReadsDao = context.component('daos').module('proteinReads');
+    const proteinsDao = context.component('daos').module('proteins');
+    const proteinReadsDao = context.component('daos').module('proteinReads');
+    const temperatureReadsDao = context.component('daos').module('temperatureReads');
 
     return {
         getProteins: function(request, response) {
@@ -32,6 +33,23 @@ module.exports = function(context) {
             }, function(error){
                 response.status(500).send(error);
             });
+        },
+
+        getProteinsFromExp: function(request, response) {
+            const protExpArray = request.body;
+
+            console.log('request.body', request.body);
+
+            temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray)
+                .then(r => {
+                    console.log('r', r);
+                    response.send(r);
+                })
+                .catch(err => {
+                    console.error('getProteinsFromExp', err);
+                    response.send([]);
+                })
+
         }
     }
 }
