@@ -2,7 +2,7 @@ html
     head
         title= "MeCu - " + title
         block preStyles
-        link(rel='stylesheet', href='/public/libs/semantic/semantic.css')
+        link(rel='stylesheet', href='/public/modules/semantic-ui/dist/semantic.min.css')
         link(rel='stylesheet', href='/public/css/style.css')
         link(rel='stylesheet', href='/public/libs/progress/progress.css')
         link(rel='stylesheet', href='/public/libs/onepage/onepage.css')
@@ -57,14 +57,15 @@ html
                                 .ui.inverted.vertical.footer.segment
 
 
+        //- libraries, loaded from frontend/libs folder (TODO replace with node_modules libs)
         script(type="text/javascript", src="/public/libs/urlRewrite.js")
-        script(type="text/javascript", src="/public/libs/semantic/semantic.js")
         script(type="text/javascript", src='/public/libs/progress/progress.js')
         script(type="text/javascript", src='/public/libs/onepage/onepage.js')
         script(type="text/javascript", src='/public/libs/store/store.legacy.min.js')
         
         //- libraries, loaded from node_modules
         script(type="text/javascript", src="/public/modules/jquery/dist/jquery.min.js")
+        script(type="text/javascript", src="/public/modules/semantic-ui/dist/semantic.min.js")
         //- custom scripts
         script(type="text/javascript", src="/public/js/settings.js")
         script(type="text/javascript", src="/public/js/storage.js")
