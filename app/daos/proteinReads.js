@@ -36,10 +36,8 @@ module.exports = function(context) {
                                 [sequelize.Op.like]: identifier + "%"
                             }
                         }
-                    }
-                );
+                    });
             }
-
         },
 
         findUniprotIdsLike: function(identifier, transaction) {
