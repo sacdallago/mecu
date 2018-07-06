@@ -66,10 +66,15 @@ html
         script(type="text/javascript", src="/public/modules/jquery/dist/jquery.min.js")
         script(type="text/javascript", src="/public/modules/semantic-ui/dist/semantic.min.js")
         script(type="text/javascript", src='/public/modules/store/dist/store.legacy.min.js')
+        script(type="text/javascript", src='/public/modules/mecu-graph/build/mecu-graph.js')
+        script(type="text/javascript", src='/public/modules/mecu-line/build/mecu-line.js')
+        script(type="text/javascript", src='/public/modules/mecu-utils/build/mecu-utils.js')
+        
         //- custom scripts
         script(type="text/javascript", src="/public/js/settings.js")
         script(type="text/javascript", src="/public/js/storage.js")
         script(type="text/javascript", src="/public/js/requests.js")
+
         if scripts
             each s in scripts
                 script(type="text/javascript", src=s)
