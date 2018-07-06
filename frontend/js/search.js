@@ -19,8 +19,13 @@ const grid = $('.grid').isotope({
 curves = [];
 
 grid.on('click', '.grid-item', function(){
+    // console.log('store content', StorageManager.get());
+    // console.log('this', $(this).data('protein'));
     let self = this;
     return StorageManager.toggle($(this).data('protein'), function(inStorage, added, removed) {
+        // console.log('click', inStorage, added, removed);
+        // console.log('localStorage', localStorage);
+        console.log('Storage', StorageManager.get(), added, removed);
         if(added === 0){
             $(self).removeClass('inStore');
         } else if(removed === 0) {
@@ -55,7 +60,6 @@ $('.clearButton').on('click', function(){
 // Get the searchInput element: used to read the value of it later and reset the URI with the right query
 const searchInput = $('.prompt.inline');
 
-
 $('.ui.search').search({
     apiSettings: {
         action: 'get from temperature reads',
@@ -67,6 +71,9 @@ $('.ui.search').search({
         return false;
     },
     onResults: function(response) {
+        // StorageManager.clear();
+        // TODO rework with new protein structure
+        console.log('response', response);
 
         //renderProgress();
 
@@ -126,8 +133,17 @@ $('.ui.search').search({
                 html += '</div>';
 
                 var element = $(html);
-                element.data("protein", protein);
-                StorageManager.has(protein, function(storage, hasCount) {
+                element.data("protein", {
+                    uniprotId: protein.uniprotId,
+                    experiment: protein.experiments.map(e => e.experiment)
+                });// protein);
+
+                // TODO change this when migrating to new structure
+                let tmpProt = {
+                    uniprotId: protein.uniprotId,
+                    experiment: protein.experiments.map(e => e.experiment)
+                };
+                StorageManager.has(tmpProt, function(storage, hasCount) {
                     if(hasCount === protein.experiments.length){
                         element.addClass('inStore');
                     } else if(hasCount > 0) {

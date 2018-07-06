@@ -70,5 +70,88 @@ module.exports = function(context) {
                 }
             );
         },
+
+        findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs) {
+            // create where clause
+
+            // TODO bad way to create where, refactor!
+            let where = ' where (';
+            uniprodIdExpIdPairs.forEach((e, i, a) => {
+                let tmp = `(pr."uniprotId" = '`+e.uniprotId+`' AND `;
+                tmp += `pr.experiment = '`+e.experiment+`')`;
+
+                if(i === uniprodIdExpIdPairs.length-1) {
+                    console.log(i);
+                } else {
+                    tmp+=' OR ';
+                }
+                where += tmp;
+            });
+            where += ')';
+            if(uniprodIdExpIdPairs.length === 0) {
+                where = '';
+            }
+
+            const query = `
+                select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
+                from (
+                  SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
+                  FROM "temperatureReads" pr
+                  `+where+`
+                  GROUP BY pr."experiment", pr."uniprotId"
+                ) tmp
+                group by tmp."uniprotId"
+            `;
+            /*
+            for the whole database
+            Planning time: 0.147 ms
+            Execution time: 1377.891 ms
+             */
+
+            return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
+
+            // TODO better solution for the above query, but subquerys are not supported
+            // find better way to impl
+            //
+            // let where = {
+            //     [sequelize.Op.or]: uniprodIdExpIdPairs
+            // };
+            //
+            //
+            // return temperatureReadsModel.findAll({
+            //     raw: true,
+            //     attributes: [
+            //         'experiment',
+            //         'uniprotId',
+            //         [
+            //             sequelize.fn(
+            //                 'json_agg',
+            //                 sequelize.fn(
+            //                     'json_build_object',
+            //                     't',
+            //                     'temperature',
+            //                     'reads',
+            //                     'reads'
+            //                 )
+            //             ),
+            //             'reads'
+            //         ]
+            //     ],
+            //     where: where,
+            //     group: ['experiment', 'uniprotId']
+            // });
+
+            /*
+            select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as reads
+            from (
+              SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
+              FROM "temperatureReads" pr
+              where (pr."uniprotId" = 'A0AVT1' and pr.experiment = '1') or (pr.experiment = '2' and pr."uniprotId" = 'A0AVF1')
+              GROUP BY pr."experiment", pr."uniprotId"
+            ) tmp
+            group by tmp."uniprotId"
+            ;
+             */
+        }
     };
 };

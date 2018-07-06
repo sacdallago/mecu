@@ -1,8 +1,10 @@
-let selectedExperiments = new Set();
-let selectedProteins = new Set();
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
 const statsTable = $('pre.statistics');
+
+let selectedExperiments = new Set();
+let selectedProteins = new Set();
+let localStorageDeleted = StorageManager.get().length === 0;
 
 $('.ui.checkbox')
     .checkbox({
@@ -95,9 +97,13 @@ let fetchMeltingCurves = function(experiments, proteins){
                 })
             })
 
+            // console.log('tableData', tableData);
+
             tableData.forEach(tr => {
-                let row = '<tr><td>'+tr.name+'</td>';
-                tr.values.forEach(v => row+=('<td>'+v+'</td>'));
+                let row = '<tr class="toggle-protein" id='+tr.name+'><td>'+tr.name+'</td>';
+                tr.values.forEach(v => {
+                    row+=('<td>'+v+'</td>');
+                });
                 row+='</tr>';
                 $('#result-table tbody').append(row);
             })
@@ -115,3 +121,44 @@ let fetchMeltingCurves = function(experiments, proteins){
         })
         .catch(error => console.error(error))
 };
+
+$('body').on('click', 'tr[class=toggle-protein]', function() {
+
+    console.log(this, $(this).attr('id'));
+
+    let self = this;
+    const toggleProtein = function(inStorage, added, removed) {
+        if(added === 0){
+            $(self).removeClass('inStore');
+        } else if(removed === 0) {
+            $(self).addClass('inStore');
+        } else {
+            if ($(self).hasClass('inStore')){
+                $(self).removeClass('inStore');
+            }
+        }
+    };
+
+    console.log('Storage', StorageManager.get());
+
+    // if the localStorage hasn't been deleted yet and there are some proteins in it
+    if(!localStorageDeleted && StorageManager.get().length > 0) {
+        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
+            StorageManager.clear();
+            console.log('store cleared');
+            localStorageDeleted = true;
+            selectedExperiments.forEach(v => {
+                let tmp = {uniprotId:$(this).attr('id'), experiment:v};
+                console.log('tmp', tmp);
+                StorageManager.toggle(tmp, toggleProtein);
+            });
+        }
+    } else {
+        console.log('protein toggle', {uniprotId:$(this).attr('id'), experiment:[0]});
+        selectedExperiments.forEach(v => {
+            StorageManager.toggle({uniprotId:$(this).attr('id'), experiment:v}, toggleProtein);
+        });
+    }
+    console.log('localStorage', StorageManager.get(), StorageManager.get().length);
+    console.log('selectedProteins', selectedProteins);
+});
