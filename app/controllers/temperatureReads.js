@@ -15,7 +15,7 @@ module.exports = function(context) {
     return {
         searchByUniprotId: function(request, response) {
             const identifier = request.params.id.toUpperCase();
-
+            const start = new Date();
             if(identifier === undefined){
                 return response.send([]);
             } else {
@@ -52,7 +52,7 @@ module.exports = function(context) {
 
                                 return element;
                             });
-
+                            console.log('duration', (Date.now()-start)/1000)
                             return response.send(result);
                         })
                             .catch(function(error){

@@ -75,7 +75,7 @@ module.exports = function(context) {
             // create where clause
 
             // TODO bad way to create where, refactor!
-            let where = '';
+            let where = ' where (';
             uniprodIdExpIdPairs.forEach((e, i, a) => {
                 let tmp = `(pr."uniprotId" = '`+e.uniprotId+`' AND `;
                 tmp += `pr.experiment = '`+e.experiment+`')`;
@@ -87,17 +87,26 @@ module.exports = function(context) {
                 }
                 where += tmp;
             });
+            where += ')';
+            if(uniprodIdExpIdPairs.length === 0) {
+                where = '';
+            }
 
             const query = `
-                select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as reads
+                select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
                 from (
                   SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
                   FROM "temperatureReads" pr
-                  where (`+where+`)
+                  `+where+`
                   GROUP BY pr."experiment", pr."uniprotId"
                 ) tmp
                 group by tmp."uniprotId"
             `;
+            /*
+            for the whole database
+            Planning time: 0.147 ms
+            Execution time: 1377.891 ms
+             */
 
             return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
 
