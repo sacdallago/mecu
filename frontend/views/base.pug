@@ -57,13 +57,15 @@ html
                                 .ui.inverted.vertical.footer.segment
 
 
-        script(type="text/javascript", src="/public/libs/jquery/jquery.js")
-        script(type="text/javascript", src="/public/libs/jquery/jquery.css")
         script(type="text/javascript", src="/public/libs/urlRewrite.js")
         script(type="text/javascript", src="/public/libs/semantic/semantic.js")
         script(type="text/javascript", src='/public/libs/progress/progress.js')
         script(type="text/javascript", src='/public/libs/onepage/onepage.js')
         script(type="text/javascript", src='/public/libs/store/store.legacy.min.js')
+        
+        //- libraries, loaded from node_modules
+        script(type="text/javascript", src="/public/modules/jquery/dist/jquery.min.js")
+        //- custom scripts
         script(type="text/javascript", src="/public/js/settings.js")
         script(type="text/javascript", src="/public/js/storage.js")
         script(type="text/javascript", src="/public/js/requests.js")
