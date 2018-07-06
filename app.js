@@ -87,15 +87,15 @@ if (cluster.isMaster) {
         app.use(compression());
 
         // Export static folders
+        // custom js scripts
         app.use("/public/js", express.static(path.join(__dirname, "frontend", "js")));
+        // custom css scripts
         app.use("/public/css", express.static(path.join(__dirname, "frontend", "css")));
-
-        app.use("/public/libs/mecu-graph", express.static(require.resolve("mecu-graph")));
-        app.use("/public/libs/mecu-utils", express.static(require.resolve("mecu-utils")));
-        app.use("/public/libs/mecu-line", express.static(require.resolve("mecu-line")));
-        app.use("/public/libs/disi", express.static(require.resolve("disi")));
-
+        // the old libs (TODO should be removed completely)
         app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
+        // new libs should all be loaded from the node_modules (TODO or in a later set with webpack)
+        app.use("/public/modules", express.static(path.join(__dirname, "node_modules")));
+
         app.use("/public", express.static(path.join(__dirname, "frontend", "public")));
         app.use(favicon(path.join(__dirname, "frontend", "public", "images", "mecu.ico")));
 
