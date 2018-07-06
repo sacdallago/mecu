@@ -37,8 +37,9 @@ block content
     h3 3. Check statistics
     .space
     p Input at least one protein and select at least one experiment to get started.
-    pre.statistics
-    .space
+    
+    //- pre.statistics
+    //- .space
     table.ui.celled.table#result-table
         thead
             tr
@@ -59,5 +60,4 @@ block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/libs/mecu-line")
     script(type="text/javascript", src="/public/js/bulkSearch.js")

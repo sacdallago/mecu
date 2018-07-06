@@ -28,6 +28,7 @@
         "express-session": "latest",
         "formidable": "latest",
         "gridfs-stream": "latest",
+        "jquery": "^3.3.1",
         "json2csv": "^4.0.1",
         "mecu-graph": "latest",
         "mecu-line": "latest",
@@ -39,8 +40,10 @@
         "pg": "latest",
         "pg-hstore": "latest",
         "pug": "^2.0.0",
+        "semantic-ui": "^2.2.1",
         "sequelize": "^4.35.2",
         "serve-favicon": "latest",
+        "store": "^2.0.12",
         "universal-analytics": "latest",
         "webpack": "^4.1.0"
     },
