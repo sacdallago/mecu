@@ -2,6 +2,10 @@
  * Created by chdallago on 1/13/17.
  */
 
+ $.fn.api.settings.api = {
+     'get list of proteins with experiments and data': '/api/proteins/search/exp/'
+ };
+
 const grid = $('.isoGrid').isotope({
     // main isotope options
     itemSelector: '.grid-item',
@@ -60,6 +64,9 @@ grid.on('click', '.grid-item', function(){
 
 function loadProteins() {
     let proteins = StorageManager.get();
+    console.log('proteins', proteins);
+    // proteins = Object.keys(proteins).map(i => ({uniprotId:i, experiment: proteins[i]}))
+    // console.log('loadProteins', proteins);
 
     // Grid
     grid.empty();
@@ -70,26 +77,23 @@ function loadProteins() {
     let items = [];
 
     proteins.forEach(function(protein) {
-        var html = '';
-
-        html += '<div class="grid-item"' + protein.experiments.map(function(expRead){
-                return (expRead.experiment + "").replace(/\s|\//g, "_")
-            }).join('E') + ' id="' + protein.uniprotId + protein.experiments.map(function(expRead){
-                return (expRead.experiment + "").replace(/\s|\//g, "_")
-            }).join('E') + '">';
+        var html = `<div class="grid-item "${protein.experiment.join('E')}
+             id="${protein.uniprotId + protein.experiment.join('E')}
+             ">`;
 
         html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-        if(protein.experiments.length > 1){
-            // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
+
+        if(protein.experiment.length === 1){
+            html += '<div class="experimentNumber">' + protein.experiment[0] + '</div>';
         } else {
-            html += '<div class="experimentNumber">' + protein.experiments[0].experiment + '</div>';
+            // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
         }
         html += '</div>';
 
         var element = $(html);
         element.data("protein", protein);
         StorageManager.has(protein, function(storage, hasCount) {
-            if(hasCount === protein.experiments.length){
+            if(hasCount === protein.experiment.length){
                 element.addClass('inStore');
             } else if(hasCount > 0) {
                 element.addClass('partiallyInStore');
@@ -101,12 +105,13 @@ function loadProteins() {
     grid.isotope('insert', items);
 
     proteins.forEach(function(protein) {
-        let curve = new MecuLine({element: "#"+protein.uniprotId+protein.experiments.map(function(expRead){
-            return (expRead.experiment + "").replace(/\s|\//g, "_")
-        }).join('E'), width:"200", height:"200"});
-
-        curve.add(protein);
-        curves.push(curve);
+        // TODO retrieve data before drawing
+        // let curve = new MecuLine({
+        //     element: "#"+protein.uniprotId+protein.experiment.join('E'), width:"200", height:"200"
+        // });
+        //
+        // curve.add(protein);
+        // curves.push(curve);
     });
 };
 
@@ -114,12 +119,22 @@ let globalCurve;
 let globalGraph;
 
 function populateGlobalsGraphs(){
-    let proteins = StorageManager.get();
-    globalCurve = new MecuLine({element: "#curvesGraph", minTemp: 37, maxTemp: 65 , axes: true});
-    globalCurve.add(proteins);
+    let proteins = StorageManager.splitUpProteins(StorageManager.get());
+    console.log('proteins split up', proteins);
+    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(proteins)
+        .then(data => {
+            console.log('data', data);
+            globalCurve = new MecuLine({element: "#curvesGraph", minTemp: 37, maxTemp: 65 , axes: true});
+            globalCurve.add(data);
 
-    globalGraph = new MecuGraph({element: "#nodesGraph"});
-    globalGraph.add(proteins);
+            globalGraph = new MecuGraph({element: "#nodesGraph"});
+            globalGraph.add(data);
+        })
+        .catch(error => {
+            console.error(error);
+            var errorMsg = 'Ajax request failed: ' + xhr.responseText;
+            $('#content').html(errorMsg);
+        });
 }
 
 populateGlobalsGraphs();
