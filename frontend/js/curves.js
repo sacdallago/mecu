@@ -16,30 +16,6 @@ const grid = $('.isoGrid').isotope({
     }
 });
 
-$('.item.proteins').on('click', function(event){
-    event.preventDefault();
-
-    var html = '<div class="ui modal">';
-    html += '<div class="header">Selected proteins</div>';
-    html += '<div class="content">';
-    html += '<div class="ui form">';
-    html += '<div class="field">';
-    html += '<textarea class="">';
-    StorageManager.get().forEach(function(protein){
-        html += protein.uniprotId + ", ";
-    });
-    html += '</textarea>';
-    html += '</div>';
-    html += '<div class="field">';
-    html += '<div class="ui submit button">Load proteins</div>';
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
-
-    $(html).modal('show');
-});
-
 curves = [];
 
 grid.on('click', '.grid-item', function(){
