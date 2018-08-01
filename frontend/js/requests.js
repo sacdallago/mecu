@@ -1,15 +1,19 @@
 TemperatureService = {};
 
 TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: '/api/proteins/search/exp/',
-            type: 'POST',
-            data: JSON.stringify(pairs),
-            dataType: 'json',
-            contentType: "application/json; charset=utf-8"
-        })
-        .done(data => resolve(data)) // the way jquery 1.11 does it
-        .fail(error => reject(error));
-    });
+    return fetch(
+            '/api/proteins/search/exp/',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(pairs)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for temperatureReadsToProteinsAndExperimentPairs: ', error, pairs);
+            return [];
+        });
 }
