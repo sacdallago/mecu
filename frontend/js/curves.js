@@ -115,18 +115,49 @@ function loadProteins() {
     });
 };
 
-let globalCurve;
 let globalGraph;
 
 function populateGlobalsGraphs(){
     let proteins = StorageManager.splitUpProteins(StorageManager.get());
-    console.log('proteins split up', proteins);
     TemperatureService.temperatureReadsToProteinsAndExperimentPairs(proteins)
         .then(data => {
-            console.log('data', data);
-            globalCurve = new MecuLine({element: "#curvesGraph", minTemp: 37, maxTemp: 65 , axes: true});
-            globalCurve.add(data);
 
+            // these 2 functions can eventually be outsourced into own utils(?) file
+            let getHashCode = function(str) {
+                var hash = 0;
+                if (str.length == 0) return hash;
+                for (var i = 0; i < str.length; i++) {
+                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                    hash = hash & hash; // Convert to 32bit integer
+                }
+                return hash;
+            };
+            let intToHSL = function(inputInt) {
+                var shortened = inputInt % 360;
+                return "hsl(" + shortened + ",100%,40%)";
+            };
+
+            // creating data series for highcharts
+            let series = [];
+            data.forEach(protein => {
+                protein.experiments.forEach(experiment => {
+                    series.push({
+                        name: protein.uniprotId+' '+experiment.experiment,
+                        data: experiment.reads.map(r => [r.t, r.r]),
+                        color: getHashCode(protein.uniprotId+"-E"+experiment.experiment).intToHSL(),
+                        marker: {symbol: 'circle'}
+                    })
+                })
+            });
+
+            // configuring and plotting highcharts
+            highChartsConfigObject['title.text'] = 'TPCA melting curve';
+            highChartsConfigObject['yAxis.title.text'] = '% alive';
+            highChartsConfigObject['xAxis.title.text'] = 'Temperature';
+            highChartsConfigObject['series'] = series;
+            Highcharts.chart('curvesGraph', highChartsConfigObject);
+
+            // plot distances
             globalGraph = new MecuGraph({element: "#nodesGraph"});
             globalGraph.add(data);
         })
