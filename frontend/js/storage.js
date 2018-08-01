@@ -11,15 +11,22 @@ StorageManager = {};
  */
 
 StorageManager.splitUpProteinIntoExperiments = (protein) => {
-    if(protein.experiment.constructor === Array) {
-        protein = protein.experiment.map(e => ({
+    // case if it's protein data used on the client
+    if(protein.experiment && protein.experiment.constructor === Array) {
+        return protein.experiment.map(e => ({
             uniprotId: protein.uniprotId,
             experiment: e
         }))
-    } else {
-        protein = [protein];
     }
-    return protein;
+    // case if it's protein data from the server
+    else if(protein.experiments && protein.experiments.constructor === Array){
+        return protein.experiments.map(e => ({
+            uniprotId: protein.uniprotId,
+            experiment: e.experiment
+        }))
+    } else {
+        return [protein];
+    }
 }
 
 StorageManager.splitUpProteins = (proteins) => {
