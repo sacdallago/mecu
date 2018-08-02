@@ -16,18 +16,21 @@ module.exports = function(context) {
 
         getExperiments: function(options = {}){
             console.log('options', options);
-            return experimentsModel.findAll({
-                attributes: ['id', 'lysate', 'description', 'uploader'],
-                limit: options.limit,
-                offset: options.offset,
-                order: [
-                    [options.sortBy, (options.order === -1 ? 'DESC' : 'ASC')]
-                ]
-            })
-            .then(res => {
-                console.log('res', res.length);
-                return res;
-            });
+            return Promise.all([
+                    experimentsModel.count(),
+                    experimentsModel.findAll({
+                        attributes: ['id', 'lysate', 'description', 'uploader'],
+                        limit: options.limit,
+                        offset: options.offset,
+                        order: [
+                            [options.sortBy, (options.order === -1 ? 'DESC' : 'ASC')]
+                        ]
+                    })
+                ])
+                .then(([count, result]) => {
+                    console.log('res', count, result.length);
+                    return {count, data: result};
+                });
         },
 
         getRawData: function(id){
