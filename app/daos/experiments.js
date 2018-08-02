@@ -10,13 +10,23 @@ module.exports = function(context) {
     var experimentsModel = context.component('models').module('experiments');
 
     return {
-        create: function(item, options) {            
+        create: function(item, options) {
             return experimentsModel.create(item, options);
         },
 
-        getExperiments: function(){
+        getExperiments: function(options = {}){
+            console.log('options', options);
             return experimentsModel.findAll({
-                attributes: ['id', 'lysate', 'description', 'uploader']
+                attributes: ['id', 'lysate', 'description', 'uploader'],
+                limit: options.limit,
+                offset: options.offset,
+                order: [
+                    [options.sortBy, (options.order === -1 ? 'DESC' : 'ASC')]
+                ]
+            })
+            .then(res => {
+                console.log('res', res.length);
+                return res;
             });
         },
 

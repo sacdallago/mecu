@@ -30,20 +30,9 @@ module.exports = function(context) {
         },
 
         bulkSearch: function(request, response) {
-            return experimentsDao.getExperiments()
-                .then(function(experiments) {
-                    return response.render('bulkSearch', {
-                        title: 'Search for proteins',
-                        experiments: experiments
-                    });
-                })
-                .catch(function(error) {
-                    return response.status(500).render('error', {
-                        title: 'Error!',
-                        message: "There was an unknown error with your request.",
-                        error: error
-                    });
-                });
+            return response.render('bulkSearch', {
+                title: 'Search for proteins'
+            });
         },
 
         curves: function(request, response) {
