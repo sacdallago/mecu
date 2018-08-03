@@ -13,18 +13,8 @@ block content
                 th Description
                 th Lysate
                 th Uploader
-        tbody
-            each experiment in experiments
-                tr
-                    td
-                        .ui.checkbox
-                            label
-                            input(type="checkbox", tabindex="0", class="hidden", data-id= experiment.id)
-                    td= experiment.id
-                    td= experiment.description
-                    td= experiment.lysate
-                    td
-                        a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
+        tbody#experiments-list-container
+            
     h3 2. Input proteins
     .text-center
         .ui.input.search.maxWidth

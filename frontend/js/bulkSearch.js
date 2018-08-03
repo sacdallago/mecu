@@ -1,27 +1,29 @@
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
 const statsTable = $('pre.statistics');
+const ITEM_PER_PAGE_COUNT = 10;
 
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
 let localStorageDeleted = StorageManager.get().length === 0;
+let experimentsQuery = {
+    search: undefined,
+    limit: ITEM_PER_PAGE_COUNT,
+    offset: 0,
+    sortBy: 'id',
+    order: 1
+};
 
-$('.ui.checkbox')
-    .checkbox({
-        onChecked: function() {
-            let experimentId = $(this).data('id');
-            selectedExperiments.add(experimentId);
+$(document).ready(
+    ExperimentService.paginatedExperiments(experimentsQuery)
+        .then(result => {
+            // draw the data retrieved onto the experiments table
+            drawExperimentsTable(result.data, 'cb');
 
-            fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
-        },
-        onUnchecked: function() {
-            let experimentId = $(this).data('id');
-            selectedExperiments.delete(experimentId);
-
-            fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
-
-        },
-    });
+            // add event handlers to the checkboxes of the experiments table
+            addEventHandlerToExperimentsTable('cb');
+        })
+    );
 
 $('textarea.inline.prompt.maxWidth.textarea')
     .keyup(function(){
@@ -32,95 +34,6 @@ $('textarea.inline.prompt.maxWidth.textarea')
 
         fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
     });
-
-
-let fetchMeltingCurves = function(experiments, proteins){
-    if(experiments.length < 1 || proteins.length < 1){
-        return;
-    }
-
-    experiments = experiments.sort();
-    proteins = proteins.sort();
-
-    fetch("/api/reads/temperature", {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify({
-                experiments: experiments,
-                proteins: proteins
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            let statistics = "";
-            statistics += "UniprotId\t" + experiments.sort().join(" ") + "\n";
-            proteins.forEach(p => {
-                let e = data.find(protein => protein.uniprotId === p);
-
-                if(e){
-                    statistics += p + "\t\t"  +
-                    experiments.sort().map(exp => e.experiments.map(redu => redu.experiment).indexOf(exp) !== -1 ? "X" : "-").join(" ") + "\n";
-                } else {
-                    statistics += p + "\t\t"  + experiments.sort().map(_ => "-").join(" ") + "\n";
-                }
-
-            });
-            statsTable.text(statistics);
-
-            // empty table and table head on change of input data
-            $('#result-table tbody').empty();
-            $('#result-table thead tr th:not(:first-child)').remove();
-
-            let header = [];
-            experiments.forEach(d => header.push(d));
-            header.forEach(d => $('#result-table thead tr').append('<th>'+d+'</th>'));
-
-            let tableData = [];
-            let totalRow = {
-                name: 'Total',
-                values: new Array(experiments.length).fill(0),
-                rating: new Array(experiments.length).fill(0)
-            };
-            proteins.forEach(p => tableData.push({name: p, values: new Array(experiments.length).fill(0)}));
-
-            data.forEach((d, i, a) => {
-                let tableProt = tableData.find(td => td.name === d.uniprotId);
-
-
-                d.experiments.forEach(e => {
-                    let idx = experiments.indexOf(e.experiment);
-                    tableProt.values[idx] = 1;
-                    totalRow.values[idx] += 1;
-                })
-            })
-
-            // console.log('tableData', tableData);
-
-            tableData.forEach(tr => {
-                let row = '<tr class="toggle-protein" id='+tr.name+'><td>'+tr.name+'</td>';
-                tr.values.forEach(v => {
-                    row+=('<td>'+v+'</td>');
-                });
-                row+='</tr>';
-                $('#result-table tbody').append(row);
-            })
-
-            let summaryRow = '<tr><td>Total</td>';
-            totalRow.values.forEach((v,i,a) => {
-                totalRow.rating[i] = v/proteins.length;
-                summaryRow += '<td>'+v+'/'+proteins.length
-                // +' ('+(totalRow.rating[i]*100).toFixed(2)+'%)' // can be omitted
-                +'</td>';
-            });
-            summaryRow += '</tr>';
-            $('#result-table tbody').append(summaryRow);
-
-        })
-        .catch(error => console.error(error))
-};
 
 $('body').on('click', 'tr[class=toggle-protein]', function() {
 
@@ -160,5 +73,129 @@ $('body').on('click', 'tr[class=toggle-protein]', function() {
         });
     }
     console.log('localStorage', StorageManager.get(), StorageManager.get().length);
-    console.log('selectedProteins', selectedProteins);
 });
+
+/**
+ * draw the experiments data table from the retrieved data
+ * @param  [{id: number, description: string, lysate: boolean, uploader:string}] data               [description]
+ * @param  string checkboxIdentifier how should the checkboxes be identified
+ */
+const drawExperimentsTable = (data, checkboxIdentifier) => {
+    let table = $('#experiments-list-container');
+    let tr = $('<tr />');
+    let td = $('<td />');
+    let div = $('<div />', {'class': 'ui checkbox'});
+    let input = $('<input />', {'class':checkboxIdentifier, 'type':'checkbox', 'tabindex':'0'});
+    let label = $('<label />');
+    let link = $('<a />', {'target':'_blank'});
+    table.empty();
+    data.forEach(exp => {
+        let row = tr.clone();
+        row.append(
+            td.clone().append(
+                div.clone().append([
+                    input.clone().attr({'id':'cbE'+exp.id, 'data-id':exp.id}),
+                    label.clone().attr({'for':'cbE'+exp.id})
+                ])
+            )
+        );
+        row.append(td.clone().text(exp.id));
+        row.append(td.clone().text(exp.description));
+        row.append(td.clone().text(exp.lysate));
+        row.append(
+            td.clone().append(
+                link.clone()
+                    .attr({'href':'https://plus.google.com/'+exp.uploader})
+                    .text('Google Plus Profile')
+                )
+        );
+
+        table.append(row);
+    });
+}
+
+/**
+ * when checking a checkbox in the experiments table, reload the experiments data
+ * @param string checkboxIdentifier
+ */
+const addEventHandlerToExperimentsTable = (checkboxIdentifier) => {
+    let list = document.getElementsByClassName(checkboxIdentifier);
+    for(let i = 0; i<list.length; i++) {
+        list[i].addEventListener('click', function() {
+            if (this.checked) {
+                let experimentId = $(this).data('id');
+                selectedExperiments.add(experimentId);
+                fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
+            } else {
+                let experimentId = $(this).data('id');
+                selectedExperiments.delete(experimentId);
+                fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
+            }
+        })
+    };
+}
+
+const fetchMeltingCurves = function(experiments, proteins){
+    const tableBodyIdentifier = '#result-table tbody';
+    const tableHeadIdentifier = '#result-table thead tr th:not(:first-child)';
+
+    // always empty table before new request
+    $(tableBodyIdentifier).empty();
+    $(tableHeadIdentifier).remove();
+    if(experiments.length < 1 || proteins.length < 1){
+        return;
+    }
+
+    experiments = experiments.sort();
+    proteins = proteins.sort();
+
+    TemperatureService.temperatureReads(experiments, proteins)
+        .then(data => drawProteinXExperimentTable(experiments, proteins, data));
+};
+
+const drawProteinXExperimentTable = (experiments, proteins, data) => {
+
+    // create header of table
+    let header = [];
+    experiments.forEach(d => header.push(d));
+    header.forEach(d => $('#result-table thead tr').append($('<th />').text(d)));
+
+    // create table content
+    let tableData = [];
+    let totalRow = {
+        name: 'Total',
+        values: new Array(experiments.length).fill(0),
+        rating: new Array(experiments.length).fill(0)
+    };
+    proteins.forEach(p => tableData.push({name: p, values: new Array(experiments.length).fill(0)}));
+
+    data.forEach((d, i, a) => {
+        let tableProt = tableData.find(td => td.name === d.uniprotId);
+
+
+        d.experiments.forEach(e => {
+            let idx = experiments.indexOf(e.experiment);
+            tableProt.values[idx] = 1;
+            totalRow.values[idx] += 1;
+        })
+    })
+
+
+    tableData.forEach(tr => {
+        let row = $('<tr />')
+            .attr({'class':'toggle-protein', 'id':tr.name});
+        row.append($('<td />').text(tr.name));
+        tr.values.forEach(v => {
+            row.append($('<td />').text(v));
+        });
+        $('#result-table tbody').append(row);
+    })
+
+    // add summary row
+    let summaryRow = $('<tr />').append($('<td />').text('Total'));
+    totalRow.values.forEach((v,i,a) => {
+        totalRow.rating[i] = v/proteins.length;
+        summaryRow.append($('<td />').text(v+'/'+proteins.length));
+    });
+    $('#result-table tbody').append(summaryRow);
+}
