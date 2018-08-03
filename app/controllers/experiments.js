@@ -143,12 +143,10 @@ module.exports = function(context) {
         },
 
         getExperiments: function(request, response) {
-            experimentsDao.getExperiments(queryParams(request.query))
-                .then(function(experiments){
-                    return response.status(200).send(experiments);
-                })
-                .catch(function(error){
-                    console.error(error);
+            experimentsDao.getExperimentsPaged(queryParams(request.query))
+                .then(result => response.status(200).send(result))
+                .catch(error => {
+                    console.error('getExperiments', error);
                     return response.status(500).send(error);
                 });
         },

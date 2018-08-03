@@ -15,7 +15,13 @@ module.exports = function(context) {
         },
 
         getExperiments: function(options = {}){
-            console.log('options', options);
+            return experimentsModel.findAll({
+                    attributes: ['id', 'lysate', 'description', 'uploader'],
+                });
+        },
+
+        getExperimentsPaged: function(options) {
+            // add search if necessary
             return Promise.all([
                     experimentsModel.count(),
                     experimentsModel.findAll({
@@ -27,10 +33,7 @@ module.exports = function(context) {
                         ]
                     })
                 ])
-                .then(([count, result]) => {
-                    console.log('res', count, result.length);
-                    return {count, data: result};
-                });
+                .then(([count, result]) => ({count, data:result}));
         },
 
         getRawData: function(id){
