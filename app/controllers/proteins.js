@@ -45,7 +45,7 @@ module.exports = function(context) {
 
             temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray)
                 .then(r => {
-                    console.log('r', r);
+                    console.log('rtemperatureReadsDao.findAndAggregateTempsByIdAndExperiment', r);
                     response.send(r);
                 })
                 .catch(err => {
