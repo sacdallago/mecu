@@ -1,6 +1,6 @@
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
-const ITEM_PER_PAGE_COUNT = 10;
+const ITEM_PER_PAGE_COUNT = 2;
 
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
@@ -13,26 +13,30 @@ let experimentsQuery = {
     order: 1
 };
 
-$(document).ready(
-    ExperimentService.paginatedExperiments(experimentsQuery)
+const pullPaginatedExperiments = (query, page) => {
+    return ExperimentService.paginatedExperiments(query)
         .then(result => {
             // draw the data retrieved onto the experiments table
             drawExperimentsTable(result.data, 'cb');
 
             // add event handlers to the checkboxes of the experiments table
             addEventHandlerToExperimentsTable('cb');
-        })
+            return result;
+        });
+}
+
+const drawPaginationComponent = (actualPage, totalPages) => {
+    new PaginationComponent(
+        '#pagination-component',
+        totalPages,
+        experimentsQuery.limit,
+        actualPage,
+        (newPage) => {
+            experimentsQuery.offset = (newPage-1)*ITEM_PER_PAGE_COUNT;
+            pullPaginatedExperiments(experimentsQuery, newPage)
+        }
     );
-
-$('textarea.inline.prompt.maxWidth.textarea')
-    .keyup(function(){
-        let matches = $(this).val().match(uniprotAccessionRegex);
-
-        selectedProteins = new Set(matches);
-        matchCount.text(selectedProteins.size);
-
-        fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
-    });
+}
 
 // $('body').on('click', 'tr[class=toggle-protein]', function() {
 //
@@ -321,3 +325,19 @@ const saveExperimentToLocalStorage = (experiment, proteinList) => {
         });
     }
 }
+
+
+$(document)
+    .ready(() => pullPaginatedExperiments(experimentsQuery)
+        .then(result => drawPaginationComponent(1, result.count))
+    );
+
+$('textarea.inline.prompt.maxWidth.textarea')
+    .keyup(function(){
+        let matches = $(this).val().match(uniprotAccessionRegex);
+
+        selectedProteins = new Set(matches);
+        matchCount.text(selectedProteins.size);
+
+        fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
+    });

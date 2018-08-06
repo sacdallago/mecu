@@ -2,6 +2,7 @@ extends base
 
 block postStyles
     link(rel='stylesheet', href='/public/css/bulkSearch.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
 
 block content
     h3 1. Select experiments
@@ -14,6 +15,8 @@ block content
                 th Lysate
                 th Uploader
         tbody#experiments-list-container
+    
+    .pagination#pagination-component
             
     h3 2. Input proteins
     .text-center
@@ -51,3 +54,4 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/bulkSearch.js")
+    script(type="text/javascript", src="/public/js/pagination.js")
