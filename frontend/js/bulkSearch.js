@@ -74,7 +74,29 @@ $('textarea.inline.prompt.maxWidth.textarea')
 //     console.log('localStorage', StorageManager.get(), StorageManager.get().length);
 // });
 
+/**
+ * fetch melting curves accoring to the experiments and proteins given
+ * @param  {number[]} experiments [description]
+ * @param  {string[]} proteins    [description]
+ * @return { {uniprotId: string, experiments:{experiment: number, reads: {t: number, r: number}[] }[] }[] } list of proteins with the according experiments
+ */
+const fetchMeltingCurves = function(experiments, proteins){
+    const tableBodyIdentifier = '#result-table tbody';
+    const tableHeadIdentifier = '#result-table thead tr th:not(:first-child)';
 
+    // always empty table before new request
+    $(tableBodyIdentifier).empty();
+    $(tableHeadIdentifier).remove();
+    if(experiments.length < 1 || proteins.length < 1){
+        return;
+    }
+
+    experiments = experiments.sort();
+    proteins = proteins.sort();
+
+    TemperatureService.temperatureReads(experiments, proteins)
+        .then(data => drawProteinXExperimentTable(experiments, proteins, data));
+};
 
 /**
  * draw the experiments data table from the retrieved data
@@ -136,26 +158,8 @@ const addEventHandlerToExperimentsTable = (checkboxIdentifier) => {
     };
 }
 
-const fetchMeltingCurves = function(experiments, proteins){
-    const tableBodyIdentifier = '#result-table tbody';
-    const tableHeadIdentifier = '#result-table thead tr th:not(:first-child)';
-
-    // always empty table before new request
-    $(tableBodyIdentifier).empty();
-    $(tableHeadIdentifier).remove();
-    if(experiments.length < 1 || proteins.length < 1){
-        return;
-    }
-
-    experiments = experiments.sort();
-    proteins = proteins.sort();
-
-    TemperatureService.temperatureReads(experiments, proteins)
-        .then(data => drawProteinXExperimentTable(experiments, proteins, data));
-};
-
 /**
- * at the moment draws both the heatmap and the table
+ * TODO at the moment draws both the heatmap and the table
  * @param  {[type]} experiments [description]
  * @param  {[type]} proteins    [description]
  * @param  {[type]} data        [description]
@@ -164,9 +168,12 @@ const fetchMeltingCurves = function(experiments, proteins){
 const drawProteinXExperimentTable = (experiments, proteins, data) => {
 
     // create header of table
-    let header = [];
-    experiments.forEach(d => header.push(d));
-    header.forEach(d => $('#result-table thead tr').append($('<th />').text(d)));
+    experiments.forEach((e,i,a) =>
+        $('#result-table thead tr')
+            .append($('<th />')
+            .attr({'class':'toggle-experiment', 'data-experiment':e, 'data-exp-id':i})
+            .text(e))
+        );
 
     // create table content
     let tableData = [];
