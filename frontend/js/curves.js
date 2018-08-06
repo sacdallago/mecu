@@ -16,8 +16,6 @@ const grid = $('.isoGrid').isotope({
     }
 });
 
-curves = [];
-
 grid.on('click', '.grid-item', function(){
     let self = this;
     return StorageManager.toggle($(this).data('protein'), function(inStorage, added, removed) {
