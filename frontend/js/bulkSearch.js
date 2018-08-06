@@ -1,6 +1,5 @@
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
-const statsTable = $('pre.statistics');
 const ITEM_PER_PAGE_COUNT = 10;
 
 let selectedExperiments = new Set();
