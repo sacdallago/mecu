@@ -3,7 +3,7 @@
  */
 $('.dropdown').dropdown();
 
-highChartsConfigObject = {
+highChartsCurvesConfigObject = {
     title: {
         text: ''
     },

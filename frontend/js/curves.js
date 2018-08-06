@@ -135,11 +135,17 @@ function populateGlobalsGraphs(){
             });
 
             // configuring and plotting highcharts
-            highChartsConfigObject['title.text'] = 'TPCA melting curve';
-            highChartsConfigObject['yAxis.title.text'] = '% alive';
-            highChartsConfigObject['xAxis.title.text'] = 'Temperature';
-            highChartsConfigObject['series'] = series;
-            Highcharts.chart('curvesGraph', highChartsConfigObject);
+            highChartsCurvesConfigObject['title.text'] = 'TPCA melting curve';
+            highChartsCurvesConfigObject['yAxis.title.text'] = '% alive';
+            highChartsCurvesConfigObject['xAxis.title.text'] = 'Temperature';
+            highChartsCurvesConfigObject['series'] = series;
+            highChartsCurvesConfigObject['tooltip'] = {
+                // valueSuffix: '',
+                split: true,
+                distance: 30,
+                padding: 5
+            };
+            Highcharts.chart('curvesGraph', highChartsCurvesConfigObject);
 
             // plot distances
             globalGraph = new MecuGraph({element: "#nodesGraph"});
