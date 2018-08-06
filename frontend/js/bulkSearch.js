@@ -202,7 +202,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         let row = $('<tr />');
         row.append($('<td />').text(tr.name));
         tr.values.forEach((v,i,a) => {
-            row.append($('<td />').attr({'class':'toggle-experiment', 'data-experiment':experiments[i]}).text(v));
+            row.append($('<td />').attr({'class':'toggle-experiment', 'data-experiment':experiments[i], 'data-exp-id':i}).text(v));
         });
         $('#result-table tbody').append(row);
     })
@@ -215,7 +215,8 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     });
     $('#result-table tbody').append(summaryRow);
 
-    addClickHandlerToProteinExperimentTable('toggle-experiment');
+    addClickHandlerToProteinExperimentTable('toggle-experiment', tableData, experiments);
+
 
     // -----------------HEATMAP-----------------------
     // heatmap for more data: https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/heatmap-canvas/
@@ -285,12 +286,17 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
 
-const addClickHandlerToProteinExperimentTable = (columnCellIdentifier) => {
+const addClickHandlerToProteinExperimentTable = (columnCellIdentifier, data, experiments) => {
     const list = document.getElementsByClassName(columnCellIdentifier);
     for(let i = 0; i<list.length; i++) {
         list[i].addEventListener('click', function(e) {
-            console.log('this', this);
-            console.log('this', this.getAttribute('data-experiment'));
+            // console.log('this', this);
+            console.log('this', this.getAttribute('data-experiment')); // experimentId
+            // console.log('this', this.getAttribute('data-exp-id')); // experimentId
+            let arrId = this.getAttribute('data-exp-id');
+            let tmpList = [];
+            data.forEach(protein => protein.values[arrId] === 1 ? tmpList.push(protein.name) : '');
+            saveExperimentToLocalStorage(this.getAttribute('data-experiment'), tmpList);
         })
     }
 }
