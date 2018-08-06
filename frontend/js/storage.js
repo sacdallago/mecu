@@ -200,3 +200,45 @@ StorageManager.getMinTemp = function() {
     let t = store.get('minTemp');
     return (t != "NaN" ? t : undefined);
 };
+
+// check structure of 'proteins' in local storage
+(function (s) {
+    console.log('Checking local storage values...');
+    let proteins = s.get();
+    let ok = true;
+    if(proteins.constructor !== Array){
+        ok = false;
+        console.error('Local storage had faulty values... (L0)', proteins);
+    } else {
+        for(let i = 0; i<proteins.length; i++) {
+            if(
+                proteins[i].constructor !== Object ||
+                proteins[i].uniprotId === undefined ||
+                proteins[i].uniprotId.constructor !== String ||
+                proteins[i].uniprotId === null ||
+                proteins[i].experiment === undefined ||
+                proteins[i].experiment.constructor !== Array
+            ) {
+                ok = false;
+                console.error('Local storage had faulty values... (L1)', proteins[i]);
+                break;
+            }
+
+            for(let j = 0; j<proteins[i].experiment.length; j++) {
+                if(proteins[i].experiment[j].constructor !== Number) {
+                    console.log(proteins[i].experiment[j].constructor !== Number);
+                    ok = false;
+                    console.error('Local storage had faulty values... (L2)', proteins[i].experiment);
+                    break;
+                }
+            }
+        }
+
+        if(!ok) {
+            s.clear();
+            console.error('Local storage had faulty values... cleared local storage', proteins);
+        } else {
+            console.log('Everything is all right');
+        }
+    }
+})(StorageManager);
