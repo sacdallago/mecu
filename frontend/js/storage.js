@@ -2,14 +2,20 @@
 
 StorageManager = {};
 
-/*
-    protein: {
-        uniprotId: string,
-        experiment: [number]
-    }
-    or array of it
+/**
+ * takes a protein or a list of proteins
+ * and creates a list of uniprotId+experiment pairs
+ *
+ * TODO (remove) cases: either for the protein.experiment, which is used on the client
+ *  or  for the protein.experiments, which comes from the server
+ *
+ * Examples:
+ *      {uniprotId: 123, experiment: [4,5]} => [{uniprotId:123, experiment:4},{uniprotId:123, experiment:5}]
+ *      [{uniprotId: 1234, experiment:[4]},{uniprotId:5678, experiment:[5]}] =>
+ *          [{uniprotId: 1234, experiment:4},{uniprotId:5678, experiment:5}]
+ * @param   { ({uniprotId: string, experiment: [number]} | [{uniprotId: string, experiment: [number]}]) } protein - a protein or an array of proteins
+ * @return  { {uniprotId: string, experiment}[] } the protein(s) split up to be only arrays of protein/experiment pairs
  */
-
 StorageManager.splitUpProteinIntoExperiments = (protein) => {
     // case if it's protein data used on the client
     if(protein.experiment && protein.experiment.constructor === Array) {
@@ -29,6 +35,11 @@ StorageManager.splitUpProteinIntoExperiments = (protein) => {
     }
 }
 
+/**
+ * takes a list of proteins, hands them to the StorageManager.splitUpProteinIntoExperiments function
+ * @param  { {uniprotId: string, (experiment:string| experiments:{experiment})}[] } proteins - list of proteins
+ * @return { {uniprotId: string, experiment}[] } the protein(s) split up to be only arrays of protein/experiment pairs
+ */
 StorageManager.splitUpProteins = (proteins) => {
     let tmp = [];
     proteins.forEach(p => {
@@ -112,7 +123,7 @@ StorageManager.toggle = function(proteins, callback) {
             current[protein.uniprotId].push(protein.experiment);
             added++;
         }
-        // if id not present, add it with experiment
+        // if id present and experiment in list, remove experiment
         else if(current[protein.uniprotId] && current[protein.uniprotId].indexOf(protein.experiment) > -1) {
             current[protein.uniprotId].splice(current[protein.uniprotId].indexOf(protein.experiment), 1);
             removed--;
