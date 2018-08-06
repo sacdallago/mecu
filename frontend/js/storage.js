@@ -48,58 +48,58 @@ StorageManager.splitUpProteins = (proteins) => {
     return tmp;
 }
 
-StorageManager.add = function(proteins, callback) {
-    if (proteins.constructor !== Array) {
-        proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
-    } else {
-        StorageManager.splitUpProteins(proteins);
-    }
+// StorageManager.add = function(proteins, callback) {
+//     if (proteins.constructor !== Array) {
+//         proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
+//     } else {
+//         StorageManager.splitUpProteins(proteins);
+//     }
+//
+//     let current = store.get('proteins') || {};
+//
+//     proteins.forEach(protein => {
+//         // if id not present, add it with experiment
+//         if(!current[protein.uniprotId]) {
+//             current[protein.uniprotId] = [protein.experiment];
+//         }
+//         // if id present and experiment not in list
+//         if(current[protein.uniprotId].indexOf(protein.experiment) === -1) {
+//             current[protein.uniprotId].push(protein.experiment);
+//         }
+//     });
+//
+//     store.set('proteins', current);
+//
+//     callback(current);
+//     return current;
+// };
 
-    let current = store.get('proteins') || {};
-
-    proteins.forEach(protein => {
-        // if id not present, add it with experiment
-        if(!current[protein.uniprotId]) {
-            current[protein.uniprotId] = [protein.experiment];
-        }
-        // if id present and experiment not in list
-        if(current[protein.uniprotId].indexOf(protein.experiment) === -1) {
-            current[protein.uniprotId].push(protein.experiment);
-        }
-    });
-
-    store.set('proteins', current);
-
-    callback(current);
-    return current;
-};
-
-StorageManager.remove = function(proteins, callback) {
-    if (proteins.constructor !== Array) {
-        proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
-    } else {
-        StorageManager.splitUpProteins(proteins);
-    }
-
-    let current = store.get('proteins') || {};
-
-    proteins.forEach(protein => {
-        // if id not present, add it with experiment
-        if(current[protein.uniprotId] && current[protein.uniprotId].indexOf(protein.experiment) > -1) {
-            current[protein.uniprotId].splice(current[protein.uniprotId].indexOf(protein.experiment), 1);
-
-            // remove id if list of experiments is empty
-            if(current[protein.uniprotId] && current[protein.uniprotId].length === 0) {
-                delete current[protein.uniprotId];
-            }
-        }
-    });
-
-    store.set('proteins', current);
-
-    callback(current);
-    return current;
-};
+// StorageManager.remove = function(proteins, callback) {
+//     if (proteins.constructor !== Array) {
+//         proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
+//     } else {
+//         StorageManager.splitUpProteins(proteins);
+//     }
+//
+//     let current = store.get('proteins') || {};
+//
+//     proteins.forEach(protein => {
+//         // if id present and experiment in list, remove experiment
+//         if(current[protein.uniprotId] && current[protein.uniprotId].indexOf(protein.experiment) > -1) {
+//             current[protein.uniprotId].splice(current[protein.uniprotId].indexOf(protein.experiment), 1);
+//
+//             // remove id if list of experiments is empty
+//             if(current[protein.uniprotId] && current[protein.uniprotId].length === 0) {
+//                 delete current[protein.uniprotId];
+//             }
+//         }
+//     });
+//
+//     store.set('proteins', current);
+//
+//     callback(current);
+//     return current;
+// };
 
 StorageManager.toggle = function(proteins, callback) {
     if (proteins.constructor !== Array) {
