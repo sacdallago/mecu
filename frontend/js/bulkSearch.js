@@ -186,15 +186,16 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             tableProt.values[idx] = 1;
             totalRow.values[idx] += 1;
         })
-    })
+    });
 
+    console.log('tableData', tableData);
 
+    // coloring of column on hover: https://stackoverflow.com/questions/1553571/html-hover-table-column
     tableData.forEach(tr => {
-        let row = $('<tr />')
-            .attr({'class':'toggle-protein', 'id':tr.name});
+        let row = $('<tr />');
         row.append($('<td />').text(tr.name));
-        tr.values.forEach(v => {
-            row.append($('<td />').text(v));
+        tr.values.forEach((v,i,a) => {
+            row.append($('<td />').attr({'class':'toggle-experiment', 'data-experiment':experiments[i]}).text(v));
         });
         $('#result-table tbody').append(row);
     })
