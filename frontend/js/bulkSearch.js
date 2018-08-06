@@ -154,6 +154,13 @@ const fetchMeltingCurves = function(experiments, proteins){
         .then(data => drawProteinXExperimentTable(experiments, proteins, data));
 };
 
+/**
+ * at the moment draws both the heatmap and the table
+ * @param  {[type]} experiments [description]
+ * @param  {[type]} proteins    [description]
+ * @param  {[type]} data        [description]
+ * @return {[type]}             [description]
+ */
 const drawProteinXExperimentTable = (experiments, proteins, data) => {
 
     // create header of table
@@ -199,4 +206,104 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         summaryRow.append($('<td />').text(v+'/'+proteins.length));
     });
     $('#result-table tbody').append(summaryRow);
+
+    addClickHandlerToProteinExperimentTable('toggle-experiment');
+
+    // -----------------HEATMAP-----------------------
+    // heatmap for more data: https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/heatmap-canvas/
+    // configuring and drawing heatmap
+    highChartsHeatMapConfigObj.chart.title = {text: null};
+    highChartsHeatMapConfigObj['xAxis'] = {
+        categories: experiments.map(e => ''+e),
+        title: {
+            align: 'high',
+            offset: 0,
+            text: 'Experiments',
+            rotation: 0,
+            y: 0,
+            x: 0 // 20
+        }
+    };
+    highChartsHeatMapConfigObj['yAxis'] = {
+        categories: tableData.map(d => d.name), // test [...Array(100).keys()]
+        title: {
+            align: 'high',
+            offset: 0,
+            text: 'Proteins',
+            rotation: 0,
+            y: -10
+        }
+    };
+    let seriesData = [];
+    tableData.forEach((d,i,a) => {
+        d.values.forEach((v,j,a2) => {
+            seriesData.push([j,tableData.length-1-i,v]);
+        })
+    });
+    console.log('seriesData', seriesData);
+    highChartsHeatMapConfigObj['series'] = [{
+        name: '',
+        borderWidth: 1,
+        data: seriesData,
+        dataLabels: {
+            enabled: false,
+            color: '#000000'
+        }
+    }];
+    highChartsHeatMapConfigObj['tooltip'] = {
+        formatter: function () {
+            if (this.point.value === 1) {
+                return `Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> has Protein
+                <b>${this.series.yAxis.categories[this.point.y]}</b> in it <b>`;
+            } else {
+                return `Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> does <b>NOT</b> have
+                <b>${this.series.yAxis.categories[this.point.y]}</b> Protein in it <b>`;
+            }
+        }
+    };
+    highChartsHeatMapConfigObj['plotOptions'] = {
+        series: {
+            events: {
+                click: function(e) {
+                    console.log('event', e);
+                    let tmpList = [];
+                    tableData.forEach(protein => protein.values[e.point.x] === 1 ? tmpList.push(protein.name) : '');
+                    saveExperimentToLocalStorage(experiments[e.point.x], tmpList);
+                }
+            }
+        }
+    };
+    $('#heatmap').attr({'style':'height:500px'});
+    Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
+}
+
+const addClickHandlerToProteinExperimentTable = (columnCellIdentifier) => {
+    const list = document.getElementsByClassName(columnCellIdentifier);
+    for(let i = 0; i<list.length; i++) {
+        list[i].addEventListener('click', function(e) {
+            console.log('this', this);
+            console.log('this', this.getAttribute('data-experiment'));
+        })
+    }
+}
+
+const saveExperimentToLocalStorage = (experiment, proteinList) => {
+    // if the localStorage hasn't been deleted yet and there are some proteins in it
+    if(!localStorageDeleted && StorageManager.get().length > 0) {
+        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
+            StorageManager.clear();
+            console.log('store cleared');
+            localStorageDeleted = true;
+            proteinList.forEach(protein => {
+                console.log('adding', {uniprotId: protein, experiment: experiment});
+                StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+            });
+        }
+    // else just add the protein/experiment pair
+    } else {
+        proteinList.forEach(protein => {
+            console.log('adding', {uniprotId: protein, experiment: experiment});
+            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+        });
+    }
 }
