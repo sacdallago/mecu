@@ -2,7 +2,19 @@
 const json2csv = require('json2csv').parse;
 const mecuUtils = require('mecu-utils');
 const fs = require('fs');
-const formidable        = require('formidable');
+const formidable = require('formidable');
+
+
+const UPPER_QUERY_LIMIT = 10;
+const queryParams = (query) => {
+    let ret = {
+        limit: query.limit ? (query.limit > UPPER_QUERY_LIMIT ? 10 : query.limit) : UPPER_QUERY_LIMIT,
+        offset: query.offset || 0,
+        sortBy: query.sortBy || 'id',
+        order: query.order ? (isNaN(parseInt(query.order)) ? 1 : parseInt(query.order)) : 1
+    };
+    return ret;
+}
 
 module.exports = function(context) {
 
@@ -131,12 +143,10 @@ module.exports = function(context) {
         },
 
         getExperiments: function(request, response) {
-            experimentsDao.getExperiments()
-                .then(function(experiments){
-                    return response.status(200).send(experiments);
-                })
-                .catch(function(error){
-                    console.error(error);
+            experimentsDao.getExperimentsPaged(queryParams(request.query))
+                .then(result => response.status(200).send(result))
+                .catch(error => {
+                    console.error('getExperiments', error);
                     return response.status(500).send(error);
                 });
         },

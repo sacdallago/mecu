@@ -102,6 +102,7 @@ module.exports = function(context) {
                 ) tmp
                 group by tmp."uniprotId"
             `;
+            console.log('query', query);
             /*
             for the whole database
             Planning time: 0.147 ms

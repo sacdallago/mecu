@@ -2,6 +2,7 @@ extends base
 
 block postStyles
     link(rel='stylesheet', href='/public/css/bulkSearch.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
 
 block content
     h3 1. Select experiments
@@ -13,18 +14,10 @@ block content
                 th Description
                 th Lysate
                 th Uploader
-        tbody
-            each experiment in experiments
-                tr
-                    td
-                        .ui.checkbox
-                            label
-                            input(type="checkbox", tabindex="0", class="hidden", data-id= experiment.id)
-                    td= experiment.id
-                    td= experiment.description
-                    td= experiment.lysate
-                    td
-                        a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
+        tbody#experiments-list-container
+    
+    .pagination#pagination-component
+            
     h3 2. Input proteins
     .text-center
         .ui.input.search.maxWidth
@@ -38,17 +31,17 @@ block content
     .space
     p Input at least one protein and select at least one experiment to get started.
     
-    //- pre.statistics
-    //- .space
+    .heatmap#heatmap
+    
     table.ui.celled.table#result-table
         thead
             tr
-                th Protein
+                th Protein\Experiment
         tbody
     .space
     .grid
     .space
-
+    
 
 block settings
     .divider
@@ -61,3 +54,4 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/bulkSearch.js")
+    script(type="text/javascript", src="/public/js/pagination.js")

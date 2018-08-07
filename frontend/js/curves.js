@@ -16,32 +16,6 @@ const grid = $('.isoGrid').isotope({
     }
 });
 
-$('.item.proteins').on('click', function(event){
-    event.preventDefault();
-
-    var html = '<div class="ui modal">';
-    html += '<div class="header">Selected proteins</div>';
-    html += '<div class="content">';
-    html += '<div class="ui form">';
-    html += '<div class="field">';
-    html += '<textarea class="">';
-    StorageManager.get().forEach(function(protein){
-        html += protein.uniprotId + ", ";
-    });
-    html += '</textarea>';
-    html += '</div>';
-    html += '<div class="field">';
-    html += '<div class="ui submit button">Load proteins</div>';
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
-
-    $(html).modal('show');
-});
-
-curves = [];
-
 grid.on('click', '.grid-item', function(){
     let self = this;
     return StorageManager.toggle($(this).data('protein'), function(inStorage, added, removed) {
@@ -63,56 +37,66 @@ grid.on('click', '.grid-item', function(){
 });
 
 function loadProteins() {
-    let proteins = StorageManager.get();
-    console.log('proteins', proteins);
-    // proteins = Object.keys(proteins).map(i => ({uniprotId:i, experiment: proteins[i]}))
-    // console.log('loadProteins', proteins);
-
     // Grid
     grid.empty();
 
-    // Curves
-    curves = [];
+    // load stored proteins
+    let proteins = StorageManager.get();
 
-    let items = [];
+    // move into own (utils?) file
+    let createIdOfProt = (protein) => {
+        return (protein.uniprotId + protein.experiments.map(e => e.experiment).join('E')).replace(/\s|\//g, '_');
+    }
 
-    proteins.forEach(function(protein) {
-        var html = `<div class="grid-item "${protein.experiment.join('E')}
-             id="${protein.uniprotId + protein.experiment.join('E')}
-             ">`;
+    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(StorageManager.splitUpProteins(proteins))
+        .then(proteins => {
+            curves = [];
 
-        html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
+            let items = [];
 
-        if(protein.experiment.length === 1){
-            html += '<div class="experimentNumber">' + protein.experiment[0] + '</div>';
-        } else {
-            // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
-        }
-        html += '</div>';
+            proteins.forEach(function(protein) {
+                var html = `<div class="grid-item" id="${createIdOfProt(protein)}">`; //"${protein.experiments.map(e => e.experiment).join('E')}"
+                html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
 
-        var element = $(html);
-        element.data("protein", protein);
-        StorageManager.has(protein, function(storage, hasCount) {
-            if(hasCount === protein.experiment.length){
-                element.addClass('inStore');
-            } else if(hasCount > 0) {
-                element.addClass('partiallyInStore');
-            }
-        });
-        items.push(element[0]);
-    });
+                if(protein.experiments.length === 1){
+                    html += '<div class="experimentNumber">' + protein.experiments[0].experiment + '</div>';
+                } else {
+                    // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
+                }
+                html += '</div>';
 
-    grid.isotope('insert', items);
+                var element = $(html);
+                element.data("protein", protein);
+                StorageManager.has(protein, function(storage, hasCount) {
+                    if(hasCount === protein.experiments.length){
+                        element.addClass('inStore');
+                    } else if(hasCount > 0) {
+                        element.addClass('partiallyInStore');
+                    }
+                });
+                items.push(element[0]);
+            });
 
-    proteins.forEach(function(protein) {
-        // TODO retrieve data before drawing
-        // let curve = new MecuLine({
-        //     element: "#"+protein.uniprotId+protein.experiment.join('E'), width:"200", height:"200"
-        // });
-        //
-        // curve.add(protein);
-        // curves.push(curve);
-    });
+            grid.isotope('insert', items);
+
+            // adding lines to the above created divs
+            proteins.forEach(function(protein) {
+                // TODO the creation of the div and the addition of the MecuLine should be done in one
+                // swoop (this step and the step before) -> rework MecuLine?
+                let curve = new MecuLine({
+                    element: '#'+createIdOfProt(protein), // "#"+
+                    width:"200",
+                    height:"200",
+                    limit: 5,
+                    minTemp: 40,
+                    maxTemp: 65,
+                    minRatio: 0.1
+                });
+
+                curve.add(protein);
+                curves.push(curve);
+            });
+        })
 };
 
 let globalGraph;
@@ -151,11 +135,17 @@ function populateGlobalsGraphs(){
             });
 
             // configuring and plotting highcharts
-            highChartsConfigObject['title.text'] = 'TPCA melting curve';
-            highChartsConfigObject['yAxis.title.text'] = '% alive';
-            highChartsConfigObject['xAxis.title.text'] = 'Temperature';
-            highChartsConfigObject['series'] = series;
-            Highcharts.chart('curvesGraph', highChartsConfigObject);
+            highChartsCurvesConfigObject['title.text'] = 'TPCA melting curve';
+            highChartsCurvesConfigObject['yAxis.title.text'] = '% alive';
+            highChartsCurvesConfigObject['xAxis.title.text'] = 'Temperature';
+            highChartsCurvesConfigObject['series'] = series;
+            highChartsCurvesConfigObject['tooltip'] = {
+                // valueSuffix: '',
+                split: true,
+                distance: 30,
+                padding: 5
+            };
+            Highcharts.chart('curvesGraph', highChartsCurvesConfigObject);
 
             // plot distances
             globalGraph = new MecuGraph({element: "#nodesGraph"});
@@ -163,8 +153,6 @@ function populateGlobalsGraphs(){
         })
         .catch(error => {
             console.error(error);
-            var errorMsg = 'Ajax request failed: ' + xhr.responseText;
-            $('#content').html(errorMsg);
         });
 }
 

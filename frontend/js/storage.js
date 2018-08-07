@@ -2,26 +2,44 @@
 
 StorageManager = {};
 
-/*
-    protein: {
-        uniprotId: string,
-        experiment: [number]
-    }
-    or array of it
+/**
+ * takes a protein or a list of proteins
+ * and creates a list of uniprotId+experiment pairs
+ *
+ * TODO (remove) cases: either for the protein.experiment, which is used on the client
+ *  or  for the protein.experiments, which comes from the server
+ *
+ * Examples:
+ *      {uniprotId: 123, experiment: [4,5]} => [{uniprotId:123, experiment:4},{uniprotId:123, experiment:5}]
+ *      [{uniprotId: 1234, experiment:[4]},{uniprotId:5678, experiment:[5]}] =>
+ *          [{uniprotId: 1234, experiment:4},{uniprotId:5678, experiment:5}]
+ * @param   { ({uniprotId: string, experiment: [number]} | [{uniprotId: string, experiment: [number]}]) } protein - a protein or an array of proteins
+ * @return  { {uniprotId: string, experiment}[] } the protein(s) split up to be only arrays of protein/experiment pairs
  */
-
 StorageManager.splitUpProteinIntoExperiments = (protein) => {
-    if(protein.experiment.constructor === Array) {
-        protein = protein.experiment.map(e => ({
+    // case if it's protein data used on the client
+    if(protein.experiment && protein.experiment.constructor === Array) {
+        return protein.experiment.map(e => ({
             uniprotId: protein.uniprotId,
             experiment: e
         }))
-    } else {
-        protein = [protein];
     }
-    return protein;
+    // case if it's protein data from the server
+    else if(protein.experiments && protein.experiments.constructor === Array){
+        return protein.experiments.map(e => ({
+            uniprotId: protein.uniprotId,
+            experiment: e.experiment
+        }))
+    } else {
+        return [protein];
+    }
 }
 
+/**
+ * takes a list of proteins, hands them to the StorageManager.splitUpProteinIntoExperiments function
+ * @param  { {uniprotId: string, (experiment:string| experiments:{experiment})}[] } proteins - list of proteins
+ * @return { {uniprotId: string, experiment}[] } the protein(s) split up to be only arrays of protein/experiment pairs
+ */
 StorageManager.splitUpProteins = (proteins) => {
     let tmp = [];
     proteins.forEach(p => {
@@ -30,58 +48,58 @@ StorageManager.splitUpProteins = (proteins) => {
     return tmp;
 }
 
-StorageManager.add = function(proteins, callback) {
-    if (proteins.constructor !== Array) {
-        proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
-    } else {
-        StorageManager.splitUpProteins(proteins);
-    }
+// StorageManager.add = function(proteins, callback) {
+//     if (proteins.constructor !== Array) {
+//         proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
+//     } else {
+//         StorageManager.splitUpProteins(proteins);
+//     }
+//
+//     let current = store.get('proteins') || {};
+//
+//     proteins.forEach(protein => {
+//         // if id not present, add it with experiment
+//         if(!current[protein.uniprotId]) {
+//             current[protein.uniprotId] = [protein.experiment];
+//         }
+//         // if id present and experiment not in list
+//         if(current[protein.uniprotId].indexOf(protein.experiment) === -1) {
+//             current[protein.uniprotId].push(protein.experiment);
+//         }
+//     });
+//
+//     store.set('proteins', current);
+//
+//     callback(current);
+//     return current;
+// };
 
-    let current = store.get('proteins') || {};
-
-    proteins.forEach(protein => {
-        // if id not present, add it with experiment
-        if(!current[protein.uniprotId]) {
-            current[protein.uniprotId] = [protein.experiment];
-        }
-        // if id present and experiment not in list
-        if(current[protein.uniprotId].indexOf(protein.experiment) === -1) {
-            current[protein.uniprotId].push(protein.experiment);
-        }
-    });
-
-    store.set('proteins', current);
-
-    callback(current);
-    return current;
-};
-
-StorageManager.remove = function(proteins, callback) {
-    if (proteins.constructor !== Array) {
-        proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
-    } else {
-        StorageManager.splitUpProteins(proteins);
-    }
-
-    let current = store.get('proteins') || {};
-
-    proteins.forEach(protein => {
-        // if id not present, add it with experiment
-        if(current[protein.uniprotId] && current[protein.uniprotId].indexOf(protein.experiment) > -1) {
-            current[protein.uniprotId].splice(current[protein.uniprotId].indexOf(protein.experiment), 1);
-
-            // remove id if list of experiments is empty
-            if(current[protein.uniprotId] && current[protein.uniprotId].length === 0) {
-                delete current[protein.uniprotId];
-            }
-        }
-    });
-
-    store.set('proteins', current);
-
-    callback(current);
-    return current;
-};
+// StorageManager.remove = function(proteins, callback) {
+//     if (proteins.constructor !== Array) {
+//         proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
+//     } else {
+//         StorageManager.splitUpProteins(proteins);
+//     }
+//
+//     let current = store.get('proteins') || {};
+//
+//     proteins.forEach(protein => {
+//         // if id present and experiment in list, remove experiment
+//         if(current[protein.uniprotId] && current[protein.uniprotId].indexOf(protein.experiment) > -1) {
+//             current[protein.uniprotId].splice(current[protein.uniprotId].indexOf(protein.experiment), 1);
+//
+//             // remove id if list of experiments is empty
+//             if(current[protein.uniprotId] && current[protein.uniprotId].length === 0) {
+//                 delete current[protein.uniprotId];
+//             }
+//         }
+//     });
+//
+//     store.set('proteins', current);
+//
+//     callback(current);
+//     return current;
+// };
 
 StorageManager.toggle = function(proteins, callback) {
     if (proteins.constructor !== Array) {
@@ -105,7 +123,7 @@ StorageManager.toggle = function(proteins, callback) {
             current[protein.uniprotId].push(protein.experiment);
             added++;
         }
-        // if id not present, add it with experiment
+        // if id present and experiment in list, remove experiment
         else if(current[protein.uniprotId] && current[protein.uniprotId].indexOf(protein.experiment) > -1) {
             current[protein.uniprotId].splice(current[protein.uniprotId].indexOf(protein.experiment), 1);
             removed--;
@@ -182,3 +200,45 @@ StorageManager.getMinTemp = function() {
     let t = store.get('minTemp');
     return (t != "NaN" ? t : undefined);
 };
+
+// check structure of 'proteins' in local storage
+(function (s) {
+    console.log('Checking local storage values...');
+    let proteins = s.get();
+    let ok = true;
+    if(proteins.constructor !== Array){
+        ok = false;
+        console.error('Local storage had faulty values... (L0)', proteins);
+    } else {
+        for(let i = 0; i<proteins.length; i++) {
+            if(
+                proteins[i].constructor !== Object ||
+                proteins[i].uniprotId === undefined ||
+                proteins[i].uniprotId.constructor !== String ||
+                proteins[i].uniprotId === null ||
+                proteins[i].experiment === undefined ||
+                proteins[i].experiment.constructor !== Array
+            ) {
+                ok = false;
+                console.error('Local storage had faulty values... (L1)', proteins[i]);
+                break;
+            }
+
+            for(let j = 0; j<proteins[i].experiment.length; j++) {
+                if(proteins[i].experiment[j].constructor !== Number) {
+                    console.log(proteins[i].experiment[j].constructor !== Number);
+                    ok = false;
+                    console.error('Local storage had faulty values... (L2)', proteins[i].experiment);
+                    break;
+                }
+            }
+        }
+
+        if(!ok) {
+            s.clear();
+            console.error('Local storage had faulty values... cleared local storage', proteins);
+        } else {
+            console.log('Everything is all right');
+        }
+    }
+})(StorageManager);

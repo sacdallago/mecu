@@ -30,11 +30,11 @@ block content
 
 block settings
     .divider
-    .item.proteins Selected proteins
+    a(href='/search').item Search
+    a(href='/').item.filterExperiments Filter experiments
 
 block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/curves.js")
-    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
