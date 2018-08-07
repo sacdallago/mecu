@@ -1,29 +1,48 @@
+
 class PaginationComponent{
     constructor(htmlId, totalItemCount, itemsPerPage, now = 1, fun) {
+        this.htmlId = htmlId;
+        this.totalItemCount = totalItemCount;
+        this.itemsPerPage = itemsPerPage;
+        this.now = now;
+        this.fun = fun;
+        this.pageElementClass = 'page';
+        this.pageElementWithClickHandlerClass = 'page-nr';
+        this.arrowLeftClass = 'arrow-left';
+        this.arrowRightClass = 'arrow-right';
+        this.arrowLeft = '❮';
+        this.arrowRight = '❯';
         if(totalItemCount <= itemsPerPage) {
             console.log('not enough elements for pagination');
         } else if(!!htmlId && !!totalItemCount && !!itemsPerPage && !!fun) {
-            this.draw(htmlId, totalItemCount, itemsPerPage, now, 'page', 'arrow-left', 'arrow-right', fun);
+            this.draw();
         }
     }
 
-    draw(id, totalItems, itemsPerPage, now, htmlClassPages, aLClass, aRClass, fun) {
-        // const totalSize = 500;
-        // const height = 70;
-
-        const htmlId = $(id);
+    draw() {
+        const htmlId = $(this.htmlId);
         htmlId.empty();
 
-        const elementCount = Math.ceil(totalItems/itemsPerPage);
+        const elementCount = Math.ceil(this.totalItemCount/this.itemsPerPage);
         const elementSize = 500 / elementCount-2;
 
-        let container = $('<div />').attr({'class':'container'}); // ,'style':`display:flex;flex-direction:row; width: totalSize; height: height`
-        let arrowElement = $('<div />') .addClass(htmlClassPages);
-        let pageElement = $('<div />').addClass(`${htmlClassPages} page-nr`);
+        let container = $('<div />').attr({'class':'container'});
+        let arrowElement = $('<div />').addClass(this.pageElementClass);
+        let pageElement = $('<div />')
+            .addClass(`${this.pageElementClass} ${this.pageElementWithClickHandlerClass}`);
 
-        container.append(arrowElement.clone().addClass(aLClass).append($('<div />').text('❮')) );
+        // append left arrow
+        container.append(
+            arrowElement.clone()
+                .addClass(this.arrowLeftClass)
+                .append(
+                    $('<div />').text(this.arrowLeft)
+                )
+            );
+
+        // append page number elements
         for(let i=0; i<elementCount; i++) {
-            if(i === now-1) {
+            if(i === this.now-1) {
                 container.append(
                     pageElement.clone()
                     .attr({'data-page':i})
@@ -34,39 +53,52 @@ class PaginationComponent{
                 container.append(
                     pageElement.clone()
                     .attr({'data-page':i})
-                    .addClass(`${htmlClassPages}`)
+                    .addClass(`${this.pageElementClass}`)
                     .append($('<div />').text(i+1))
                 );
             }
         }
-        container.append(arrowElement.clone().addClass(aRClass).append($('<div />').text('❯')) );
+
+        // append right arrow
+        container.append(
+            arrowElement.clone()
+                .addClass(this.arrowRightClass)
+                .append(
+                    $('<div />').text(this.arrowRight)
+                )
+            );
+
         htmlId.append(container);
 
-        this.addClickHandler(id, totalItems, itemsPerPage, now, 'page-nr', aLClass, aRClass, fun);
+        this.addClickHandler();
     }
 
-    addClickHandler(id, totalItems, itemsPerPage, now, htmlClass, aL, aR, fun) {
+    addClickHandler() {
         const self = this;
-        const pagesDivs = $(`#pagination-component .${htmlClass}`);
+        const pagesDivs = $(`${this.htmlId} .${this.pageElementWithClickHandlerClass}`);
         const pagesElementsCount = pagesDivs.length;
-        const arrowLeftDiv = $(`#pagination-component .${aL}`);
-        const arrowRightDiv = $(`#pagination-component .${aR}`);
+        const arrowLeftDiv = $(`${this.htmlId} .${this.arrowLeftClass}`);
+        const arrowRightDiv = $(`${this.htmlId} .${this.arrowRightClass}`);
         arrowLeftDiv[0].addEventListener('click', () => {
-            if(now !== 1) {
-                this.draw(id, totalItems, itemsPerPage, now-1, 'page', aL, aR, fun);
-                fun(now-1);
+            if(this.now !== 1) {
+                this.now = this.now-1;
+                this.draw();
+                this.fun(this.now);
             }
         });
         arrowRightDiv[0].addEventListener('click', (e) => {
-            if(now < pagesElementsCount) {
-                this.draw(id, totalItems, itemsPerPage, now+1, 'page', aL, aR, fun);
-                fun(now+1);
+            if(this.now < pagesElementsCount) {
+                this.now = this.now+1;
+                this.draw();
+                this.fun(this.now);
             }
         });
         for(let i=0; i<pagesDivs.length; i++) {
             pagesDivs[i].addEventListener('click', function(e) {
-                self.draw(id, totalItems, itemsPerPage, parseInt(this.getAttribute('data-page'))+1, 'page', aL, aR, fun);
-                fun(parseInt(this.getAttribute('data-page'))+1);
+                let newPage = parseInt(this.getAttribute('data-page'))+1;
+                self.now = newPage;
+                self.draw();
+                self.fun(self.now);
             });
         }
     }
