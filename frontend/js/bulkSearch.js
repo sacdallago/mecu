@@ -223,6 +223,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
 
 
     // -----------------HEATMAP-----------------------
+    // heatmap with total row: https://stackoverflow.com/questions/32978274/does-highchart-heat-map-support-sum-of-values
     // heatmap for more data: https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/heatmap-canvas/
     // configuring and drawing heatmap
     highChartsHeatMapConfigObj.chart.title = {text: null};
