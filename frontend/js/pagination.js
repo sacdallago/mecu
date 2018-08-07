@@ -1,17 +1,21 @@
 
 class PaginationComponent{
+    // TODO for now the pagination component is redrawn every time the page is changed
+    //      but I could actually only update the component if there was a page change
     constructor(htmlId, totalItemCount, itemsPerPage, now = 1, fun) {
-        this.htmlId = htmlId;
-        this.totalItemCount = totalItemCount;
-        this.itemsPerPage = itemsPerPage;
-        this.now = now;
-        this.fun = fun;
         this.pageElementClass = 'page';
         this.pageElementWithClickHandlerClass = 'page-nr';
         this.arrowLeftClass = 'arrow-left';
         this.arrowRightClass = 'arrow-right';
         this.arrowLeft = '❮';
         this.arrowRight = '❯';
+        this.maxNumberPagesToShow = 7; // should be odd
+
+        this.htmlId = htmlId;
+        this.totalItemCount = totalItemCount;
+        this.itemsPerPage = itemsPerPage;
+        this.now = now;
+        this.fun = fun;
         if(totalItemCount <= itemsPerPage) {
             console.log('not enough elements for pagination');
         } else if(!!htmlId && !!totalItemCount && !!itemsPerPage && !!fun) {
@@ -23,7 +27,13 @@ class PaginationComponent{
         const htmlId = $(this.htmlId);
         htmlId.empty();
 
-        const elementCount = Math.ceil(this.totalItemCount/this.itemsPerPage);
+        let totalPageCount = this.totalPageCount();
+        let elementsStashed = false;
+        let elementCount = totalPageCount;
+        if(elementCount > this.maxNumberPagesToShow) {
+            elementCount = this.maxNumberPagesToShow;
+            elementsStashed = true;
+        }
         const elementSize = 500 / elementCount-2;
 
         let container = $('<div />').attr({'class':'container'});
@@ -40,8 +50,25 @@ class PaginationComponent{
                 )
             );
 
-        // append page number elements
-        for(let i=0; i<elementCount; i++) {
+        let startPage = 0;
+        let endPage = elementCount;
+        if(elementsStashed){
+            startPage = this.now-1 < (elementCount-1)/2 ?
+                0 :
+                (this.now-1)-(elementCount-1)/2;
+            endPage = this.now+(elementCount-1)/2 > totalPageCount ?
+                totalPageCount :
+                (this.now)+(elementCount-1)/2;
+        }
+
+        // draw ... element if there are more pages before
+        if(startPage > 0){
+            container.append(
+                arrowElement.clone()
+                    .append($('<div />').text('...'))
+            );
+        }
+        for(let i=startPage; i<endPage; i++) {
             if(i === this.now-1) {
                 container.append(
                     pageElement.clone()
@@ -57,6 +84,13 @@ class PaginationComponent{
                     .append($('<div />').text(i+1))
                 );
             }
+        }
+        // draw ... element if there are more pages after
+        if(endPage < totalPageCount) {
+            container.append(
+                arrowElement.clone()
+                    .append($('<div />').text('...'))
+            );
         }
 
         // append right arrow
@@ -76,7 +110,6 @@ class PaginationComponent{
     addClickHandler() {
         const self = this;
         const pagesDivs = $(`${this.htmlId} .${this.pageElementWithClickHandlerClass}`);
-        const pagesElementsCount = pagesDivs.length;
         const arrowLeftDiv = $(`${this.htmlId} .${this.arrowLeftClass}`);
         const arrowRightDiv = $(`${this.htmlId} .${this.arrowRightClass}`);
         arrowLeftDiv[0].addEventListener('click', () => {
@@ -87,7 +120,7 @@ class PaginationComponent{
             }
         });
         arrowRightDiv[0].addEventListener('click', (e) => {
-            if(this.now < pagesElementsCount) {
+            if(this.now < this.totalPageCount()) {
                 this.now = this.now+1;
                 this.draw();
                 this.fun(this.now);
@@ -101,5 +134,9 @@ class PaginationComponent{
                 self.fun(self.now);
             });
         }
+    }
+
+    totalPageCount() {
+        return Math.ceil(this.totalItemCount/this.itemsPerPage);
     }
 }
