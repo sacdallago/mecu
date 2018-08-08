@@ -108,6 +108,7 @@ const fetchMeltingCurves = function(experiments, proteins){
  * @param  string checkboxIdentifier how should the checkboxes be identified
  */
 const drawExperimentsTable = (data, checkboxIdentifier) => {
+    const selectedExperimentsArray = Array.from(selectedExperiments);
     let table = $('#experiments-list-container');
     let tr = $('<tr />');
     let td = $('<td />');
@@ -118,10 +119,17 @@ const drawExperimentsTable = (data, checkboxIdentifier) => {
     table.empty();
     data.forEach(exp => {
         let row = tr.clone();
+
+        // checkbox attributes
+        let cbAttriutes = {'id':'cbE'+exp.id, 'data-id':exp.id};
+        if(selectedExperimentsArray.indexOf(exp.id) > -1) {
+            cbAttriutes.checked = 'true';
+        }
+
         row.append(
             td.clone().append(
                 div.clone().append([
-                    input.clone().attr({'id':'cbE'+exp.id, 'data-id':exp.id}),
+                    input.clone().attr(cbAttriutes),
                     label.clone().attr({'for':'cbE'+exp.id})
                 ])
             )
@@ -254,7 +262,6 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             seriesData.push([j,tableData.length-1-i,v]);
         })
     });
-    console.log('seriesData', seriesData);
     highChartsHeatMapConfigObj['series'] = [{
         name: '',
         borderWidth: 1,
