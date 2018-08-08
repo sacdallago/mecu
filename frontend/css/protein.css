@@ -1,0 +1,24 @@
+.protein-name, .experiments-container, .related-proteins-container {
+    padding: 20px;
+}
+
+.protein-container {
+    height: 250px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.protein-container .protein-curve{
+    width:220px;
+    height:220px;
+    background-color: red;
+}
+.protein-container .protein-data{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.protein-container .uniprot-id, .name, .gene-id {
+    display: flex;
+}

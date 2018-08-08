@@ -1,0 +1,35 @@
+extends base
+
+block postStyles
+        link(rel='stylesheet', href='/public/css/protein.css')
+
+block content
+    h3.protein-name#protein-name P12345
+
+    .protein-container
+        .protein-curve#protein-curve
+        
+        .protein-data#protein-data
+            .uniprot-id
+                .field Uniprot ID
+                .value asdfasdf
+            .name
+                .field Protein Name
+                .value 12312
+            .gene-id
+                .field Gene ID
+                .value 12312-asdfas
+                
+    h3.experiments-container#experiments-container Experiments
+    
+    h3.related-proteins-container#related-proteins-container Related Proteins
+
+block settings
+    .divider
+    a(href='/curves').item Selected Curves
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/js/protein.js")

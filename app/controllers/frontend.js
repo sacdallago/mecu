@@ -41,6 +41,10 @@ module.exports = function(context) {
             });
         },
 
+        protein: function(request, response) {
+            return response.render('protein', {});
+        },
+
         uploadExperiment: function(request, response) {
             return response.render('experimentUpload', {
                 title: 'Upload'
