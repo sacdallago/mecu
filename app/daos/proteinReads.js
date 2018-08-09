@@ -16,30 +16,6 @@ module.exports = function(context) {
             return proteinReadsModel.bulkCreate(items, options);
         },
 
-        findProteins: function(identifier, transaction) {
-            if(transaction){
-                return proteinReadsModel.findAll({
-                        attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
-                        where: {
-                            uniprotId: {
-                                [sequelize.Op.like]: identifier + "%"
-                            }
-                        },
-                        transaction: transaction
-                    }
-                );
-            } else {
-                return proteinReadsModel.findAll({
-                        attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
-                        where: {
-                            uniprotId: {
-                                [sequelize.Op.like]: identifier + "%"
-                            }
-                        }
-                    });
-            }
-        },
-
         findUniprotIdsLike: function(identifier, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({

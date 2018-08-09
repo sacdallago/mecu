@@ -6,21 +6,6 @@ module.exports = function(context) {
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
 
     return {
-        getProteins: function(request, response) {
-            const identifier = request.params.id.toUpperCase();
-
-            if(identifier === undefined){
-                response.send([]);
-            } else {
-                proteinReadsDao.findProteins(identifier)
-                    .then(function(proteins){
-                        response.send(proteins);
-                    })
-                    .catch(function(error){
-                        response.status(500).send(error);
-                });
-            }
-        },
         getProteinByUniProtId: function(request, response) {
             const identifier = request.params.id.toUpperCase();
 
