@@ -1,5 +1,4 @@
 $.fn.api.settings.api = {
-    'get from proteins': '/api/proteins/search/{query}',
     'get from temperature reads': '/api/reads/temperature/search/{query}'
 };
 

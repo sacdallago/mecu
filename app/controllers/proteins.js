@@ -52,7 +52,24 @@ module.exports = function(context) {
                     console.error('getProteinsFromExp', err);
                     response.send([]);
                 })
+        },
 
+        getSpecProt: function(request, response) {
+            temperatureReadsDao.getSingleProteinXExperiment(request.params.name, request.params.expid)
+                .then(result => {
+                    if(result.length === 1) {
+                        response.send(result[0]);
+                    } else if(result.length > 1) {
+                        console.warn('found more than one proteinname*experiment pair');
+                        response.send(result[0]);
+                    } else {
+                        response.send([]);
+                    }
+                })
+                .catch(err => {
+                    console.error('getProteinsFromExp', err);
+                    response.send([]);
+                });
         }
     }
 }

@@ -44,3 +44,13 @@ ExperimentService.paginatedExperiments = (queryObj) => {
             return [];
         });
 }
+
+ProteinService = {};
+ProteinService.getSpecificProtein = (uniprotId, experimendId) => {
+    return fetch(`/api/proteins/${uniprotId}/experiment/${experimendId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for paginatedExperiments: ', error, uniprotId, experimendId);
+            return [];
+        });
+}
