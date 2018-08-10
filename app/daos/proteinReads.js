@@ -16,6 +16,16 @@ module.exports = function(context) {
             return proteinReadsModel.bulkCreate(items, options);
         },
 
+        findProteinExperiment: function(uniprotId, experiment) {
+            return proteinReadsModel.findAll({
+                attributes: ['uniprotId', 'experiment', 'peptides', 'psms', 'createdAt', 'updatedAt'],
+                where: {
+                    uniprotId,
+                    experiment
+                }
+            });
+        },
+
         findUniprotIdsLike: function(identifier, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({

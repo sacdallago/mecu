@@ -16,8 +16,17 @@ module.exports = function(context) {
 
         getExperiments: function(options = {}){
             return experimentsModel.findAll({
-                    attributes: ['id', 'lysate', 'description', 'uploader'],
-                });
+                attributes: ['id', 'lysate', 'description', 'uploader'],
+            });
+        },
+
+        findExperiment: function(id) {
+            return experimentsModel.findAll({
+                attributes: ['id', 'lysate', 'description', 'uploader', 'createdAt', 'updatedAt'],
+                where: {
+                    id
+                }
+            })
         },
 
         getExperimentsPaged: function(options) {
