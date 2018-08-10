@@ -140,12 +140,12 @@ const addEventHandlerToExperimentsTable = (checkboxIdentifier) => {
 const drawProteinXExperimentTable = (experiments, proteins, data) => {
 
     // create header of table
-    experiments.forEach((e,i,a) =>
-        $('#result-table thead tr')
-            .append($('<th />')
-            .attr({'class':'toggle-experiment', 'data-experiment':e, 'data-exp-id':i})
-            .text(e))
-        );
+    // experiments.forEach((e,i,a) =>
+    //     $('#result-table thead tr')
+    //         .append($('<th />')
+    //         .attr({'class':'toggle-experiment', 'data-experiment':e, 'data-exp-id':i})
+    //         .text(e))
+    //     );
 
     // create table content
     let tableData = [];
@@ -174,7 +174,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         tr.values.forEach((v,i,a) => {
             row.append($('<td />').attr({'class':'toggle-experiment', 'data-experiment':experiments[i], 'data-exp-id':i}).text(v));
         });
-        $('#result-table tbody').append(row);
+        // $('#result-table tbody').append(row);
     })
 
     // add summary row
@@ -183,9 +183,11 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         totalRow.rating[i] = v/proteins.length;
         summaryRow.append($('<td />').text(v+'/'+proteins.length));
     });
-    $('#result-table tbody').append(summaryRow);
 
-    addClickHandlerToProteinExperimentTable('toggle-experiment', tableData, experiments);
+    // FOR NOW: ONLY DRAW HEATMAP
+    // $('#result-table tbody').append(summaryRow);
+    //
+    // addClickHandlerToProteinExperimentTable('toggle-experiment', tableData, experiments);
 
 
     // -----------------HEATMAP-----------------------
