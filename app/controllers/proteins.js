@@ -4,6 +4,7 @@ module.exports = function(context) {
     const proteinsDao = context.component('daos').module('proteins');
     const proteinReadsDao = context.component('daos').module('proteinReads');
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
+    const experimentsDao = context.component('daos').module('experiments');
 
     return {
         getProteinByUniProtId: function(request, response) {
@@ -40,20 +41,34 @@ module.exports = function(context) {
         },
 
         getSpecProt: function(request, response) {
-            temperatureReadsDao.getSingleProteinXExperiment(request.params.name, request.params.expid)
-                .then(result => {
-                    if(result.length === 1) {
-                        response.send(result[0]);
-                    } else if(result.length > 1) {
-                        console.warn('found more than one proteinname*experiment pair');
-                        response.send(result[0]);
+            Promise.all([
+                    temperatureReadsDao.getSingleProteinXExperiment(request.params.name, request.params.expid),
+                    proteinReadsDao.findProteinExperiment(request.params.name, request.params.expid),
+                    experimentsDao.findExperiment(request.params.expid)
+                ])
+                .then(([tempData, proteinData, experimentData]) => {
+                    if(tempData.length > 0 && proteinData.length > 0 && experimentData.length > 0) {
+                        response.send({
+                            uniprotId: tempData[0].uniprotId,
+                            experiment: tempData[0].experiment,
+                            reads: tempData[0].reads,
+                            psms: proteinData[0].psms,
+                            peptides: proteinData[0].peptides,
+                            p_createdAt: proteinData[0].createdAt,
+                            p_updatedAt: proteinData[0].updatedAt,
+                            lysate: experimentData[0].lysate,
+                            description: experimentData[0].description,
+                            uploader: experimentData[0].uploader,
+                            e_createdAt: experimentData[0].createdAt,
+                            e_updatedAt: experimentData[0].updatedAt
+                        });
                     } else {
-                        response.send([]);
+                        throw Error('no data found', tempData, proteinData);
                     }
                 })
                 .catch(err => {
                     console.error('getProteinsFromExp', err);
-                    response.send([]);
+                    response.send({});
                 });
         }
     }
