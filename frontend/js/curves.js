@@ -2,9 +2,9 @@
  * Created by chdallago on 1/13/17.
  */
 
- $.fn.api.settings.api = {
-     'get list of proteins with experiments and data': '/api/proteins/search/exp/'
- };
+ // $.fn.api.settings.api = {
+ //     'get list of proteins with experiments and data': '/api/protein/search/exp/'
+ // };
 
 const grid = $('.isoGrid').isotope({
     // main isotope options
