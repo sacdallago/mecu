@@ -17,10 +17,10 @@ const pullPaginatedExperiments = (query, page) => {
     return ExperimentService.paginatedExperiments(query)
         .then(result => {
             // draw the data retrieved onto the experiments table
-            drawExperimentsTable(result.data, 'cb');
+            drawExperimentsTable(result.data, 'exp-table-cb');
 
             // add event handlers to the checkboxes of the experiments table
-            addEventHandlerToExperimentsTable('cb');
+            addEventHandlerToExperimentsTable('exp-table-cb');
             return result;
         });
 }
