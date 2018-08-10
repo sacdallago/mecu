@@ -1,0 +1,73 @@
+extends base
+
+block postStyles
+        link(rel='stylesheet', href='/public/css/protein.css')
+
+block content
+    .protein-header
+        h3.protein-name#protein-name
+        h3.experiment-description#experiment-description
+
+    .protein-container
+        .protein-curve#protein-curve
+        
+        .meta-data-container
+            .protein-data#protein-data
+                h4.container-info Protein:
+                .uniprot-id
+                    .field Uniprot ID:
+                    .separator
+                    .value
+                .peptides
+                    .field Peptides:
+                    .separator
+                    .value
+                .psms
+                    .field PSMS:
+                    .separator
+                    .value
+                .created
+                    .field Created:
+                    .separator
+                    .value
+                .updated
+                    .field Updated:
+                    .separator
+                    .value
+            
+            .experiment-data#experiment-data
+                h4.container-info Experiment:
+                .description
+                    .field Description:
+                    .separator
+                    .value
+                .lysate
+                    .field Lysate:
+                    .separator
+                    .value
+                .created
+                    .field Created:
+                    .separator
+                    .value
+                .updated
+                    .field Updated:
+                    .separator
+                    .value
+                .uploader
+                    .field Uploader:
+                    .separator
+                    a.value
+                
+    h3.experiments-container#experiments-container Experiments
+    
+    h3.related-proteins-container#related-proteins-container Related Proteins
+
+block settings
+    .divider
+    a(href='/curves').item Selected Curves
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/js/protein.js")
