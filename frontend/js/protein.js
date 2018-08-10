@@ -3,15 +3,13 @@ $(document).ready(() => {
     const query = currentUri.search(true);
     console.log('query', query);
     if(query.protein && query.experiment) {
-        Promise.all(
-            [
-                ProteinService.getSpecificProtein(query.protein, query.experiment)
-            ]
-        )
-        .then(([proteinCurveData]) => {
-            console.log('proteinCurveData', proteinCurveData);
-            drawProtein(proteinCurveData);
-        });
+        ProteinService.getSpecificProtein(query.protein, query.experiment)
+            .then(proteinData => {
+                console.log('proteinCurveData', proteinData);
+                if(Object.keys(proteinData).length > 0) {
+                    drawProtein(proteinData);
+                }
+            });
     }
 })
 
@@ -22,9 +20,10 @@ $(document).ready(() => {
 const drawProtein = (data) => {
 
     drawProteinCurve(data);
+    writeProteinMetaData(data);
 }
 
-const drawProteinCurve = (protein) => {
+const drawProteinCurve = ({uniprotId, experiment, reads}) => {
     // these 2 functions can eventually be outsourced into own utils(?) file
     let getHashCode = function(str) {
         var hash = 0;
@@ -43,9 +42,9 @@ const drawProteinCurve = (protein) => {
     // creating data series for highcharts
     let series = [];
     series.push({
-        name: protein.uniprotId+' '+protein.experiment,
-        data: protein.reads.map(r => [r.t, r.r]),
-        color: getHashCode(protein.uniprotId+"-E"+protein.experiment).intToHSL(),
+        name: uniprotId+' '+experiment,
+        data: reads.map(r => [r.t, r.r]),
+        color: getHashCode(uniprotId+"-E"+experiment).intToHSL(),
         marker: {symbol: 'circle'}
     });
 
@@ -59,5 +58,32 @@ const drawProteinCurve = (protein) => {
         distance: 30,
         padding: 5
     };
+    highChartsCurvesConfigObject['legend'] = {enabled: false};
     Highcharts.chart('protein-curve', highChartsCurvesConfigObject);
+}
+
+const writeProteinMetaData = ({
+        uniprotId, peptides, psms, p_createdAt, p_updatedAt, experiment, description,
+        lysate, e_createdAt, e_updatedAt, uploader
+    }) => {
+    $('#protein-name').text(uniprotId);
+
+    $('#protein-data .uniprot-id .value').text(uniprotId);
+    $('#protein-data .peptides .value').text(peptides);
+    $('#protein-data .psms .value').text(psms);
+    $('#protein-data .created .value').text(dateTimeStringPrettify(p_createdAt));
+    $('#protein-data .updated .value').text(dateTimeStringPrettify(p_updatedAt));
+
+    $('#experiment-data .description .value').text(description);
+    $('#experiment-data .lysate .value').text(lysate);
+    $('#experiment-data .created .value').text(dateTimeStringPrettify(e_createdAt));
+    $('#experiment-data .updated .value').text(dateTimeStringPrettify(e_updatedAt));
+    $('#experiment-data .uploader .value').attr({'href':'https://plus.google.com/'+uploader})
+        .text('Google Plus Profile');
+}
+
+
+const dateTimeStringPrettify = (dateTime) => {
+    const dt = new Date(Date.parse(dateTime));
+    return `${dt.getDate()}-${dt.getMonth()+1}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
 }

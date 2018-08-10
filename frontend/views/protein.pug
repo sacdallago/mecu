@@ -5,22 +5,58 @@ block postStyles
 
 block content
     .protein-header
-        h3.protein-name#protein-name P12345
-        h3.experiment-description#experiment-description description
+        h3.protein-name#protein-name
+        h3.experiment-description#experiment-description
 
     .protein-container
         .protein-curve#protein-curve
         
-        .protein-data#protein-data
-            .uniprot-id
-                .field Uniprot ID
-                .value asdfasdf
-            .name
-                .field Protein Name
-                .value 12312
-            .gene-id
-                .field Gene ID
-                .value 12312-asdfas
+        .meta-data-container
+            .protein-data#protein-data
+                h4.container-info Protein:
+                .uniprot-id
+                    .field Uniprot ID:
+                    .separator
+                    .value
+                .peptides
+                    .field Peptides:
+                    .separator
+                    .value
+                .psms
+                    .field PSMS:
+                    .separator
+                    .value
+                .created
+                    .field Created:
+                    .separator
+                    .value
+                .updated
+                    .field Updated:
+                    .separator
+                    .value
+            
+            .experiment-data#experiment-data
+                h4.container-info Experiment:
+                .description
+                    .field Description:
+                    .separator
+                    .value
+                .lysate
+                    .field Lysate:
+                    .separator
+                    .value
+                .created
+                    .field Created:
+                    .separator
+                    .value
+                .updated
+                    .field Updated:
+                    .separator
+                    .value
+                .uploader
+                    .field Uploader:
+                    .separator
+                    a.value
                 
     h3.experiments-container#experiments-container Experiments
     
