@@ -1,7 +1,7 @@
 TemperatureService = {};
 TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
     return fetch(
-            '/api/proteins/search/exp/',
+            '/api/protein/search/exp/',
             {
                 method: 'POST',
                 headers: {
