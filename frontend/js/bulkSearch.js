@@ -1,6 +1,6 @@
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
-const ITEM_PER_PAGE_COUNT = 2;
+const ITEM_PER_PAGE_COUNT = 3;
 
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
@@ -207,8 +207,6 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         })
     });
 
-    console.log('tableData', tableData);
-
     // coloring of column on hover: https://stackoverflow.com/questions/1553571/html-hover-table-column
     tableData.forEach(tr => {
         let row = $('<tr />');
@@ -234,8 +232,8 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     // heatmap with total row: https://stackoverflow.com/questions/32978274/does-highchart-heat-map-support-sum-of-values
     // heatmap for more data: https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/heatmap-canvas/
     // configuring and drawing heatmap
-    highChartsHeatMapConfigObj.chart.title = {text: null};
-    highChartsHeatMapConfigObj['xAxis'] = {
+    highChartsHeatMapConfigObj.title = {text: null};
+    highChartsHeatMapConfigObj.xAxis = {
         categories: experiments.map(e => ''+e),
         title: {
             align: 'high',
@@ -246,7 +244,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             x: 0 // 20
         }
     };
-    highChartsHeatMapConfigObj['yAxis'] = {
+    highChartsHeatMapConfigObj.yAxis = {
         categories: tableData.map(d => d.name), // test [...Array(100).keys()]
         title: {
             align: 'high',
@@ -259,21 +257,23 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     let seriesData = [];
     tableData.forEach((d,i,a) => {
         d.values.forEach((v,j,a2) => {
-            seriesData.push([j,tableData.length-1-i,v]);
+            if(seriesData[j]) {
+                seriesData[j].push([j, tableData.length-1-i, v]);
+            } else {
+                seriesData[j] = [[j, tableData.length-1-i, v]];
+            }
         })
     });
-    highChartsHeatMapConfigObj['series'] = [{
-        name: '',
-        borderWidth: 1,
-        data: seriesData,
-        dataLabels: {
-            enabled: false,
-            color: '#000000'
-        }
-    }];
-    highChartsHeatMapConfigObj['tooltip'] = {
+    console.log('seriesData', seriesData);
+    highChartsHeatMapConfigObj['series'] = seriesData.map((s,i,a) => ({
+        name: 'Series '+i,
+        borderWidth: .4,
+        borderColor: '#95a5a6',
+        data: s
+    }));
+    highChartsHeatMapConfigObj.tooltip = {
         formatter: function () {
-            if (this.point.value === 1) {
+            if (this.point.value >= 1) {
                 return `Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> has Protein
                 <b>${this.series.yAxis.categories[this.point.y]}</b> in it <b>`;
             } else {
@@ -282,7 +282,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             }
         }
     };
-    highChartsHeatMapConfigObj['plotOptions'] = {
+    highChartsHeatMapConfigObj.plotOptions = {
         series: {
             events: {
                 click: function(e) {
@@ -290,6 +290,13 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] === 1 ? tmpList.push(protein.name) : '');
                     saveExperimentToLocalStorage(experiments[e.point.x], tmpList);
+                }
+            },
+            heatmap: {
+                states: {
+                    hover: {
+                        color: '#000000'
+                    }
                 }
             }
         }
