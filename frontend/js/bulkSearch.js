@@ -38,46 +38,6 @@ const drawPaginationComponent = (actualPage, totalPages) => {
     );
 }
 
-// $('body').on('click', 'tr[class=toggle-protein]', function() {
-//
-//     console.log(this, $(this).attr('id'));
-//
-//     let self = this;
-//     const toggleProtein = function(inStorage, added, removed) {
-//         if(added === 0){
-//             $(self).removeClass('inStore');
-//         } else if(removed === 0) {
-//             $(self).addClass('inStore');
-//         } else {
-//             if ($(self).hasClass('inStore')){
-//                 $(self).removeClass('inStore');
-//             }
-//         }
-//     };
-//
-//     console.log('Storage', StorageManager.get());
-//
-//     // if the localStorage hasn't been deleted yet and there are some proteins in it
-//     if(!localStorageDeleted && StorageManager.get().length > 0) {
-//         if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
-//             StorageManager.clear();
-//             console.log('store cleared');
-//             localStorageDeleted = true;
-//             selectedExperiments.forEach(v => {
-//                 let tmp = {uniprotId:$(this).attr('id'), experiment:v};
-//                 console.log('tmp', tmp);
-//                 StorageManager.toggle(tmp, toggleProtein);
-//             });
-//         }
-//     } else {
-//         console.log('protein toggle', {uniprotId:$(this).attr('id'), experiment:[0]});
-//         selectedExperiments.forEach(v => {
-//             StorageManager.toggle({uniprotId:$(this).attr('id'), experiment:v}, toggleProtein);
-//         });
-//     }
-//     console.log('localStorage', StorageManager.get(), StorageManager.get().length);
-// });
-
 /**
  * fetch melting curves accoring to the experiments and proteins given
  * @param  {number[]} experiments [description]
