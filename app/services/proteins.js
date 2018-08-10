@@ -1,7 +1,7 @@
 module.exports = function(context) {
     const proteinsController = context.component('controllers').module('proteins');
     context.api
-        .post('/proteins/search/exp/', proteinsController.getProteinsFromExp)
-        .get('/proteins/:name/experiment/:expid', proteinsController.getSpecProt)
+        .post('/protein/search/exp/', proteinsController.getProteinsFromExp)
+        .get('/protein/:name/experiment/:expid', proteinsController.getSpecProt)
         ;
 }
