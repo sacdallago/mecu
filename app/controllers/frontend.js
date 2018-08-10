@@ -42,7 +42,7 @@ module.exports = function(context) {
         },
 
         protein: function(request, response) {
-            return response.render('protein', {});
+            return response.render('protein', {title: 'Protein'});
         },
 
         uploadExperiment: function(request, response) {
