@@ -10,3 +10,12 @@
     font-size: 1.2rem !important;
     text-decoration: none !important;
 }
+
+/* workaround so that the highcharts tooltip is not cut off*/
+.highcharts-container {
+    overflow: visible !important;
+}
+
+.highcharts-container svg {
+    overflow: visible !important;
+}
