@@ -35,6 +35,5 @@
     background-color: lightgrey;
 }
 #pagination-component .page:hover{
-    background-color: lightgrey;
-    opacity: .5;
+    background-color: rgb(211,211,211, .5);
 }
