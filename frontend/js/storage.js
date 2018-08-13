@@ -203,7 +203,6 @@ StorageManager.getMinTemp = function() {
 
 // check structure of 'proteins' in local storage
 (function (s) {
-    console.log('Checking local storage values...');
     let proteins = s.get();
     let ok = true;
     if(proteins.constructor !== Array){
@@ -238,7 +237,7 @@ StorageManager.getMinTemp = function() {
             s.clear();
             console.error('Local storage had faulty values... cleared local storage', proteins);
         } else {
-            console.log('Everything is all right');
+            console.log('Local Storage data is viable');
         }
     }
 })(StorageManager);
