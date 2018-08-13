@@ -208,6 +208,17 @@ module.exports = function(context) {
                     console.error(error);
                     return response.status(500).send(error);
                 });
+        },
+
+        getExperimentsWhichHaveProtein: function(request, response) {
+            console.log('request.params.uniprotId', request.params.uniprotId);
+
+            experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId)
+                .then(result => response.status(200).send(result.map(e => e.experiment)))
+                .catch(error => {
+                    console.error('getExperiments', error);
+                    return response.status(500).send(error);
+                });
         }
     }
 };

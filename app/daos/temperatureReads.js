@@ -102,7 +102,8 @@ module.exports = function(context) {
                 ) tmp
                 group by tmp."uniprotId"
             `;
-            console.log('query', query);
+            // console.log('query', query);
+            console.warn(`findAndAggregateTempsByIdAndExperiment still uses SQL query`);
             /*
             for the whole database
             Planning time: 0.147 ms
@@ -168,8 +169,9 @@ module.exports = function(context) {
                  where pr."uniprotId" = '${proteinName}' and pr.experiment = '${experimendId}'
                  GROUP BY pr."experiment", pr."uniprotId"
              `;
-             console.log('query', query);
-             return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT}); 
+             console.warn(`getSingleProteinXExperiment still uses SQL query`);
+             // console.log('query', query);
+             return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
         }
     };
 };
