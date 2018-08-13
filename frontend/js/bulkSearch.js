@@ -239,7 +239,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         }
     };
     highChartsHeatMapConfigObj['yAxis'] = {
-        categories: tableData.map(d => d.name), // test [...Array(100).keys()]
+        categories: tableData.map(d => d.name).reverse(), // test [...Array(100).keys()]
         title: {
             align: 'high',
             offset: 0,
