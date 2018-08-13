@@ -6,7 +6,6 @@ block postStyles
 block content
     .protein-header
         h3.protein-name#protein-name
-        h3.experiment-description#experiment-description
 
     .protein-container
         .protein-curve#protein-curve
@@ -58,9 +57,12 @@ block content
                     .separator
                     a.value
                 
-    h3.experiments-container#experiments-container Experiments
+    .experiments-container#experiments-container
+        h3 Experiments with this Protein
+        .grid
     
-    h3.related-proteins-container#related-proteins-container Related Proteins
+    .related-proteins-container#related-proteins-container
+        h3 Related Proteins
 
 block settings
     .divider

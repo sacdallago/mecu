@@ -54,3 +54,8 @@
 .protein-container .meta-data-container .separator {
     width:40px;
 }
+
+
+.experiments-container .grid .actual-experiment {
+    border: 3px solid green;
+}
