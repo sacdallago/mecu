@@ -202,18 +202,19 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             offset: 0,
             text: 'Experiments',
             rotation: 0,
-            y: 0,
+            y: 20,
             x: 0 // 20
         }
     };
     highChartsHeatMapConfigObj.yAxis = {
-        categories: tableData.map(d => d.name), // test [...Array(100).keys()]
+        categories: tableData.map(d => d.name),
         title: {
             align: 'high',
             offset: 0,
             text: 'Proteins',
             rotation: 0,
-            y: -10
+            y: 0,
+            x: -10
         }
     };
     let seriesData = [];
@@ -232,6 +233,8 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         borderWidth: .4,
         borderColor: '#95a5a6',
         data: s
+        // ,
+        // colsize: 0.5
     }));
     highChartsHeatMapConfigObj.tooltip = {
         formatter: function () {
@@ -248,7 +251,6 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         series: {
             events: {
                 click: function(e) {
-                    console.log('event', e);
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] === 1 ? tmpList.push(protein.name) : '');
                     saveExperimentToLocalStorage(experiments[e.point.x], tmpList);
@@ -263,7 +265,13 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             }
         }
     };
-    $('#heatmap').attr({'style':'height:500px'});
+
+    const colSize = 20;
+    const rowSize = 20;
+    $('#heatmap').attr(
+        {'style':`height:${100+rowSize*proteins.length}px; width:${100+colSize*experiments.length}px`}
+    );
+
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
 
