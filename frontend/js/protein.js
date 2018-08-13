@@ -1,3 +1,5 @@
+let localStorageDeleted = StorageManager.get().length === 0;
+
 
 // grid for experiments which use this protein as well
 const grid = $('#experiments-container .grid').isotope({
@@ -11,9 +13,9 @@ const grid = $('#experiments-container .grid').isotope({
 });
 grid.on('click', '.grid-item', function(){
     const data = $(this).data('protein');
-    if(data.uniprotId && data.experiment) {
-        document.location.href = `/protein?protein=${data.uniprotId}&experiment=${data.experiment.experiment}`;
-    }
+    $(this).toggleClass('actual-experiment');
+    console.log('data', data.uniprotId, data.experiment.experiment);
+    saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
 });
 
 $(document).ready(() => {
@@ -158,15 +160,12 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                 }
                 html += '</div>';
 
-                var element = $(html);
-                if(expRead.experiment === parseInt(actualExperiment)) {
-                    element.addClass('actual-experiment');
-                } else {
-                    element.data("protein", {
-                        uniprotId: protein.uniprotId,
-                        experiment: expRead
-                    });
-                }
+                let element = $(html);
+
+                element.data("protein", {
+                    uniprotId: protein.uniprotId,
+                    experiment: expRead
+                });
 
                 items.push(element[0]);
             })
@@ -208,4 +207,21 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
         });
     });
 
+}
+
+const saveExperimentToLocalStorage = (protein, experiment) => {
+    // if the localStorage hasn't been deleted yet and there are some proteins in it
+    if(!localStorageDeleted && StorageManager.get().length > 0) {
+        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
+            StorageManager.clear();
+            console.log('store cleared');
+            localStorageDeleted = true;
+            console.log('adding', {uniprotId: protein, experiment: experiment});
+            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+        }
+    // else just add the protein/experiment pair
+    } else {
+        console.log('adding', {uniprotId: protein, experiment: experiment});
+        StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+    }
 }
