@@ -1,8 +1,29 @@
+let localStorageDeleted = StorageManager.get().length === 0;
+
+
+// grid for experiments which use this protein as well
+const grid = $('#experiments-container .grid').isotope({
+    // main isotope options
+    itemSelector: '.grid-item',
+    // set layoutMode
+    layoutMode: 'packery',
+    packery: {
+        gutter: 10
+    }
+});
+grid.on('click', '.grid-item', function(){
+    const data = $(this).data('protein');
+    $(this).toggleClass('actual-experiment');
+    console.log('data', data.uniprotId, data.experiment.experiment);
+    saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
+});
+
 $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     console.log('query', query);
     if(query.protein && query.experiment) {
+
         ProteinService.getSpecificProtein(query.protein, query.experiment)
             .then(proteinData => {
                 console.log('proteinCurveData', proteinData);
@@ -10,6 +31,16 @@ $(document).ready(() => {
                     drawProtein(proteinData);
                 }
             });
+
+        ExperimentService.experimentsWhichHaveProtein(query.protein)
+            .then(exps => {
+                console.log('exps', exps);
+                TemperatureService.temperatureReads(exps, [query.protein])
+                    .then(reads => {
+                        console.log('reads', reads);
+                        drawExperimentsWhichHaveProtein(reads, query.experiment);
+                    })
+            })
     }
 })
 
@@ -18,7 +49,6 @@ $(document).ready(() => {
  * @param  {experiment: number, uniprotId: string, reads: {r:number, t:number}[] } data [description]
  */
 const drawProtein = (data) => {
-
     drawProteinCurve(data);
     writeProteinMetaData(data);
 }
@@ -86,4 +116,112 @@ const writeProteinMetaData = ({
 const dateTimeStringPrettify = (dateTime) => {
     const dt = new Date(Date.parse(dateTime));
     return `${dt.getDate()}-${dt.getMonth()+1}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
+}
+
+
+/**
+ * [drawExperimentsWhichHaveProtein description]
+ * @param  {[type]} const [description]
+ * @return {[type]}       [description]
+ */
+const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
+
+    // Grid
+    grid.empty();
+
+    // Curves
+    curves = [];
+
+    let items = [];
+
+    arr.forEach(function(responseProtein){
+        let proteins = [];
+
+        responseProtein.experiments.forEach(function(experiment){
+            proteins.push({
+                uniprotId: responseProtein.uniprotId,
+                experiments: [experiment]
+            });
+        });
+
+        proteins.forEach(function(protein) {
+            protein.experiments.forEach(expRead => {
+                var html = '';
+
+                html += '<div class="grid-item"' + [protein.uniprotId,expRead.experiment].join('E').toLowerCase() +
+                    ' id="' + [protein.uniprotId,expRead.experiment].join('E').toLowerCase() + '">';
+
+                html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
+                html += '<div class="cube"></div>';
+                if(expRead.experiment === parseInt(actualExperiment)){
+                    html += '<div class="experimentNumber">Actual</div>';
+                } else {
+                    html += '<div class="experimentNumber">E' + expRead.experiment + '</div>';
+                }
+                html += '</div>';
+
+                let element = $(html);
+
+                element.data("protein", {
+                    uniprotId: protein.uniprotId,
+                    experiment: expRead
+                });
+
+                items.push(element[0]);
+            })
+        });
+    });
+
+    grid.isotope('insert', items);
+
+    arr.forEach(function(responseProtein){
+        let proteins = [];
+
+        responseProtein.experiments.forEach(function(experiment){
+            proteins.push({
+                uniprotId: responseProtein.uniprotId,
+                experiments: [experiment]
+            });
+        });
+
+        proteins.forEach(function(protein) {
+            protein.experiments.forEach(expRead => {
+                let curve = new MecuLine({
+                    element: "#"+[protein.uniprotId,expRead.experiment].join('E').toLowerCase(),
+                    width:"200",
+                    height:"200",
+                    limit: 5,
+                    minTemp: 41,
+                    maxTemp: 71,
+                    minRatio: 0.1,
+                    //maxRatio: 1
+                });
+
+                curve.add({
+                    uniprotId: protein.uniprotId,
+                    experiments: [expRead]
+                });
+
+                curves.push(curve);
+            })
+        });
+    });
+
+}
+
+const saveExperimentToLocalStorage = (protein, experiment) => {
+    // if the localStorage hasn't been deleted yet and there are some proteins in it
+    if(!localStorageDeleted && StorageManager.get().length > 0) {
+        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
+            StorageManager.clear();
+            console.log('store cleared');
+            localStorageDeleted = true;
+            console.log('adding', {uniprotId: protein, experiment: experiment});
+            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+        }
+    // else just add the protein/experiment pair
+    } else {
+        console.log('adding', {uniprotId: protein, experiment: experiment});
+        StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+    }
 }

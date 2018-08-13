@@ -207,7 +207,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
         }
     };
     highChartsHeatMapConfigObj.yAxis = {
-        categories: tableData.map(d => d.name),
+        categories: tableData.map(d => d.name).reverse(), // test [...Array(100).keys()]
         title: {
             align: 'high',
             offset: 0,
@@ -253,7 +253,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
                 click: function(e) {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] === 1 ? tmpList.push(protein.name) : '');
-                    saveExperimentToLocalStorage(experiments[e.point.x], tmpList);
+                    saveExperimentToLocalStorage(tmpList, experiments[e.point.x]);
                 }
             },
             heatmap: {
@@ -285,12 +285,12 @@ const addClickHandlerToProteinExperimentTable = (columnCellIdentifier, data, exp
             let arrId = this.getAttribute('data-exp-id');
             let tmpList = [];
             data.forEach(protein => protein.values[arrId] === 1 ? tmpList.push(protein.name) : '');
-            saveExperimentToLocalStorage(this.getAttribute('data-experiment'), tmpList);
+            saveExperimentToLocalStorage(tmpList, this.getAttribute('data-experiment'));
         })
     }
 }
 
-const saveExperimentToLocalStorage = (experiment, proteinList) => {
+const saveExperimentToLocalStorage = (proteinList, experiment) => {
     // if the localStorage hasn't been deleted yet and there are some proteins in it
     if(!localStorageDeleted && StorageManager.get().length > 0) {
         if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
