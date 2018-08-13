@@ -3,4 +3,5 @@ module.exports = function(context) {
     const proteinsService = context.component('services').module('proteins');
     const experimentsService = context.component('services').module('experiments');
     const temperatureReadsService = context.component('services').module('temperatureReads');
+    const complexesService = context.component('services').module('complexes');
 }
