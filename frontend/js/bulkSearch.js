@@ -159,10 +159,17 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     data.forEach((d, i, a) => {
         let tableProt = tableData.find(td => td.name === d.uniprotId);
 
-
         d.experiments.forEach(e => {
             let idx = experiments.indexOf(e.experiment);
-            tableProt.values[idx] = 1;
+            StorageManager.has({uniprotId: d.uniprotId, experiment: e.experiment},
+                (c,h,n) => {
+                    if(h == 1) {
+                        tableProt.values[idx] = 2; // 2 means: in localStorage
+                    } else {
+                        tableProt.values[idx] = 1; // 1 means: not in localStorage
+                    }
+                }
+            )
             totalRow.values[idx] += 1;
         })
     });
@@ -222,6 +229,23 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     const cContained = $('.heatmap-container .legend .c2 .sample').css('background-color');
     const cInStorage = $('.heatmap-container .legend .c3 .sample').css('background-color');
 
+    let nothingSelected = true;
+    tableData.forEach(d => d.values.forEach(v => {
+        if(v>1){
+            nothingSelected = false;
+        }
+    }));
+    let colorAxis = {
+        stops: [
+            [0, cNotContained],
+            [0.5, cContained]
+        ]
+    };
+    if(!nothingSelected) {
+        colorAxis.stops.push([1, cInStorage]);
+    }
+    highChartsHeatMapConfigObj.colorAxis = colorAxis;
+
     let seriesData = [];
     tableData.forEach((d,i,a) => {
         d.values.forEach((v,j,a2) => {
@@ -254,8 +278,9 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             events: {
                 click: function(e) {
                     let tmpList = [];
-                    tableData.forEach(protein => protein.values[e.point.x] === 1 ? tmpList.push(protein.name) : '');
+                    tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : '');
                     saveExperimentToLocalStorage(tmpList, experiments[e.point.x]);
+                    drawProteinXExperimentTable(experiments, proteins, data);
                 }
             },
             heatmap: {
