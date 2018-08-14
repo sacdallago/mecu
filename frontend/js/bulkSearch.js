@@ -227,14 +227,11 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             }
         })
     });
-    console.log('seriesData', seriesData);
     highChartsHeatMapConfigObj['series'] = seriesData.map((s,i,a) => ({
         name: 'Series '+i,
         borderWidth: .4,
         borderColor: '#95a5a6',
         data: s
-        // ,
-        // colsize: 0.5
     }));
     highChartsHeatMapConfigObj.tooltip = {
         formatter: function () {
@@ -275,20 +272,18 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
 
-const addClickHandlerToProteinExperimentTable = (columnCellIdentifier, data, experiments) => {
-    const list = document.getElementsByClassName(columnCellIdentifier);
-    for(let i = 0; i<list.length; i++) {
-        list[i].addEventListener('click', function(e) {
-            // console.log('this', this);
-            console.log('this', this.getAttribute('data-experiment')); // experimentId
-            // console.log('this', this.getAttribute('data-exp-id')); // experimentId
-            let arrId = this.getAttribute('data-exp-id');
-            let tmpList = [];
-            data.forEach(protein => protein.values[arrId] === 1 ? tmpList.push(protein.name) : '');
-            saveExperimentToLocalStorage(tmpList, this.getAttribute('data-experiment'));
-        })
-    }
-}
+// const addClickHandlerToProteinExperimentTable = (columnCellIdentifier, data, experiments) => {
+//     const list = document.getElementsByClassName(columnCellIdentifier);
+//     for(let i = 0; i<list.length; i++) {
+//         list[i].addEventListener('click', function(e) {
+//             console.log('this', this.getAttribute('data-experiment')); // experimentId
+//             let arrId = this.getAttribute('data-exp-id');
+//             let tmpList = [];
+//             data.forEach(protein => protein.values[arrId] === 1 ? tmpList.push(protein.name) : '');
+//             saveExperimentToLocalStorage(tmpList, this.getAttribute('data-experiment'));
+//         })
+//     }
+// }
 
 const saveExperimentToLocalStorage = (proteinList, experiment) => {
     // if the localStorage hasn't been deleted yet and there are some proteins in it
@@ -298,14 +293,14 @@ const saveExperimentToLocalStorage = (proteinList, experiment) => {
             console.log('store cleared');
             localStorageDeleted = true;
             proteinList.forEach(protein => {
-                console.log('adding', {uniprotId: protein, experiment: experiment});
+                // console.log('adding', {uniprotId: protein, experiment: experiment});
                 StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
             });
         }
     // else just add the protein/experiment pair
     } else {
         proteinList.forEach(protein => {
-            console.log('adding', {uniprotId: protein, experiment: experiment});
+            // console.log('adding', {uniprotId: protein, experiment: experiment});
             StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
         });
     }
