@@ -21,7 +21,7 @@ block content
     h3 2. Input proteins
     .text-center
         .ui.input.search.maxWidth
-            textarea(name="prot", placeholder="P1234, P43244").inline.prompt.maxWidth.textarea P55072 P00338 P12314 O95456 P12345 P43523 A0AVF1 P37837 P12346 P12347 P12348 P12349 P12310 P12311 P12312 P12313 P12315 P12316 P12317 P12318 P12319 P12320
+            textarea(name="prot", placeholder="P1234, P43244").inline.prompt.maxWidth.textarea P55072 P00338 O95456  P43523 A0AVF1 P37837 P12347 P12349   
     .stats
         span
             strong 0
@@ -31,22 +31,31 @@ block content
     .space
     p Input at least one protein and select at least one experiment to get started.
     
-    .heatmap#heatmap
     
-    table.ui.celled.table#result-table
-        thead
-            tr
-                th Protein\Experiment
-        tbody
-    .space
-    .grid
-    .space
+    //- table.ui.celled.table#result-table
+    //-     thead
+    //-         tr
+    //-             th Protein\Experiment
+    //-     tbody
+    //- .space
+    //- .grid
+    //- .space
     
+    .heatmap-container
+        .heatmap#heatmap
+        .legend
+            .l-item.c1 
+                .sample
+                .text Protein is not contained
+            .l-item.c2 
+                .sample
+                .text Protein is contained
+            .l-item.c3 
+                .sample
+                .text Protein is saved for visualization
 
 block settings
     .divider
-    .item.filterExperiments Filter experiments
-    .item.showMean Toggle means
     a(href='/curves').item Selected Curves
 
 block scripts

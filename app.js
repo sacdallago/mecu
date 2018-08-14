@@ -93,7 +93,7 @@ if (cluster.isMaster) {
         app.use("/public/css", express.static(path.join(__dirname, "frontend", "css")));
         // the old libs (TODO should be removed completely)
         app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
-        // new libs should all be loaded from the node_modules (TODO or in a later set with webpack)
+        // new libs should all be loaded from the node_modules
         app.use("/public/modules", express.static(path.join(__dirname, "node_modules")));
 
         app.use("/public", express.static(path.join(__dirname, "frontend", "public")));

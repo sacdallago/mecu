@@ -1,0 +1,61 @@
+.protein-name, .experiments-container, .related-proteins-container {
+    padding: 20px;
+}
+
+.protein-container {
+    height: 400px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-flow: row wrap;
+}
+.protein-container > *{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+
+    width: 50%;
+    height: 100%;
+    padding: 10px;
+}
+
+.protein-container .protein-curve {
+    position:relative;
+}
+.protein-container .protein-curve #chart {
+    position:absolute;
+}
+
+.protein-container .meta-data-container {
+    min-width: 300px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+}
+.protein-container .meta-data-container > * {
+    padding: 10px;
+}
+
+.protein-container
+        .protein-data > *:not(.container-info),
+        .experiment-data > *:not(.container-info) {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 0.5px solid silver;
+}
+
+.protein-container .meta-data-container .experiment-data .description .value {
+    word-break: break-word;
+    text-align: right;
+}
+.protein-container .meta-data-container .separator {
+    width:40px;
+}
+
+
+.experiments-container .grid .actual-experiment {
+    border: 3px solid green;
+}

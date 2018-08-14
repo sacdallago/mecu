@@ -7,7 +7,8 @@
 module.exports = function(context) {
 
     // Imports
-    var experimentsModel = context.component('models').module('experiments');
+    const experimentsModel = context.component('models').module('experiments');
+    const temperatureReadsModel = context.component('models').module('temperatureReads');
 
     return {
         create: function(item, options) {
@@ -16,8 +17,17 @@ module.exports = function(context) {
 
         getExperiments: function(options = {}){
             return experimentsModel.findAll({
-                    attributes: ['id', 'lysate', 'description', 'uploader'],
-                });
+                attributes: ['id', 'lysate', 'description', 'uploader'],
+            });
+        },
+
+        findExperiment: function(id) {
+            return experimentsModel.findAll({
+                attributes: ['id', 'lysate', 'description', 'uploader', 'createdAt', 'updatedAt'],
+                where: {
+                    id
+                }
+            })
         },
 
         getExperimentsPaged: function(options) {
@@ -46,6 +56,16 @@ module.exports = function(context) {
                     attributes: ['rawData', 'id']
                 });
             }
+        },
+
+        getExperimentsWhichHaveProtein: function(uniprotId) {
+            return temperatureReadsModel.findAll({
+                attributes: ['experiment'],
+                where: {
+                    uniprotId
+                },
+                group: ['experiment', 'uniprotId']
+            })
         }
     };
 };

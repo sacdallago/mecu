@@ -1,7 +1,7 @@
 TemperatureService = {};
 TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
     return fetch(
-            '/api/proteins/search/exp/',
+            '/api/protein/search/exp/',
             {
                 method: 'POST',
                 headers: {
@@ -41,6 +41,24 @@ ExperimentService.paginatedExperiments = (queryObj) => {
         .then(resp => resp.json())
         .catch(error => {
             console.error('Request error for paginatedExperiments: ', error, queryObj);
+            return [];
+        });
+}
+ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
+    return fetch(`/api/experiments/${uniprotId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for paginatedExperiments: ', error, queryObj);
+            return [];
+        });
+}
+
+ProteinService = {};
+ProteinService.getSpecificProtein = (uniprotId, experimendId) => {
+    return fetch(`/api/protein/${uniprotId}/experiment/${experimendId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for paginatedExperiments: ', error, uniprotId, experimendId);
             return [];
         });
 }

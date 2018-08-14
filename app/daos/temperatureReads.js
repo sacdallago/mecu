@@ -102,7 +102,8 @@ module.exports = function(context) {
                 ) tmp
                 group by tmp."uniprotId"
             `;
-            console.log('query', query);
+            // console.log('query', query);
+            console.warn(`findAndAggregateTempsByIdAndExperiment still uses SQL query`);
             /*
             for the whole database
             Planning time: 0.147 ms
@@ -153,6 +154,24 @@ module.exports = function(context) {
             group by tmp."uniprotId"
             ;
              */
+        },
+
+        getSingleProteinXExperiment: function(proteinName, experimendId) {
+            /*
+            SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
+            FROM "temperatureReads" pr
+            where pr."uniprotId" = 'P12004' and pr.experiment = '1'
+            GROUP BY pr."experiment", pr."uniprotId";
+             */
+             const query = `
+                 SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
+                 FROM "temperatureReads" pr
+                 where pr."uniprotId" = '${proteinName}' and pr.experiment = '${experimendId}'
+                 GROUP BY pr."experiment", pr."uniprotId"
+             `;
+             console.warn(`getSingleProteinXExperiment still uses SQL query`);
+             // console.log('query', query);
+             return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
         }
     };
 };
