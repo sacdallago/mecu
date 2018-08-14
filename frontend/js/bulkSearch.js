@@ -217,6 +217,11 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             x: -10
         }
     };
+
+    const cNotContained = $('.heatmap-container .legend .c1 .sample').css('background-color');
+    const cContained = $('.heatmap-container .legend .c2 .sample').css('background-color');
+    const cInStorage = $('.heatmap-container .legend .c3 .sample').css('background-color');
+
     let seriesData = [];
     tableData.forEach((d,i,a) => {
         d.values.forEach((v,j,a2) => {
@@ -268,6 +273,8 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
     $('#heatmap').attr(
         {'style':`height:${100+rowSize*proteins.length}px; width:${100+colSize*experiments.length}px`}
     );
+
+    $('.heatmap-container .legend').css('visibility', 'visible');
 
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
