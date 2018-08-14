@@ -170,7 +170,9 @@ StorageManager.has = function(proteins, callback) {
         }
     });
 
-    callback(current, has, hasNot);
+    if(callback) {
+        callback(current, has, hasNot);
+    }
 
     return current;
 };
