@@ -59,7 +59,7 @@ const fetchMeltingCurves = function(experiments, proteins){
     proteins = proteins.sort();
 
     TemperatureService.temperatureReads(experiments, proteins)
-        .then(data => drawProteinXExperimentTable(experiments, proteins, data));
+        .then(data => drawProteinXExperimentHeatmap(experiments, proteins, data));
 };
 
 /**
@@ -131,21 +131,12 @@ const addEventHandlerToExperimentsTable = (checkboxIdentifier) => {
 }
 
 /**
- * TODO at the moment draws both the heatmap and the table
- * @param  {[type]} experiments [description]
- * @param  {[type]} proteins    [description]
- * @param  {[type]} data        [description]
- * @return {[type]}             [description]
+ * TODO draw proteinXexperiment heatmap
+ * @param  { number[] } experiments list of experiments
+ * @param  { string[] } proteins    list of proteins
+ * @param  { } data                 data as retrieved from the server
  */
-const drawProteinXExperimentTable = (experiments, proteins, data) => {
-
-    // create header of table
-    // experiments.forEach((e,i,a) =>
-    //     $('#result-table thead tr')
-    //         .append($('<th />')
-    //         .attr({'class':'toggle-experiment', 'data-experiment':e, 'data-exp-id':i})
-    //         .text(e))
-    //     );
+const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
 
     // create table content
     let tableData = [];
@@ -173,29 +164,6 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
             totalRow.values[idx] += 1;
         })
     });
-
-    // coloring of column on hover: https://stackoverflow.com/questions/1553571/html-hover-table-column
-    tableData.forEach(tr => {
-        let row = $('<tr />');
-        row.append($('<td />').text(tr.name));
-        tr.values.forEach((v,i,a) => {
-            row.append($('<td />').attr({'class':'toggle-experiment', 'data-experiment':experiments[i], 'data-exp-id':i}).text(v));
-        });
-        // $('#result-table tbody').append(row);
-    })
-
-    // add summary row
-    let summaryRow = $('<tr />').append($('<td />').text('Total'));
-    totalRow.values.forEach((v,i,a) => {
-        totalRow.rating[i] = v/proteins.length;
-        summaryRow.append($('<td />').text(v+'/'+proteins.length));
-    });
-
-    // FOR NOW: ONLY DRAW HEATMAP
-    // $('#result-table tbody').append(summaryRow);
-    //
-    // addClickHandlerToProteinExperimentTable('toggle-experiment', tableData, experiments);
-
 
     // -----------------HEATMAP-----------------------
     // heatmap with total row: https://stackoverflow.com/questions/32978274/does-highchart-heat-map-support-sum-of-values
@@ -280,7 +248,7 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : '');
                     saveExperimentToLocalStorage(tmpList, experiments[e.point.x]);
-                    drawProteinXExperimentTable(experiments, proteins, data);
+                    drawProteinXExperimentHeatmap(experiments, proteins, data);
                 }
             },
             heatmap: {
@@ -303,19 +271,6 @@ const drawProteinXExperimentTable = (experiments, proteins, data) => {
 
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
-
-// const addClickHandlerToProteinExperimentTable = (columnCellIdentifier, data, experiments) => {
-//     const list = document.getElementsByClassName(columnCellIdentifier);
-//     for(let i = 0; i<list.length; i++) {
-//         list[i].addEventListener('click', function(e) {
-//             console.log('this', this.getAttribute('data-experiment')); // experimentId
-//             let arrId = this.getAttribute('data-exp-id');
-//             let tmpList = [];
-//             data.forEach(protein => protein.values[arrId] === 1 ? tmpList.push(protein.name) : '');
-//             saveExperimentToLocalStorage(tmpList, this.getAttribute('data-experiment'));
-//         })
-//     }
-// }
 
 const saveExperimentToLocalStorage = (proteinList, experiment) => {
     // if the localStorage hasn't been deleted yet and there are some proteins in it
