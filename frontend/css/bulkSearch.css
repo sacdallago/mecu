@@ -4,6 +4,7 @@
 
 .textarea {
     height: 6em;
+    border-radius: 3px;
 }
 
 .prompt.inline {
