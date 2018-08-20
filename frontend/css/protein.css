@@ -1,4 +1,4 @@
-.protein-name, .experiments-container, .related-proteins-container {
+.protein-name, .experiments-container, .related-proteins-container, .related-complexes {
     padding: 20px;
 }
 
@@ -16,17 +16,15 @@
 
     width: 50%;
     min-width: 300px;
-    height: 400px;
+    height: 440px;
     padding: 10px;
 }
-
 .protein-container .protein-curve {
     position:relative;
 }
 .protein-container .protein-curve #chart {
     position:absolute;
 }
-
 .protein-container .meta-data-container {
     min-width: 300px;
 
@@ -38,7 +36,6 @@
 .protein-container .meta-data-container > * {
     padding: 10px;
 }
-
 .protein-container
         .protein-data > *:not(.container-info),
         .experiment-data > *:not(.container-info) {
@@ -46,7 +43,6 @@
     justify-content: space-between;
     border-bottom: 0.5px solid silver;
 }
-
 .protein-container .meta-data-container .experiment-data .description .value {
     word-break: break-word;
     text-align: right;
@@ -54,8 +50,31 @@
 .protein-container .meta-data-container .separator {
     width:40px;
 }
+.protein-container .other-experiments-container {
+    display: flex;
+    justify-content: space-between;
+}
+.protein-container .other-experiments-container .other-experiment {
+    border: 1px solid silver;
+    background-color: silver;
+    border-radius: 3px;
 
+    padding: 1 5 1 5px;
+}
+.protein-container .other-experiments-container .other-experiment a {
+    color: black;
+}
+.protein-container .other-experiments-container .other-experiment:hover {
+    background: white;
+}
 
-.experiments-container .grid .actual-experiment {
-    border: 3px solid green;
+.experiments-container .grid .selected-curve-dot {
+    visibility: hidden;
+    width: 20px;
+    background: green;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    margin: 5px;
+    border-radius: 10px;
 }
