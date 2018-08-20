@@ -175,7 +175,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                 if(expRead.experiment === parseInt(actualExperiment)){
                     html += '<div class="experimentNumber">Actual</div>';
                 } else {
-                    html += '<div class="experimentNumber">E' + expRead.experiment + '</div>';
+                    html += '<div class="experimentNumber">Experiment ' + expRead.experiment + '</div>';
                 }
                 html += '<div class="selected-curve-dot"></div>';
                 html += '</div>';
