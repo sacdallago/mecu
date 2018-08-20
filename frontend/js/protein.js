@@ -13,7 +13,8 @@ const grid = $('#experiments-container .grid').isotope({
 });
 grid.on('click', '.grid-item', function(){
     const data = $(this).data('protein');
-    $(this).toggleClass('actual-experiment');
+    let dot = $(this).children('.selected-curve-dot');
+    dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
     console.log('data', data.uniprotId, data.experiment.experiment);
     saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
 });
@@ -176,6 +177,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                 } else {
                     html += '<div class="experimentNumber">E' + expRead.experiment + '</div>';
                 }
+                html += '<div class="selected-curve-dot"></div>';
                 html += '</div>';
 
                 let element = $(html);

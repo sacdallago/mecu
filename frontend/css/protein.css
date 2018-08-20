@@ -68,6 +68,13 @@
     background: white;
 }
 
-.experiments-container .grid .actual-experiment {
-    border: 3px solid green;
+.experiments-container .grid .selected-curve-dot {
+    visibility: hidden;
+    width: 20px;
+    background: green;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    margin: 5px;
+    border-radius: 10px;
 }
