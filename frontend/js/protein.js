@@ -35,6 +35,7 @@ $(document).ready(() => {
         ExperimentService.experimentsWhichHaveProtein(query.protein)
             .then(exps => {
                 console.log('exps', exps);
+                drawOtherExperiments(exps, query.protein, query.experiment);
                 TemperatureService.temperatureReads(exps, [query.protein])
                     .then(reads => {
                         console.log('reads', reads);
@@ -112,6 +113,21 @@ const writeProteinMetaData = ({
         .text('Google Plus Profile');
 }
 
+const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
+    const otherExperimentsContainer = $('#other-experiments .other-experiments-container');
+    experiments.forEach(e => {
+        if(e != actualExperiment) {
+            otherExperimentsContainer.append(
+                $('<div />').append(
+                        $('<a />')
+                            .attr({'href':`/protein?protein=${uniprotId}&experiment=${e}`})
+                            .text(`Experiment ${e}`)
+                    )
+                    .addClass('other-experiment')
+            )
+        }
+    })
+}
 
 const dateTimeStringPrettify = (dateTime) => {
     const dt = new Date(Date.parse(dateTime));
