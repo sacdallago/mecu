@@ -99,7 +99,9 @@ const writeProteinMetaData = ({
     }) => {
     $('#protein-name').text(uniprotId);
 
-    $('#protein-data .uniprot-id .value').text(uniprotId);
+    $('#protein-data .uniprot-id .value')
+        .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
+        .text(uniprotId);
     $('#protein-data .peptides .value').text(peptides);
     $('#protein-data .psms .value').text(psms);
     $('#protein-data .created .value').text(dateTimeStringPrettify(p_createdAt));
