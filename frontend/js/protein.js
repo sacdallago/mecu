@@ -212,7 +212,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                     height:"200",
                     limit: 5,
                     minTemp: 41,
-                    maxTemp: 71,
+                    maxTemp: 64,
                     minRatio: 0.1,
                     //maxRatio: 1
                 });
