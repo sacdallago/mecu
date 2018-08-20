@@ -13,7 +13,8 @@ const grid = $('#experiments-container .grid').isotope({
 });
 grid.on('click', '.grid-item', function(){
     const data = $(this).data('protein');
-    $(this).toggleClass('actual-experiment');
+    let dot = $(this).children('.selected-curve-dot');
+    dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
     console.log('data', data.uniprotId, data.experiment.experiment);
     saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
 });
@@ -35,6 +36,7 @@ $(document).ready(() => {
         ExperimentService.experimentsWhichHaveProtein(query.protein)
             .then(exps => {
                 console.log('exps', exps);
+                drawOtherExperiments(exps, query.protein, query.experiment);
                 TemperatureService.temperatureReads(exps, [query.protein])
                     .then(reads => {
                         console.log('reads', reads);
@@ -98,7 +100,9 @@ const writeProteinMetaData = ({
     }) => {
     $('#protein-name').text(uniprotId);
 
-    $('#protein-data .uniprot-id .value').text(uniprotId);
+    $('#protein-data .uniprot-id .value')
+        .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
+        .text(uniprotId);
     $('#protein-data .peptides .value').text(peptides);
     $('#protein-data .psms .value').text(psms);
     $('#protein-data .created .value').text(dateTimeStringPrettify(p_createdAt));
@@ -112,6 +116,21 @@ const writeProteinMetaData = ({
         .text('Google Plus Profile');
 }
 
+const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
+    const otherExperimentsContainer = $('#other-experiments .other-experiments-container');
+    experiments.forEach(e => {
+        if(e != actualExperiment) {
+            otherExperimentsContainer.append(
+                $('<div />').append(
+                        $('<a />')
+                            .attr({'href':`/protein?protein=${uniprotId}&experiment=${e}`})
+                            .text(`Experiment ${e}`)
+                    )
+                    .addClass('other-experiment')
+            )
+        }
+    })
+}
 
 const dateTimeStringPrettify = (dateTime) => {
     const dt = new Date(Date.parse(dateTime));
@@ -156,8 +175,9 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                 if(expRead.experiment === parseInt(actualExperiment)){
                     html += '<div class="experimentNumber">Actual</div>';
                 } else {
-                    html += '<div class="experimentNumber">E' + expRead.experiment + '</div>';
+                    html += '<div class="experimentNumber">Experiment ' + expRead.experiment + '</div>';
                 }
+                html += '<div class="selected-curve-dot"></div>';
                 html += '</div>';
 
                 let element = $(html);
@@ -192,7 +212,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                     height:"200",
                     limit: 5,
                     minTemp: 41,
-                    maxTemp: 71,
+                    maxTemp: 64,
                     minRatio: 0.1,
                     //maxRatio: 1
                 });
