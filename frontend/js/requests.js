@@ -62,3 +62,21 @@ ProteinService.getSpecificProtein = (uniprotId, experimendId) => {
             return [];
         });
 }
+
+ComplexService = {};
+ComplexService.getComplexById = (id) => {
+    return fetch(`/api/complex/${id}`)
+    .then(resp => resp.json())
+    .catch(error => {
+        console.error('Request error for getComplexById: ', error, uniprotId, experimendId);
+        return [];
+    });
+}
+ComplexService.getAllComplexesWhichContainProtein = (uniprotId) => {
+    return fetch(`/api/complex/hasprotein/${uniprotId}`)
+    .then(resp => resp.json())
+    .catch(error => {
+        console.error('Request error for getAllComplexesWhichContainProtein: ', error, uniprotId, experimendId);
+        return [];
+    });
+}
