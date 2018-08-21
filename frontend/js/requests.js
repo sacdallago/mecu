@@ -48,7 +48,7 @@ ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
     return fetch(`/api/experiments/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for paginatedExperiments: ', error, queryObj);
+            console.error('Request error for experimentsWhichHaveProtein: ', error, queryObj);
             return [];
         });
 }
@@ -58,7 +58,7 @@ ProteinService.getSpecificProtein = (uniprotId, experimendId) => {
     return fetch(`/api/protein/${uniprotId}/experiment/${experimendId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for paginatedExperiments: ', error, uniprotId, experimendId);
+            console.error('Request error for getSpecificProtein: ', error, uniprotId, experimendId);
             return [];
         });
 }
