@@ -1,0 +1,20 @@
+extends base
+
+block postStyles
+        //- link(rel='stylesheet', href='/public/css/protein.css')
+
+block content
+    h3.complex-name#complex-name
+        
+    .data-container#data-container
+    
+block settings
+    .divider
+    a(href='/search').item Search
+    a(href='/curves').item Selected Curves
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/js/complex.js")
