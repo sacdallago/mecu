@@ -1,20 +1,17 @@
 const sequelize = require('sequelize');
 
 module.exports = function(context) {
-    const userModel = context.component('models').module('users');
 
-    return context.dbConnection.define('complex', {
-        // experiment id as foreign key?
+    const model = context.dbConnection.define('complex', {
         name: {
             type: sequelize.STRING,
             allowNull: false
         },
         purificationMethod: {
-            type: sequelize.STRING,
-            allowNull: false
+            type: sequelize.TEXT
         },
         comment: {
-            type: sequelize.STRING
+            type: sequelize.TEXT
         },
         cellLine: {
             type: sequelize.STRING
@@ -29,14 +26,13 @@ module.exports = function(context) {
             type: sequelize.INTEGER
         },
         diseaseComment: {
-            type: sequelize.STRING
+            type: sequelize.TEXT
         },
         proteins: {
-            type: sequelize.ARRAY(sequelize.STRING), // for array storage
-            // type: sequelize.ARRAY(sequelize.INTEGER), // for foreign keys
+            type: sequelize.ARRAY(sequelize.STRING),
         },
         proteinNames: {
-            type: sequelize.ARRAY(sequelize.STRING)
+            type: sequelize.ARRAY(sequelize.TEXT)
         },
         geneNames: {
             type: sequelize.ARRAY(sequelize.STRING)
@@ -50,17 +46,17 @@ module.exports = function(context) {
             type: sequelize.ARRAY(sequelize.STRING)
         },
         goDescription: {
-            type: sequelize.STRING
+            type: sequelize.TEXT
         },
 
         entrezIds: {
-            type: sequelize.ARRAY(sequelize.INTEGER)
+            type: sequelize.ARRAY(sequelize.STRING)
         },
         subunitsComment: {
-            type: sequelize.STRING
+            type: sequelize.TEXT
         },
         swissprotOrganism: {
-            type: sequelize.ARRAY(sequelize.STRING)
+            type: sequelize.ARRAY(sequelize.TEXT)
         },
 
         pubMedId: {
@@ -70,25 +66,23 @@ module.exports = function(context) {
         funCatId: {
             type: sequelize.ARRAY(sequelize.STRING)
         },
-        funCatdescription: {
-            type: sequelize.STRING
+        funCatDescription: {
+            type: sequelize.TEXT
         },
 
-        uploader: {
-            type: sequelize.STRING,
-            allowNull: false,
-            onDelete: "CASCADE",
-            onUpdate: "CASCADE",
-            references: {
-                // This is a reference to another model
-                model: userModel,
-
-                // This is the column name of the referenced model
-                key: 'googleId',
-
-                // This declares when to check the foreign key constraint. PostgreSQL only.
-                deferrable: sequelize.Deferrable.INITIALLY_IMMEDIATE
-            }
+        createdAt: {
+            type: sequelize.DATE(3),
+            defaultValue: sequelize.literal('CURRENT_TIMESTAMP(3)'),
+        },
+        updatedAt: {
+            type: sequelize.DATE(3),
+            defaultValue: sequelize.literal('CURRENT_TIMESTAMP(3)'),
+            onUpdate: sequelize.literal('CURRENT_TIMESTAMP(3)')
         }
+    }, {
+        timestamps: false
     });
+
+
+    return model;
 }
