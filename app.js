@@ -6,6 +6,8 @@ const cluster           = require('cluster');
 const consoleStamp      = require('console-stamp');
 const path              = require('path');
 
+const seedFile =  require('./app/seeds/loadComplexes');
+
 if (cluster.isMaster) {
     // Setup timestamps for logging
     consoleStamp(console,{
@@ -211,6 +213,18 @@ if (cluster.isMaster) {
 
         // Sync the database --> Write table definitions
         context.dbConnection.sync().then(function() {
+            // seeding
+            if(context.constants.seedComplexes) {
+                console.warn('SEEDING: complexes');
+                seedFile().loadComplexes('./app/seeds/010718corum_complexes.json')
+                    .then(res => {
+                        console.warn(`SEEDING ${res.length} new complexes`);
+                        return context.dbConnection.queryInterface.bulkInsert({tableName: "complexes"}, res)
+                            .catch(e => console.error('Problem seeding(1)', e));
+                    })
+                    .catch(e => console.error('Problem seeding(1)', e));
+            }
+
             // Make the process listen to incoming requests
             app.listen(app.get('port'), function(){
                 console.log("Express server listening on port ", app.get('port'));

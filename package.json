@@ -53,6 +53,7 @@
     },
     "scripts": {
         "start": "node app.js",
+        "seed-start": "SEED_COMPLEXES=true yarn start",
         "yarn-lock-to-npm": "synp --source-file ./yarn.lock",
         "npm-lock-to-yarn": "synp --source-file package-lock.json"
     }

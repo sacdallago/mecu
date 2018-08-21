@@ -16,7 +16,9 @@ module.exports = {
 
         // Initialize the context
         context = {
-            constants       : {}
+            constants: {
+                seedComplexes: process.env.SEED_COMPLEXES || false
+            }
         };
 
         // Function to load all components from the respective folders (models, controllers, services, daos, utils)
