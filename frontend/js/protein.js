@@ -42,6 +42,12 @@ $(document).ready(() => {
                         console.log('reads', reads);
                         drawExperimentsWhichHaveProtein(reads, query.experiment);
                     })
+            });
+
+        ComplexService.getAllComplexesWhichContainProtein(query.protein)
+            .then(complexes => {
+                console.log('complexes', complexes);
+                drawRelatedComplexes(complexes);
             })
     }
 })
@@ -244,4 +250,23 @@ const saveExperimentToLocalStorage = (protein, experiment) => {
         console.log('adding', {uniprotId: protein, experiment: experiment});
         StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
     }
+}
+
+const drawRelatedComplexes = (complexes) => {
+    const relatedComplexesContainer = $('#related-complexes-container');
+    if(complexes.length === 0) {
+        relatedComplexesContainer.append(
+            $('<div />').text('No complexes found which contain this protein.')
+        );
+        return;
+    }
+    complexes.forEach(complex => {
+        relatedComplexesContainer.append(
+            $('<div />').append(
+                $('<a />')
+                    .attr({'href':`/complex?id=${complex.id}`})
+                    .text(complex.id+'   '+complex.name)
+            )
+        );
+    });
 }
