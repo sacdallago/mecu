@@ -212,29 +212,25 @@ if (cluster.isMaster) {
         context.component('.').module('routes');
 
         // Sync the database --> Write table definitions
-        context.dbConnection.sync().then(function() {
-            // seeding
-            if(context.constants.seedComplexes) {
-                console.warn('SEEDING: complexes');
-                seedFile().loadComplexes('./app/seeds/010718corum_complexes.json')
-                    .then(res => {
-                        console.warn(`SEEDING ${res.length} new complexes`);
-                        return context.dbConnection.queryInterface.bulkInsert({tableName: "complexes"}, res)
-                            .catch(e => console.error('Problem seeding(1)', e));
-                    })
-                    .catch(e => console.error('Problem seeding(1)', e));
-            }
-
+        context.dbConnection.sync()
+            .then(() => {
+                // seeding
+                if(context.constants.seedComplexes) {
+                    return seedFile(context, './app/seeds/010718corum_complexes.json');
+                } else {
+                    return Promise.resolve();
+                }
+            })
             // Make the process listen to incoming requests
-            app.listen(app.get('port'), function(){
-                console.log("Express server listening on port ", app.get('port'));
-                console.log("According to your configuration, the webapp is reachable at", address);
+            .then(() => app.listen( app.get('port'), function(){
+                    console.log("Express server listening on port ", app.get('port'));
+                    console.log("According to your configuration, the webapp is reachable at", address);
+                })
+            ).catch(function(error) {
+                console.error("There was an error while syncronizing the tables between the application and the database.");
+                console.error(error);
+                process.exit(2);
             });
-        }).catch(function(error) {
-            console.error("There was an error while syncronizing the tables between the application and the database.");
-            console.error(error);
-            process.exit(2);
-        });
     });
 
     // Watch in case of file changes, restart worker (basically can keep up server running forever)
