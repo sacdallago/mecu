@@ -6,7 +6,6 @@
 
 const sequelize = require('sequelize');
 
-
 module.exports = function(context) {
     return context.dbConnection.define('protein', {
         uniprotId: {
@@ -14,11 +13,6 @@ module.exports = function(context) {
             // allowNull: false,
             // unique: true,
             primaryKey: true
-        },
-        primaryGene: {
-            type: sequelize.STRING,
-            allowNull: false,
-            unique: 'primaryGene'
         }
     });
 };
