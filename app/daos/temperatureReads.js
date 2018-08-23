@@ -156,7 +156,7 @@ module.exports = function(context) {
              */
         },
 
-        getSingleProteinXExperiment: function(proteinName, experimendId) {
+        getSingleProteinXExperiment: function(proteinName, experimentId) {
             /*
             SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
             FROM "temperatureReads" pr
@@ -166,12 +166,22 @@ module.exports = function(context) {
              const query = `
                  SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
                  FROM "temperatureReads" pr
-                 where pr."uniprotId" = '${proteinName}' and pr.experiment = '${experimendId}'
+                 where pr."uniprotId" = :proteinName and pr.experiment = :experimentId
                  GROUP BY pr."experiment", pr."uniprotId"
              `;
              console.warn(`getSingleProteinXExperiment still uses SQL query`);
              // console.log('query', query);
-             return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
+             return context.dbConnection.query(
+                     query,
+                     {
+                         replacements: {
+                             proteinName: proteinName,
+                             experimentId: experimentId
+                         }
+                     },
+                     {type: sequelize.QueryTypes.SELECT}
+                 )
+                 .then(result => result[0]);
         }
     };
 };

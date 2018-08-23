@@ -17,8 +17,17 @@ module.exports = function(context) {
 
         getComplexWhichHasProtein: function(uniprotId) {
             console.warn(`getComplexWhichHasProtein still uses sql query`);
-            const query = `select c.id, c.name, c.proteins, c.comment from complexes c where '${uniprotId}' = any (c.proteins);`
-            return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
+            const query = `
+                select c.id, c.name
+                from complexes c, proteins p, protein_complexes cp
+                where c.id = cp."complexId" and p."uniprotId" = cp."uniprotId" and p."uniprotId" = :uniprotId;
+            `;
+            return context.dbConnection.query(
+                    query,
+                    {replacements: {uniprotId: uniprotId}},
+                    {type: sequelize.QueryTypes.SELECT}
+                )
+                .then(result => result[0]);
         }
     };
 };
