@@ -14,7 +14,6 @@ module.exports = function(context) {
                 });
         },
         hasProtein: function(request, response) {
-            console.log('request.params', request.params);
             const start = new Date();
             complexesDao.getComplexWhichHasProtein(request.params.uniprotId)
                 .then(r => {
