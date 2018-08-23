@@ -304,7 +304,7 @@ const drawRelatedComplexes = (complexes, actualProtein) => {
     });
 
     $('#related-complexes-container .container').on('click', '.complex-item', function(e) {
-        console.log('e', e);
-        console.log('complex id', $(this).data('complex-id'));
+        const complexId = $(this).data('complex-id');
+        document.location.href = `/complex?id=${complexId}`;
     })
 }
