@@ -4,8 +4,7 @@ module.exports = function(context) {
 
     const model = context.dbConnection.define('complex', {
         name: {
-            type: sequelize.STRING,
-            allowNull: false
+            type: sequelize.STRING
         },
         purificationMethod: {
             type: sequelize.TEXT
