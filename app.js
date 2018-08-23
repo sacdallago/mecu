@@ -216,7 +216,7 @@ if (cluster.isMaster) {
             .then(() => {
                 // seeding
                 if(context.constants.seedComplexes) {
-                    return seedFile(context, './app/seeds/010718corum_complexes.json');
+                    return seedFile(context, './private/010718corum_complexes.json');
                 } else {
                     return Promise.resolve();
                 }
