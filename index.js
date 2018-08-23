@@ -95,7 +95,8 @@ module.exports = {
             pool: {
                 max: 5,
                 min: 0,
-                idle: 10000
+                idle: 20000,
+                acquire: 20000
             },
             logging: config.database.logging !== false ? console.log : false
             // TODO - omitNull will avoid passing NULL values in create, but it doesn't fix the problem: how to assign default values?
