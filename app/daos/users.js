@@ -7,7 +7,7 @@
 module.exports = function(context) {
 
     // Imports
-    var usersModel = context.component('models').module('users');
+    const usersModel = context.component('models').module('users');
 
     return {
         findOrCreate: function(document) {
