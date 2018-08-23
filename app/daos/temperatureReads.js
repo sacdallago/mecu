@@ -102,7 +102,6 @@ module.exports = function(context) {
                 ) tmp
                 group by tmp."uniprotId"
             `;
-            // console.log('query', query);
             console.warn(`findAndAggregateTempsByIdAndExperiment still uses SQL query`);
             /*
             for the whole database
@@ -157,12 +156,6 @@ module.exports = function(context) {
         },
 
         getSingleProteinXExperiment: function(proteinName, experimentId) {
-            /*
-            SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
-            FROM "temperatureReads" pr
-            where pr."uniprotId" = 'P12004' and pr.experiment = '1'
-            GROUP BY pr."experiment", pr."uniprotId";
-             */
              const query = `
                  SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
                  FROM "temperatureReads" pr
