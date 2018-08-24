@@ -38,7 +38,7 @@ const loadFileAndParseAttributes = function(filePath) {
             content = JSON.parse(content);
         } catch(e) {
             console.error('problem loading/parsing file ', filePath, e);
-            return [];
+            resolve([]);
         }
 
         // map to database attributes
@@ -92,7 +92,7 @@ const loadFileAndParseAttributes = function(filePath) {
             })
         );
 
-        return resolve(result);
+        resolve(result);
     });
 }
 
