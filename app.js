@@ -6,7 +6,7 @@ const cluster           = require('cluster');
 const consoleStamp      = require('console-stamp');
 const path              = require('path');
 
-const seedFile =  require('./app/seeds/loadComplexes');
+const seedComplexes =  require('./app/seeds/loadComplexes');
 
 if (cluster.isMaster) {
     // Setup timestamps for logging
@@ -213,10 +213,10 @@ if (cluster.isMaster) {
 
         // Sync the database --> Write table definitions
         context.dbConnection.sync()
+            // seeding complexes
             .then(() => {
-                // seeding
                 if(context.constants.seedComplexes) {
-                    return seedFile(context, './private/010718corum_complexes.json');
+                    return seedComplexes(context, './private/010718corum_complexes.json');
                 } else {
                     return Promise.resolve();
                 }
