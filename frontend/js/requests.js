@@ -52,6 +52,15 @@ ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
             return [];
         });
 }
+ExperimentService.allProteinsContainedInExperiment = (experimentId) => {
+    return fetch(`/api/experiments/proteins/${experimentId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, queryObj);
+            return [];
+        });
+}
+
 
 ProteinService = {};
 ProteinService.getSpecificProtein = (uniprotId, experimendId) => {
