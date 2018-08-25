@@ -179,9 +179,9 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                 html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
                 html += '<div class="cube"></div>';
                 if(expRead.experiment === parseInt(actualExperiment)){
-                    html += '<div class="experimentNumber">Actual</div>';
+                    html += '<div class="experimentNumber" style="font-size: 14;">Experiment '+actualExperiment+' (Actual)</div>';
                 } else {
-                    html += '<div class="experimentNumber">Experiment ' + expRead.experiment + '</div>';
+                    html += '<div class="experimentNumber" style="font-size: 14;">Experiment ' + expRead.experiment + '</div>';
                 }
                 html += '<div class="selected-curve-dot"></div>';
                 html += '</div>';
