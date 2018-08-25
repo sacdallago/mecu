@@ -1,0 +1,36 @@
+.data-container {
+    padding: 10 20 10 20px;
+    border: 1px solid grey;
+    background-color: #F5F5F5;
+}
+
+.data-container > * {
+    display: flex;
+    align-items: flex-end;
+    border-bottom: 0.5px solid silver;
+    padding: 5px;
+}
+.data-container .text {
+    min-width: 150px;
+}
+.data-container .list {
+    display: flex;
+    flex-wrap: wrap;
+}
+.data-container .list-item {
+    padding: 5px;
+    margin: 2 1 2 1px;
+
+    border-radius: 2px;
+    background-color: #E0E0E0;
+    text-align: center;
+}
+.data-container .id-and-names-list-item {
+    display: flex;
+    flex-wrap: wrap;
+
+    border-bottom: 0.5px dashed silver;
+}
+.data-container .id-and-names-id {
+    min-width: 80px;
+}
