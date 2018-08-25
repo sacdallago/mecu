@@ -212,6 +212,8 @@ if (cluster.isMaster) {
         context.component('.').module('routes');
 
         // Sync the database --> Write table definitions
+        // TODO throw this out, this should only be done once, or when the table is changed
+        // force: true -> drops table and recreates it...
         context.dbConnection.sync()
             // seeding complexes
             .then(() => {

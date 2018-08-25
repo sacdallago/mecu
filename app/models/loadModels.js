@@ -6,7 +6,6 @@ module.exports = function(context) {
     const complexesModel = context.component('models').module('complexes');
     const proteinXcomplexModel = context.component('models').module('proteinXcomplex');
     const proteinXProteinModel = context.component('models').module('proteinXprotein');
-    // context.dbConnection.queryInterface.addIndex('protein_protein', {fields:['interactor1', 'interactor2', 'correlation']});
 
     // m-to-n between complex and protein
     proteinsModel.belongsToMany(complexesModel, {
