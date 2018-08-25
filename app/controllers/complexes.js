@@ -5,7 +5,6 @@ module.exports = function(context) {
 
     return {
         getById: function(request, response) {
-            console.log('request.params', request.params);
             complexesDao.getComplex(request.params.id)
                 .then(result => response.status(200).send(result))
                 .catch(error => {
