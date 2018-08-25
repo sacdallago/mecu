@@ -1,7 +1,8 @@
 const fs = require('fs');
-const filePath = 'private/hippie_current_uniprotID.json';
-load(filePath);
-const load = function(filePath) {
+
+
+module.exports = function(filePath) {
+    const proteinsModel = context.component('models').module('proteins');
 
     console.warn('SEEDING PROTEIN X PROTEIN INTERACTION');
 
@@ -10,8 +11,7 @@ const load = function(filePath) {
             console.warn(`SEEDING PROTEIN X PROTEIN: ${result.length} found`);
             return result;
         })
-        // .then(data => seedProteinXProtein(proteinXProteinModel, data))
-        .then(data => createInsertIntoFile(data))
+        .then(data => seedNecessaryProteins(proteinsModel, data))
         .then(done => console.warn(`SEEDING PROTEIN X PROTEIN finished`))
         .catch(e => console.error('Problem seeding protein x protein', e));
 }
@@ -80,89 +80,7 @@ const mapVal5 = function(val5) {
     return ret;
 }
 
-const seedProteinXProtein = function(pxpiModel, arrOfProteinXProteinInterations) {
-    const atOnce = 2000;
-    let p = [];
-    for(let i=0, j=-1; i<arrOfProteinXProteinInterations.length; i++) {
-        if(i%atOnce === 0) {
-            p.push([]);
-            j++;
-        }
-        p[j].push(
-            pxpiModel.findOrCreate({
-                where: {
-                    interactor1: arrOfProteinXProteinInterations[i].interactor1,
-                    interactor2: arrOfProteinXProteinInterations[i].interactor2
-                },
-                defaults: arrOfProteinXProteinInterations[i]
-            })
-            .catch(e => console.error(`error findOrCreate: ${arrOfProteinXProteinInterations[i]} error: ${e.message}`))
-        );
-    }
-    console.warn('creating promises');
-    let ret = Promise.resolve();
-    p.forEach(arrOfPromises => ret = ret.then(
-        () => Promise.all(arrOfPromises)
-        .then(arrRes => {
-            let added = 0, notAdded = 0;
-            arrRes.forEach(res => res && res[1] ? added++ : notAdded++);
-            console.log(`added: ${added}, notAdded: ${notAdded}`);
-        })
-    ));
-    return ret;
-
-    // let ret = Promise.resolve();
-    // arrOfProteinXProteinInterations.forEach(pxpi => {
-    //     ret = ret.then(() => pxpiModel.findOrCreate({
-    //             where: {
-    //                 interactor1: pxpi.interactor1,
-    //                 interactor2: pxpi.interactor2
-    //             },
-    //             defaults: pxpi
-    //         })
-    //         .catch(e => console.error(`error findOrCreate error: ${e.message}`, pxpi))
-    //     )
-    // })
-    // return ret;
-
-    // console.log('context', context);
-    // return context.dbConnection.queryInterface.bulkInsert('protein_proteins', arrOfProteinXProteinInterations)
-    //     .then(console.warn);
-    // let ret = Promise.resolve({added: 0, notAdded: 0});
-    // arrOfProteinXProteinInterations.forEach(pxpi => {
-    //     // ret = ret.then(stats => Promise.all([
-    //             p.push(pxpiModel.findOrCreate({
-    //                 where: {
-    //                     interactor1: pxpi.interactor1,
-    //                     interactor2: pxpi.interactor2
-    //                 },
-    //                 defaults: pxpi
-    //             })
-    //             .then(results => {
-    //                 // if(results[1]) {console.warn('added', results[0].interactor1)}
-    //             })
-    //             .catch(e => console.warn(pxpi, e))
-    //
-    //         );
-    //         //     ,
-    //         //     Promise.resolve(stats)
-    //         // ])
-    //         // )
-    //         // .then(([results, stats]) => {
-    //         //     if(results[1]) {stats.added++}
-    //         //     else stats.notAdded++;
-    //         //     return stats;
-    //         // });
-    // });
-
-    // return p;
-    //
-    // return ret
-    //     .then((s) => console.warn(`SEEDING PROTEIN X PROTEIN finished (new:${s.added}, old:${s.notAdded})`));
-}
-
-
-const createInsertIntoFile = (data) => {
+const seedNecessaryProteins = function(arrOfProteinXProteinInterations) {
     try {
         let str = '';
         data.forEach((d,i,a) => {
