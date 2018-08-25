@@ -7,7 +7,7 @@
 module.exports = function(context) {
 
     // Imports
-    var proteinsModel = context.component('models').module('proteins');
+    const proteinsModel = context.component('models').module('proteins');
 
     return {
         create: function(item) {

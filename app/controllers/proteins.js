@@ -22,12 +22,10 @@ module.exports = function(context) {
         },
 
         getProteinsFromExp: function(request, response) {
-            console.log('request.body', request.body);
             let protExpArray = request.body;
             if(protExpArray.constructor == Object) {
                 protExpArray = [];
             }
-            console.log('protExpArray', protExpArray);
 
             temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray)
                 .then(r => {

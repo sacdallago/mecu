@@ -16,7 +16,9 @@ module.exports = {
 
         // Initialize the context
         context = {
-            constants       : {}
+            constants: {
+                seedComplexes: process.env.SEED_COMPLEXES || false
+            }
         };
 
         // Function to load all components from the respective folders (models, controllers, services, daos, utils)
@@ -93,7 +95,8 @@ module.exports = {
             pool: {
                 max: 5,
                 min: 0,
-                idle: 10000
+                idle: 5000,
+                acquire: 20000
             },
             logging: config.database.logging !== false ? console.log : false
             // TODO - omitNull will avoid passing NULL values in create, but it doesn't fix the problem: how to assign default values?

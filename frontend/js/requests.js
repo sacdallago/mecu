@@ -48,7 +48,7 @@ ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
     return fetch(`/api/experiments/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for paginatedExperiments: ', error, queryObj);
+            console.error('Request error for experimentsWhichHaveProtein: ', error, queryObj);
             return [];
         });
 }
@@ -58,7 +58,25 @@ ProteinService.getSpecificProtein = (uniprotId, experimendId) => {
     return fetch(`/api/protein/${uniprotId}/experiment/${experimendId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for paginatedExperiments: ', error, uniprotId, experimendId);
+            console.error('Request error for getSpecificProtein: ', error, uniprotId, experimendId);
             return [];
         });
+}
+
+ComplexService = {};
+ComplexService.getComplexById = (id) => {
+    return fetch(`/api/complex/${id}`)
+    .then(resp => resp.json())
+    .catch(error => {
+        console.error('Request error for getComplexById: ', error, uniprotId, experimendId);
+        return [];
+    });
+}
+ComplexService.getAllComplexesWhichContainProtein = (uniprotId) => {
+    return fetch(`/api/complex/hasprotein/${uniprotId}`)
+    .then(resp => resp.json())
+    .catch(error => {
+        console.error('Request error for getAllComplexesWhichContainProtein: ', error, uniprotId, experimendId);
+        return [];
+    });
 }

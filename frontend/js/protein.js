@@ -42,6 +42,12 @@ $(document).ready(() => {
                         console.log('reads', reads);
                         drawExperimentsWhichHaveProtein(reads, query.experiment);
                     })
+            });
+
+        ComplexService.getAllComplexesWhichContainProtein(query.protein)
+            .then(complexes => {
+                console.log('complexes', complexes);
+                drawRelatedComplexes(complexes, query.protein);
             })
     }
 })
@@ -244,4 +250,61 @@ const saveExperimentToLocalStorage = (protein, experiment) => {
         console.log('adding', {uniprotId: protein, experiment: experiment});
         StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
     }
+}
+
+const drawRelatedComplexes = (complexes, actualProtein) => {
+    const relatedComplexesContainer = $('#related-complexes-container .container');
+
+    if(complexes.length === 0) {
+        relatedComplexesContainer.append(
+            $('<div />').text('No complexes found which contain this protein.')
+        );
+        return;
+    }
+
+
+    const text = $('<div />').addClass('text');
+    const value = $('<div />').addClass('value');
+    const complexItem = $('<div />').addClass('complex-item');
+    const complexName = $('<div />').addClass('name');
+    const complexComment = $('<div />').addClass('comment');
+    const complexProteins = $('<div />').addClass('proteins');
+    const complexProteinItem = $('<div />').addClass('protein-item');
+
+    complexes.forEach(complex => {
+        const tmpComplexProteins = $('<div />').addClass('protein-list');
+        complex.proteins.forEach(protein => {
+            let tmp = complexProteinItem.clone().text(protein);
+            if(protein === actualProtein) {
+                tmp.addClass('actual-protein');
+            }
+            tmpComplexProteins.append(tmp);
+        });
+        relatedComplexesContainer.append(
+            complexItem.clone().data('complex-id', complex.id)
+                .append(
+                    complexName.clone().append([
+                        text.clone().text('Name'),
+                        value.clone().text(complex.name)
+                    ])
+                )
+                .append(
+                    complexComment.clone().append([
+                        text.clone().text('Comment'),
+                        value.clone().text(complex.comment || '-')
+                    ])
+                )
+                .append(
+                    complexProteins.clone().append([
+                        text.clone().text('Contained Proteins'),
+                        tmpComplexProteins.addClass('value')
+                    ])
+                )
+        );
+    });
+
+    $('#related-complexes-container .container').on('click', '.complex-item', function(e) {
+        const complexId = $(this).data('complex-id');
+        document.location.href = `/complex?id=${complexId}`;
+    })
 }

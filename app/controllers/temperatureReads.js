@@ -52,7 +52,7 @@ module.exports = function(context) {
 
                                 return element;
                             });
-                            console.log('duration', (Date.now()-start)/1000)
+                            console.log('DURATION searchByUniprotId', (Date.now()-start)/1000)
                             return response.send(result);
                         })
                             .catch(function(error){
