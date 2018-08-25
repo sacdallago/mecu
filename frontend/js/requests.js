@@ -71,6 +71,14 @@ ProteinService.getSpecificProtein = (uniprotId, experimendId) => {
             return [];
         });
 }
+ProteinService.getProteinInteractions = (uniprotId) => {
+    return fetch(`/api/protein/interactions/${uniprotId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ProteinService.getProteinInteractions: ', error, uniprotId, experimendId);
+            return [];
+        });
+}
 
 ComplexService = {};
 ComplexService.getComplexById = (id) => {
