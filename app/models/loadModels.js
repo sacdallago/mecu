@@ -5,7 +5,10 @@ module.exports = function(context) {
     const temperatureReadsModel = context.component('models').module('temperatureReads');
     const complexesModel = context.component('models').module('complexes');
     const proteinXcomplexModel = context.component('models').module('proteinXcomplex');
+    const proteinXProteinModel = context.component('models').module('proteinXprotein');
+    // context.dbConnection.queryInterface.addIndex('protein_protein', {fields:['interactor1', 'interactor2', 'correlation']});
 
+    // m-to-n between complex and protein
     proteinsModel.belongsToMany(complexesModel, {
         as: 'proteinM',
         through: {
@@ -22,6 +25,26 @@ module.exports = function(context) {
             unique: false
         },
         foreignKey: 'complexId',
+        constraints: false
+    });
+
+    // m-to-n between protein and protein
+    proteinsModel.belongsToMany(proteinsModel, {
+        as: 'proteinXprotein1',
+        through: {
+            model: proteinXProteinModel,
+            unique: false
+        },
+        foreignKey: 'interactor1',
+        constraints: false
+    });
+    proteinsModel.belongsToMany(proteinsModel, {
+        as: 'proteinXprotein2',
+        through: {
+            model: proteinXProteinModel,
+            unique: false
+        },
+        foreignKey: 'interactor2',
         constraints: false
     });
 }
