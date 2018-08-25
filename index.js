@@ -95,7 +95,7 @@ module.exports = {
             pool: {
                 max: 5,
                 min: 0,
-                idle: 20000,
+                idle: 5000,
                 acquire: 20000
             },
             logging: config.database.logging !== false ? console.log : false
