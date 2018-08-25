@@ -22,11 +22,7 @@ module.exports = function(context) {
                     },
                     {type: sequelize.QueryTypes.SELECT}
                 )
-            .then(result => result[0])
-            .then(proteinInteractions => {
-                console.log('proteinInteractions', proteinInteractions);
-                return proteinInteractions;
-            });
+            .then(result => result[0]);
         }
     };
 };
