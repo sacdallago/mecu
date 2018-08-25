@@ -6,7 +6,6 @@ module.exports = function(context) {
 
     return {
         getComplex: function(id) {
-            console.log('id', id);
             return complexesModel.findAll({
                 where: {
                     id

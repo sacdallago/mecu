@@ -14,9 +14,9 @@ const grid = $('#experiments-container .grid').isotope({
 grid.on('click', '.grid-item', function(){
     const data = $(this).data('protein');
     let dot = $(this).children('.selected-curve-dot');
-    dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
     console.log('data', data.uniprotId, data.experiment.experiment);
-    saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
+    const hasBeenAdded = saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
+    if(hasBeenAdded) dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
 });
 
 $(document).ready(() => {
@@ -48,6 +48,16 @@ $(document).ready(() => {
             .then(complexes => {
                 console.log('complexes', complexes);
                 drawRelatedComplexes(complexes, query.protein);
+            })
+
+        Promise.all([
+                ProteinService.getProteinInteractions(query.protein),
+                ExperimentService.allProteinsContainedInExperiment(query.experiment)
+            ])
+            .then(([proteinInteractions, proteinsContainedInExperiment]) => {
+                console.log('proteinInteractions', proteinInteractions);
+                console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
+                drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment);
             })
     }
 })
@@ -179,9 +189,9 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                 html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
                 html += '<div class="cube"></div>';
                 if(expRead.experiment === parseInt(actualExperiment)){
-                    html += '<div class="experimentNumber">Actual</div>';
+                    html += '<div class="experimentNumber" style="font-size: 14;">Experiment '+actualExperiment+' (Actual)</div>';
                 } else {
-                    html += '<div class="experimentNumber">Experiment ' + expRead.experiment + '</div>';
+                    html += '<div class="experimentNumber" style="font-size: 14;">Experiment ' + expRead.experiment + '</div>';
                 }
                 html += '<div class="selected-curve-dot"></div>';
                 html += '</div>';
@@ -236,9 +246,11 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
 }
 
 const saveExperimentToLocalStorage = (protein, experiment) => {
+    let added = true;
     // if the localStorage hasn't been deleted yet and there are some proteins in it
     if(!localStorageDeleted && StorageManager.get().length > 0) {
-        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
+        added = confirm("There are Proteins still in the local storage. Do you want to overwrite them?");
+        if(added) {
             StorageManager.clear();
             console.log('store cleared');
             localStorageDeleted = true;
@@ -250,6 +262,30 @@ const saveExperimentToLocalStorage = (protein, experiment) => {
         console.log('adding', {uniprotId: protein, experiment: experiment});
         StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
     }
+    return added;
+}
+
+const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment) => {
+    const proteinInteractionContainer = $('#related-proteins-container .container');
+
+    const sameCorrelationItem = $('<div />').addClass('same-correlation-item');
+    const correlation = $('<div />').addClass('correlation');
+    const listProteins = $('<div />').addClass('list-proteins');
+    const listProteinItem = $('<div />').addClass('list-protein-item');
+    proteinInteractions.some((interaction, i, a) => {
+        // only show 10 at the moment
+        if(i>10) {
+            proteinInteractionContainer.append($('<div />').text('TODO: only showing 10 at the moment... totalLength:'+proteinInteractions.length))
+            return true;
+        }
+        let list = Object.keys(interaction).map(k => listProteinItem.clone().text(k+' : '+interaction[k]));
+        proteinInteractionContainer.append(
+            sameCorrelationItem.clone().append([
+                correlation.clone().text('Correlation: '+interaction.correlation),
+                listProteins.clone().append(list)
+            ])
+        );
+    })
 }
 
 const drawRelatedComplexes = (complexes, actualProtein) => {

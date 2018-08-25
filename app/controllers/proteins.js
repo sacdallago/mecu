@@ -3,6 +3,7 @@ module.exports = function(context) {
     // Imports
     const proteinsDao = context.component('daos').module('proteins');
     const proteinReadsDao = context.component('daos').module('proteinReads');
+    const proteinXproteinsDao = context.component('daos').module('proteinXproteins');
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
     const experimentsDao = context.component('daos').module('experiments');
 
@@ -67,6 +68,15 @@ module.exports = function(context) {
                 .catch(err => {
                     console.error('getProteinsFromExp', err);
                     response.send({});
+                });
+        },
+
+        getProteinInteractions: function(request, response) {
+            proteinXproteinsDao.getProteinInteraction(request.params.uniprotId)
+                .then(result => response.status(200).send(result))
+                .catch(error => {
+                    console.error('getProteinInteractions', error);
+                    return response.status(500).send({});
                 });
         }
     }
