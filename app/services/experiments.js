@@ -8,7 +8,7 @@ module.exports = function(context) {
         .get('/experiment/raw/:id', experimentsController.getRawData)
         .post('/experiment',securityController.loggedIn, securityController.allowedPostRequests, experimentsController.uploadExperiment)
         .get('/experiments', experimentsController.getExperiments)
-        .get('/experiments/:uniprotId', experimentsController.getExperimentsWhichHaveProtein)
+        .get('/experiments/proteins/:id', experimentsController.getProteinsInExperiment)
         .get('/experiments/containing/:uniprotId', experimentsController.getExperimentsWhichHaveProtein)
         ;
 };

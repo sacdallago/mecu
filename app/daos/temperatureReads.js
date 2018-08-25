@@ -175,6 +175,18 @@ module.exports = function(context) {
                      {type: sequelize.QueryTypes.SELECT}
                  )
                  .then(result => result[0]);
+        },
+
+        getDistinctProteinsInExperiment: function(experimentId) {
+            return temperatureReadsModel.findAll({
+                        attributes: ['uniprotId'],
+                        where: {
+                            experiment: experimentId
+                        },
+                        group: 'uniprotId'
+                    }
+                )
+                .then(data => data.map(d => d.uniprotId));
         }
     };
 };
