@@ -49,6 +49,16 @@ $(document).ready(() => {
                 console.log('complexes', complexes);
                 drawRelatedComplexes(complexes, query.protein);
             })
+
+        Promise.all([
+                ProteinService.getProteinInteractions(query.protein),
+                ExperimentService.allProteinsContainedInExperiment(query.experiment)
+            ])
+            .then(([proteinInteractions, proteinsContainedInExperiment]) => {
+                console.log('proteinInteractions', proteinInteractions);
+                console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
+                drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment);
+            })
     }
 })
 
@@ -253,6 +263,29 @@ const saveExperimentToLocalStorage = (protein, experiment) => {
         StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
     }
     return added;
+}
+
+const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment) => {
+    const proteinInteractionContainer = $('#related-proteins-container .container');
+
+    const sameCorrelationItem = $('<div />').addClass('same-correlation-item');
+    const correlation = $('<div />').addClass('correlation');
+    const listProteins = $('<div />').addClass('list-proteins');
+    const listProteinItem = $('<div />').addClass('list-protein-item');
+    proteinInteractions.some((interaction, i, a) => {
+        // only show 10 at the moment
+        if(i>10) {
+            proteinInteractionContainer.append($('<div />').text('TODO: only showing 10 at the moment... totalLength:'+proteinInteractions.length))
+            return true;
+        }
+        let list = Object.keys(interaction).map(k => listProteinItem.clone().text(k+' : '+interaction[k]));
+        proteinInteractionContainer.append(
+            sameCorrelationItem.clone().append([
+                correlation.clone().text('Correlation: '+interaction.correlation),
+                listProteins.clone().append(list)
+            ])
+        );
+    })
 }
 
 const drawRelatedComplexes = (complexes, actualProtein) => {

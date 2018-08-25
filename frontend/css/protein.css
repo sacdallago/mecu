@@ -82,6 +82,16 @@
 }
 
 
+.related-proteins-container .container{
+}
+.related-proteins-container .container .same-correlation-item{
+    display: flex;
+    padding: 5 10 5 10px;
+}
+.related-proteins-container .container .same-correlation-item .correlation{
+    min-width: 200px;
+}
+
 
 .related-complexes .container {
     margin: 10px;
