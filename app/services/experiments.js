@@ -9,5 +9,6 @@ module.exports = function(context) {
         .post('/experiment',securityController.loggedIn, securityController.allowedPostRequests, experimentsController.uploadExperiment)
         .get('/experiments', experimentsController.getExperiments)
         .get('/experiments/:uniprotId', experimentsController.getExperimentsWhichHaveProtein)
+        .get('/experiments/containing/:uniprotId', experimentsController.getExperimentsWhichHaveProtein)
         ;
 };

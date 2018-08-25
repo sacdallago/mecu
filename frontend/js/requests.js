@@ -45,7 +45,7 @@ ExperimentService.paginatedExperiments = (queryObj) => {
         });
 }
 ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
-    return fetch(`/api/experiments/${uniprotId}`)
+    return fetch(`/api/experiments/containing/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
             console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, queryObj);
