@@ -91,6 +91,12 @@
 .related-proteins-container .container .same-correlation-item .correlation{
     min-width: 200px;
 }
+.related-proteins-container .container .in-experiment-contained{
+    background-color: grey;
+}
+.related-proteins-container .container .not-in-experiment-contained{
+    opacity: 0.5;
+}
 
 
 .related-complexes .container {

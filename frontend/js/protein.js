@@ -19,6 +19,7 @@ grid.on('click', '.grid-item', function(){
     if(hasBeenAdded) dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
 });
 
+// on page drawing finished, start requests
 $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
@@ -273,14 +274,21 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
     const listProteins = $('<div />').addClass('list-proteins');
     const listProteinItem = $('<div />').addClass('list-protein-item');
     proteinInteractions.some((interaction, i, a) => {
-        // only show 10 at the moment
-        if(i>10) {
-            proteinInteractionContainer.append($('<div />').text('TODO: only showing 10 at the moment... totalLength:'+proteinInteractions.length))
+        // only show 5 at the moment
+        const onlyShow = 5
+        if(i>(onlyShow-1)) {
+            proteinInteractionContainer.append($('<div />').text('TODO: only showing '+onlyShow+' at the moment... total:'+proteinInteractions.length))
             return true;
+        }
+        const item = sameCorrelationItem.clone();
+        if(proteinsContainedInExperiment.indexOf(interaction.interactor2) >= 0) {
+            item.addClass('in-experiment-contained');
+        } else {
+            item.addClass('not-in-experiment-contained');
         }
         let list = Object.keys(interaction).map(k => listProteinItem.clone().text(k+' : '+interaction[k]));
         proteinInteractionContainer.append(
-            sameCorrelationItem.clone().append([
+            item.append([
                 correlation.clone().text('Correlation: '+interaction.correlation),
                 listProteins.clone().append(list)
             ])
