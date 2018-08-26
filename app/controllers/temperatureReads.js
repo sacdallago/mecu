@@ -1,7 +1,7 @@
 // External imports
 const json2csv = require('json2csv').parse;
 
-const UPPER_QUERY_LIMIT = 10;
+const UPPER_QUERY_LIMIT = 100;
 const queryParams = (query) => {
     let s;
     if(query.search.constructor === Array && query.search.length > 0) {
