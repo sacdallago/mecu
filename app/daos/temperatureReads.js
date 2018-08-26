@@ -72,11 +72,11 @@ module.exports = function(context) {
                 FROM "temperatureReads" pr
                 where ${whereClause}
                 GROUP BY pr."experiment", pr."uniprotId"
+                order by "uniprotId" asc, experiment asc
+                offset :offset
+                limit :limit
             ) tmp
-            group by tmp."uniprotId"
-            order by "uniprotId"
-            offset :offset
-            limit :limit;
+            group by tmp."uniprotId";
             `;
             console.warn(`findAndAggregateTempsBySimilarUniprotId still uses SQL query`);
             return context.dbConnection.query(
