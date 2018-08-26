@@ -1,12 +1,14 @@
 extends base
 
+block postStyles
+    link(rel='stylesheet', href='/public/css/search.css')
+
 block content
-    .text-center
-        .ui.input.search
-            input(type="text", name="prot", placeholder="Search protein" value="P12").prompt.inline
+    .search-header
+        .search
+            input(type="text", name="prot", placeholder="Search protein" value="P12").field
     .space
     .selectors
-        // .ui.label.clearButton clear
     .space
     .grid
     .space

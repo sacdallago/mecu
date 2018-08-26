@@ -26,31 +26,6 @@ module.exports = function(context) {
             });
         },
 
-        findUniprotIdsLike: function(identifier, transaction) {
-            if(transaction){
-                return proteinReadsModel.findAll({
-                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: {
-                                [sequelize.Op.like]: identifier + "%"
-                            }
-                        },
-                        transaction: transaction
-                    }
-                );
-            } else {
-                return proteinReadsModel.findAll({
-                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: {
-                                [sequelize.Op.like]: identifier + "%"
-                            }
-                        }
-                    }
-                );
-            }
-        },
-
         findUniprotIds: function(uniprotIds, transaction) {
             if(transaction){
                 return proteinReadsModel.findAll({
