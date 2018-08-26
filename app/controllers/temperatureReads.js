@@ -1,6 +1,5 @@
-/**
- * Created by chdallago on 1/5/17.
- */
+// External imports
+const json2csv = require('json2csv').parse;
 
 module.exports = function(context) {
 
@@ -8,9 +7,6 @@ module.exports = function(context) {
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
     const proteinReadsDao = context.component('daos').module('proteinReads');
     const experimentsDao = context.component('daos').module('experiments');
-
-    // External imports
-    const json2csv = require('json2csv').parse;
 
     return {
         searchByUniprotId: function(request, response) {

@@ -12,7 +12,6 @@ const grid = $('.grid').isotope({
     }
 });
 
-curves = [];
 
 grid.on('click', '.grid-item', function(){
     const data = $(this).data('protein');
@@ -65,10 +64,9 @@ $('.ui.search').search({
         // Grid
         grid.empty();
 
-        // Curves
-        curves = [];
+    const curves = [];
 
-        var items = [];
+    const items = [];
 
         response.forEach(function(responseProtein){
             let proteins = [];

@@ -17,7 +17,7 @@ TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
         });
 }
 TemperatureService.temperatureReads = (experiments, proteins) => {
-    return fetch("/api/reads/temperature", {
+    return fetch('/api/reads/temperature', {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
     return fetch(`/api/experiments/containing/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, queryObj);
+            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, uniprotId);
             return [];
         });
 }
@@ -56,7 +56,7 @@ ExperimentService.allProteinsContainedInExperiment = (experimentId) => {
     return fetch(`/api/experiments/proteins/${experimentId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, queryObj);
+            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, experimentId);
             return [];
         });
 }
@@ -75,7 +75,7 @@ ProteinService.getProteinInteractions = (uniprotId) => {
     return fetch(`/api/protein/interactions/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for ProteinService.getProteinInteractions: ', error, uniprotId, experimendId);
+            console.error('Request error for ProteinService.getProteinInteractions: ', error, uniprotId);
             return [];
         });
 }
