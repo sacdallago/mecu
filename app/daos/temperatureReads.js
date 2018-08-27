@@ -66,9 +66,9 @@ module.exports = function(context) {
                 whereClause = 'pr."uniprotId" like :search';
             }
             const sqlQuery = `
-            select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
+            select tmp.total, tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
             from (
-                SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
+                SELECT count(*) over() as total, pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
                 FROM "temperatureReads" pr
                 where ${whereClause}
                 GROUP BY pr."experiment", pr."uniprotId"
@@ -76,7 +76,7 @@ module.exports = function(context) {
                 offset :offset
                 limit :limit
             ) tmp
-            group by tmp."uniprotId";
+            group by tmp."uniprotId", tmp.total;
             `;
             console.warn(`findAndAggregateTempsBySimilarUniprotId still uses SQL query`);
             return context.dbConnection.query(
