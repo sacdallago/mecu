@@ -2,22 +2,26 @@
 class PaginationComponent{
     // TODO for now the pagination component is redrawn every time the page is changed
     //      but I could actually only update the component if there was a page change
-    constructor(htmlId, totalItemCount, itemsPerPage, now = 1, fun) {
+    constructor(htmlId, totalItemCount, itemsPerPage, now = 1, fun, maxNumberPagesToShow) {
         this.pageElementClass = 'page';
         this.pageElementWithClickHandlerClass = 'page-nr';
         this.arrowLeftClass = 'arrow-left';
         this.arrowRightClass = 'arrow-right';
         this.arrowLeft = '❮';
         this.arrowRight = '❯';
-        this.maxNumberPagesToShow = 7; // should be odd
+        this.maxNumberPagesToShow = maxNumberPagesToShow || 7; // should be odd
+        if(this.maxNumberPagesToShow % 2 == 0) {
+            console.warn(`Max number of pages elements to show in pagination component has to be odd (${maxNumberPagesToShow})`)
+            return;
+        }
 
         this.htmlId = htmlId;
         this.totalItemCount = totalItemCount;
         this.itemsPerPage = itemsPerPage;
         this.now = now;
         this.fun = fun;
-        if(totalItemCount <= itemsPerPage) {
-            console.log('not enough elements for pagination');
+        if(totalItemCount <= itemsPerPage || totalItemCount === 0) {
+            $(this.htmlId).empty();
         } else if(!!htmlId && !!totalItemCount && !!itemsPerPage && !!fun) {
             this.draw();
         }

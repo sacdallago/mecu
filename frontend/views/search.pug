@@ -2,6 +2,7 @@ extends base
 
 block postStyles
     link(rel='stylesheet', href='/public/css/search.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
 
 block content
     .search-header
@@ -10,6 +11,7 @@ block content
     .space
     .selectors
     .space
+    .pagination#pagination-component
     .grid-container
         .grid
     .space
@@ -25,3 +27,4 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/search.js")
+    script(type="text/javascript", src="/public/js/pagination.js")

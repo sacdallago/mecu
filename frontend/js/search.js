@@ -58,7 +58,7 @@ grid.on('click', '.grid-item', function(){
  * @return {[type]}   [description]
  */
 searchInput.keydown(function(e) {
-    delay(() => handleInput(), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
+    delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
 });
 
 /**
@@ -68,7 +68,8 @@ searchInput.keydown(function(e) {
  *  - if it's not a uniprotId       -> send request to external server, convert string into array of
  *      uniprotId's and then request matching curves from our server
  */
-const handleInput = () => {
+const handleInput = (page, resetOffset) => {
+    if(resetOffset) proteinsQuery.offset = 0;
     const inputValue = searchInput.val().trim();
 
     if(inputValue.length === 0) {
@@ -89,6 +90,7 @@ const handleInput = () => {
             .then(response => {
                 console.log('response', response);
                 drawProteinCurves(response.data);
+                drawPaginationComponent(page+1, response.total);
             })
     } else {
         console.log('requesting from external...');
@@ -177,6 +179,20 @@ const drawProteinCurves = (data) => {
             curves.push(curve);
         });
     });
+}
+
+const drawPaginationComponent = (actualPage, totalPages) => {
+    new PaginationComponent(
+        '#pagination-component',
+        totalPages,
+        proteinsQuery.limit,
+        actualPage,
+        (newPage) => {
+            proteinsQuery.offset = (newPage-1)*ITEM_PER_PAGE_COUNT;
+            handleInput(newPage-1);
+        },
+        5
+    );
 }
 
 (function(){
