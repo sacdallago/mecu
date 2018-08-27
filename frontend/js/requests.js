@@ -17,7 +17,7 @@ TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
         });
 }
 TemperatureService.temperatureReads = (experiments, proteins) => {
-    return fetch("/api/reads/temperature", {
+    return fetch('/api/reads/temperature', {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -34,6 +34,21 @@ TemperatureService.temperatureReads = (experiments, proteins) => {
             return [];
         })
 }
+TemperatureService.queryUniprotIdReceiveTemperatureReads = (query) => {
+    return fetch('/api/reads/temperature/search', {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify(query)
+        })
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for TemperatureService.queryUniprotIdReceiveTemperatureReads: ', error, query);
+            return [];
+        });
+}
 
 ExperimentService = {};
 ExperimentService.paginatedExperiments = (queryObj) => {
@@ -48,7 +63,7 @@ ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
     return fetch(`/api/experiments/containing/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, queryObj);
+            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, uniprotId);
             return [];
         });
 }
@@ -56,7 +71,7 @@ ExperimentService.allProteinsContainedInExperiment = (experimentId) => {
     return fetch(`/api/experiments/proteins/${experimentId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, queryObj);
+            console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, experimentId);
             return [];
         });
 }
@@ -75,7 +90,7 @@ ProteinService.getProteinInteractions = (uniprotId) => {
     return fetch(`/api/protein/interactions/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
-            console.error('Request error for ProteinService.getProteinInteractions: ', error, uniprotId, experimendId);
+            console.error('Request error for ProteinService.getProteinInteractions: ', error, uniprotId);
             return [];
         });
 }
@@ -83,17 +98,54 @@ ProteinService.getProteinInteractions = (uniprotId) => {
 ComplexService = {};
 ComplexService.getComplexById = (id) => {
     return fetch(`/api/complex/${id}`)
-    .then(resp => resp.json())
-    .catch(error => {
-        console.error('Request error for ComplexService.getComplexById: ', error, uniprotId, experimendId);
-        return [];
-    });
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ComplexService.getComplexById: ', error, id);
+            return [];
+        });
 }
 ComplexService.getAllComplexesWhichContainProtein = (uniprotId) => {
     return fetch(`/api/complex/hasprotein/${uniprotId}`)
-    .then(resp => resp.json())
-    .catch(error => {
-        console.error('Request error for ComplexService.getAllComplexesWhichContainProtein: ', error, uniprotId, experimendId);
-        return [];
-    });
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ComplexService.getAllComplexesWhichContainProtein: ', error, uniprotId);
+            return [];
+        });
+}
+
+ExternalService = {};
+ExternalService.getUniprotIdsFromText = (text) => {
+    const urlEncodedText = encodeURIComponent(text);
+    console.log('urlEncodedText', urlEncodedText);
+    return fetch(
+            `https://www.uniprot.org/uniprot/?format=tab&columns=id&limit=7&query=${urlEncodedText}`
+        )
+        .then(response => response.text())
+        // parse the text
+        // example:
+        //
+        // list Entry
+        // B8AFK5
+        // E1BM58
+        // P03367
+        // E9PT37
+        // Q9BXM0
+        // P02812
+        // P30460
+        .then(textResponse => {
+            let ret = [];
+            textResponse.split('\n').forEach((line, i, a) => {
+                if(i===0) {
+                    return;
+                }
+                if(line.length > 0) {
+                    ret.push(line);
+                }
+            })
+            return ret;
+        })
+        .catch(error => {
+            console.error('Request error for ExternalService.getUniprotIdsFromText: ', error, text);
+            return [];
+        });
 }

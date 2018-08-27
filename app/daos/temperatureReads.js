@@ -16,31 +16,6 @@ module.exports = function(context) {
             return temperatureReadsModel.bulkCreate(items, options);
         },
 
-        findByUniprotId: function(identifier, transaction) {
-            if (transaction){
-                return temperatureReadsModel.findAll({
-                        attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
-                        where: {
-                            uniprotId: {
-                                [sequelize.Op.like]: identifier + "%"
-                            }
-                        },
-                        transaction: transaction
-                    }
-                );
-            } else {
-                return temperatureReadsModel.findAll({
-                        attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
-                        where: {
-                            uniprotId: {
-                                [sequelize.Op.like]: identifier + "%"
-                            }
-                        }
-                    }
-                );
-            }
-        },
-
         findByUniprotIdAndExperiment: function(uniprotId, experimentId) {
             let where = {};
             if(uniprotId !== undefined){
@@ -71,6 +46,68 @@ module.exports = function(context) {
             );
         },
 
+        findAndAggregateTempsBySimilarUniprotId: function(query) {
+            let replacements = {
+                search: query.search+'%',
+                offset: query.offset,
+                limit: query.limit
+            };
+            let whereClause = '';
+            if(query.search.constructor === Array) {
+                query.search.forEach((v,i,a) => {
+                    if(i != 0) {
+                        whereClause += ' or '
+                    };
+                    let replStr = 'search'+i;
+                    whereClause += 'pr."uniprotId" like :'+replStr;
+                    replacements[replStr] = v;
+                })
+            } else {
+                whereClause = 'pr."uniprotId" like :search';
+            }
+            const sqlQuery = `
+                select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
+                from (
+                    SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
+                    FROM "temperatureReads" pr
+                    where ${whereClause}
+                    GROUP BY pr."experiment", pr."uniprotId"
+                    order by "uniprotId" asc, experiment asc
+                    offset :offset
+                    limit :limit
+                ) tmp
+                group by tmp."uniprotId";
+            `;
+            const sqlQueryTotal = `
+                select count(*) from (
+                    select count(*)
+                    FROM "temperatureReads" pr
+                    where ${whereClause}
+                    GROUP BY pr."experiment", pr."uniprotId"
+                ) t;
+            `;
+            console.warn(`findAndAggregateTempsBySimilarUniprotId still uses SQL query`);
+            return Promise.all([
+                    context.dbConnection.query(
+                        sqlQuery,
+                        {
+                            replacements: replacements
+                        },
+                        {type: sequelize.QueryTypes.SELECT}
+                    ),
+                    context.dbConnection.query(
+                        sqlQueryTotal,
+                        {
+                            replacements: replacements
+                        },
+                        {type: sequelize.QueryTypes.SELECT}
+                    )
+                ])
+                .then(([results, total]) => {
+                    return {total: total[0][0].count || 0, data: results[0] || []};
+                });
+        },
+
         findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs) {
             // create where clause
 
@@ -95,7 +132,7 @@ module.exports = function(context) {
             const query = `
                 select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
                 from (
-                  SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
+                  SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
                   FROM "temperatureReads" pr
                   `+where+`
                   GROUP BY pr."experiment", pr."uniprotId"
@@ -109,7 +146,10 @@ module.exports = function(context) {
             Execution time: 1377.891 ms
              */
 
-            return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
+            return context.dbConnection.query(
+                query,
+                {type: sequelize.QueryTypes.SELECT}
+            );
 
             // TODO better solution for the above query, but subquerys are not supported
             // find better way to impl

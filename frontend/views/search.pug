@@ -1,14 +1,19 @@
 extends base
 
+block postStyles
+    link(rel='stylesheet', href='/public/css/search.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
+
 block content
-    .text-center
-        .ui.input.search
-            input(type="text", name="prot", placeholder="Search protein" value="P12").prompt.inline
+    .search-header
+        .search
+            input(type="text", name="prot", placeholder="e.g. P12004" value="P12").field
     .space
     .selectors
-        // .ui.label.clearButton clear
     .space
-    .grid
+    .pagination#pagination-component
+    .grid-container
+        .grid
     .space
 
 
@@ -22,3 +27,4 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/search.js")
+    script(type="text/javascript", src="/public/js/pagination.js")
