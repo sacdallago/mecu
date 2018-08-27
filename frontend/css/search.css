@@ -20,3 +20,7 @@
 .search-header .search .field:focus {
     outline: none;
 }
+
+.grid-container {
+    padding-left: 3.6%;
+}
