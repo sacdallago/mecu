@@ -37,7 +37,7 @@ module.exports = function(context) {
                 temperatureReadsDao.findAndAggregateTempsBySimilarUniprotId(query)
                     .then(results => {
                         console.log('DURATION searchByUniprotId', (Date.now()-start)/1000)
-                        return response.status(200).send(results[0]);
+                        return response.status(200).send(results);
                     })
                     .catch(error => {
                         console.error('searchByUniprotId', error, query);

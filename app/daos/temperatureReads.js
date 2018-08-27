@@ -80,12 +80,17 @@ module.exports = function(context) {
             `;
             console.warn(`findAndAggregateTempsBySimilarUniprotId still uses SQL query`);
             return context.dbConnection.query(
-                sqlQuery,
-                {
-                    replacements: replacements
-                },
-                {type: sequelize.QueryTypes.SELECT}
-            );
+                    sqlQuery,
+                    {
+                        replacements: replacements
+                    },
+                    {type: sequelize.QueryTypes.SELECT}
+                )
+                .then(result => {
+                    const totalRows = result.length > 0 && result[0].length > 0 ? result[0][0].total : 0;
+                    const rows = result.length > 0 && result[0].length > 0 ? result[0].map(r => {delete r.total; return r;}): [];
+                    return {total: totalRows, data: rows};
+                });
         },
 
         findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs) {
@@ -126,7 +131,10 @@ module.exports = function(context) {
             Execution time: 1377.891 ms
              */
 
-            return context.dbConnection.query(query, {type: sequelize.QueryTypes.SELECT});
+            return context.dbConnection.query(
+                query,
+                {type: sequelize.QueryTypes.SELECT}
+            );
 
             // TODO better solution for the above query, but subquerys are not supported
             // find better way to impl

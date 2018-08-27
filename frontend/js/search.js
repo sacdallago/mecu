@@ -88,7 +88,7 @@ const handleInput = () => {
         TemperatureService.queryUniprotIdReceiveTemperatureReads(proteinsQuery)
             .then(response => {
                 console.log('response', response);
-                drawProteinCurves(response);
+                drawProteinCurves(response.data);
             })
     } else {
         console.log('requesting from external...');
@@ -97,13 +97,12 @@ const handleInput = () => {
                 console.log('external service uniprotId list', list);
                 proteinsQuery.search = list;
                 return proteinsQuery;
-
-
             })
             .then(q => TemperatureService.queryUniprotIdReceiveTemperatureReads(q))
             .then(response => {
                 console.log('response', response);
-                drawProteinCurves(response);
+                drawProteinCurves(response.data);
+                drawPaginationComponent(page+1, response.total);
             });
     }
 }
