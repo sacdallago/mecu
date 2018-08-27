@@ -66,30 +66,45 @@ module.exports = function(context) {
                 whereClause = 'pr."uniprotId" like :search';
             }
             const sqlQuery = `
-            select tmp.total, tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
-            from (
-                SELECT count(*) over() as total, pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
-                FROM "temperatureReads" pr
-                where ${whereClause}
-                GROUP BY pr."experiment", pr."uniprotId"
-                order by "uniprotId" asc, experiment asc
-                offset :offset
-                limit :limit
-            ) tmp
-            group by tmp."uniprotId", tmp.total;
+                select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
+                from (
+                    SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
+                    FROM "temperatureReads" pr
+                    where ${whereClause}
+                    GROUP BY pr."experiment", pr."uniprotId"
+                    order by "uniprotId" asc, experiment asc
+                    offset :offset
+                    limit :limit
+                ) tmp
+                group by tmp."uniprotId";
+            `;
+            const sqlQueryTotal = `
+                select count(*) from (
+                    select count(*)
+                    FROM "temperatureReads" pr
+                    where ${whereClause}
+                    GROUP BY pr."experiment", pr."uniprotId"
+                ) t;
             `;
             console.warn(`findAndAggregateTempsBySimilarUniprotId still uses SQL query`);
-            return context.dbConnection.query(
-                    sqlQuery,
-                    {
-                        replacements: replacements
-                    },
-                    {type: sequelize.QueryTypes.SELECT}
-                )
-                .then(result => {
-                    const totalRows = result.length > 0 && result[0].length > 0 ? result[0][0].total : 0;
-                    const rows = result.length > 0 && result[0].length > 0 ? result[0].map(r => {delete r.total; return r;}): [];
-                    return {total: totalRows, data: rows};
+            return Promise.all([
+                    context.dbConnection.query(
+                        sqlQuery,
+                        {
+                            replacements: replacements
+                        },
+                        {type: sequelize.QueryTypes.SELECT}
+                    ),
+                    context.dbConnection.query(
+                        sqlQueryTotal,
+                        {
+                            replacements: replacements
+                        },
+                        {type: sequelize.QueryTypes.SELECT}
+                    )
+                ])
+                .then(([results, total]) => {
+                    return {total: total[0][0].count || 0, data: results[0] || []};
                 });
         },
 
