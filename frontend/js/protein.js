@@ -45,14 +45,14 @@ $(document).ready(() => {
                     })
             });
 
-        ComplexService.getAllComplexesWhichContainProtein(query.protein)
+        ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
             .then(complexes => {
                 console.log('complexes', complexes);
                 drawRelatedComplexes(complexes, query.protein);
             })
 
         Promise.all([
-                ProteinService.getProteinInteractions(query.protein),
+                ProteinService.getProteinInteractions(query.protein, query.experiment),
                 ExperimentService.allProteinsContainedInExperiment(query.experiment)
             ])
             .then(([proteinInteractions, proteinsContainedInExperiment]) => {
