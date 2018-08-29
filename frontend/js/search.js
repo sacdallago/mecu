@@ -47,8 +47,8 @@ const grid = $('.grid').isotope({
  * redirect to the protein page of the clicked protein
  */
 grid.on('click', '.grid-item', function(){
-    const data = $(this).data('protein');
-    document.location.href = `/protein?protein=${data.uniprotId}&experiment=${data.experiment.experiment}`;
+    const data = $(this).data('grid-item-contents');
+    document.location.href = `/protein?protein=${data.obj.uniprotId}&experiment=${data.experiment.experiment}`;
 });
 
 /**
@@ -115,11 +115,6 @@ const handleInput = (page, resetOffset) => {
  * @return {[type]}      [description]
  */
 const drawProteinCurves = (data) => {
-    // empty grid on draw
-    grid.empty();
-
-    const curves = [];
-    const items = [];
 
     // split up protein/experiments pairs into protein/experiment(single) pairs
     const proteinExperimentObject = [];
@@ -132,53 +127,32 @@ const drawProteinCurves = (data) => {
         })
     });
 
-    // draw squares for each curve
-    proteinExperimentObject.forEach(obj => {
-        obj.experiments.forEach(expRead => {
-            let html = '';
+    const toAppend = (obj, exp) => {
+        return [
+            $('<p />')
+                .addClass('grid-item-text')
+                .css({
+                    'position': 'absolute',
+                    'text-align': 'center',
+                    'width': '100%',
+                    'line-height': '35px',
+                    'font-size': '1.2rem',
+                    'transition-property': 'opacity',
+                    'transition-duration': '1s'
+                })
+                .text(obj.uniprotId),
+            $('<div />')
+                .addClass(['experimentNumber', 'grid-item-text'])
+                .css({
+                    'transition-property': 'opacity',
+                    'transition-duration': '1s'
+                })
+                .text('Experiment '+ exp.experiment)
+        ];
+    };
 
-            html += '<div class="grid-item"' + [obj.uniprotId,expRead.experiment].join('E').toLowerCase() +
-                ' id="' + [obj.uniprotId,expRead.experiment].join('E').toLowerCase() + '">';
+    HelperFunctions.drawItems('.grid', proteinExperimentObject, toAppend);
 
-            html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + obj.uniprotId + '</p>';
-            html += '<div class="cube"></div>';
-            html += '<div class="experimentNumber">Experiment ' + expRead.experiment + '</div>';
-            html += '</div>';
-
-            var element = $(html);
-            element.data("protein", {
-                uniprotId: obj.uniprotId,
-                experiment: expRead
-            });
-
-            items.push(element[0]);
-        });
-    });
-
-    grid.isotope('insert', items);
-
-    // draw curves into each square
-    proteinExperimentObject.forEach(obj => {
-        obj.experiments.forEach(expRead => {
-            let curve = new MecuLine({
-                element: "#"+[obj.uniprotId,expRead.experiment].join('E').toLowerCase(),
-                width:"200",
-                height:"200",
-                limit: 5,
-                minTemp: 41,
-                maxTemp: 64,
-                minRatio: 0.1,
-                //maxRatio: 1
-            });
-
-            curve.add({
-                uniprotId: obj.uniprotId,
-                experiments: [expRead]
-            });
-
-            curves.push(curve);
-        });
-    });
 }
 
 const drawPaginationComponent = (actualPage, totalPages) => {
