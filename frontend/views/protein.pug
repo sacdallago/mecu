@@ -5,7 +5,10 @@ block postStyles
 
 block content
     .protein-header
-        h3.protein-name#protein-name
+        .protein
+            h3.protein-name#protein-name
+        .experiment
+            h3.experiment-number#experiment-number
 
     .protein-container
         .protein-curve#protein-curve
@@ -67,13 +70,13 @@ block content
         .info Click to select
         .grid
     
-    .related-proteins-container#related-proteins-container
-        h3 Related Proteins
-        .container
-    
     .related-complexes#related-complexes-container
         h3 Related Complexes
-        .container
+        .grid
+            
+    .related-proteins-container#related-proteins-container
+        h3 Related Proteins
+        .grid
 
 block settings
     .divider
@@ -85,3 +88,4 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/protein.js")
+    script(type="text/javascript", src="/public/js/helper.js")

@@ -1,5 +1,11 @@
-.protein-name, .experiments-container, .related-proteins-container, .related-complexes {
+.protein-header, .experiments-container, .related-proteins-container, .related-complexes {
     padding: 20px;
+}
+
+.protein-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .protein-container {
@@ -61,7 +67,6 @@
     border: 1px solid silver;
     border-radius: 3px;
     background-color: silver;
-
 }
 .protein-container .other-experiments-container .other-experiment a {
     color: black;
@@ -81,64 +86,10 @@
     border-radius: 10px;
 }
 
-
-.related-proteins-container .container{
-}
-.related-proteins-container .container .same-correlation-item{
-    display: flex;
-    padding: 5 10 5 10px;
-}
-.related-proteins-container .container .same-correlation-item .correlation{
-    min-width: 200px;
-}
-.related-proteins-container .container .in-experiment-contained{
-    background-color: grey;
-}
-.related-proteins-container .container .not-in-experiment-contained{
-    opacity: 0.5;
+.related-complexes .grid .grid-item:hover .grid-item-text {
+    opacity: 0;
 }
 
-
-.related-complexes .container {
-    margin: 10px;
-    border: 1px solid silver;
-    padding: 10px;
-    background-color: #F5F5F5;
-}
-.related-complexes .container .complex-item {
-    margin: 5 0 5 0px;
-    padding: 10 5 10 5px;
-    min-width: 220px;
-    cursor: pointer;
-    background-color: #EEEEEE;
-}
-.related-complexes .container .complex-item .name, .comment, .proteins {
-    display: flex;
-    align-items: flex-end;
-    border-bottom: 0.5px solid silver;
-}
-.related-complexes .container .text {
-    min-width: 130px;
-}
-.related-complexes .container .value {
-}
-.related-complexes .container .complex-item:hover {
-    background-color: #FAFAFA;
-    border: .1px solid black;
-}
-.related-complexes .container .complex-item .protein-list {
-    display: flex;
-    flex-wrap: wrap;
-}
-.related-complexes .container .complex-item .protein-list .protein-item{
-    width: 80px;
-    padding: 5px;
-    margin: 2 1 2 1px;
-
-    border-radius: 2px;
-    background-color: #E0E0E0;
-    text-align: center;
-}
-.related-complexes .container .complex-item .protein-list .protein-item.actual-protein{
-    background-color: #9E9E9E;
+.related-proteins-container .grid .grid-item:hover .grid-item-text {
+    opacity: 0;
 }

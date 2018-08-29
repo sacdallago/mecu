@@ -2,21 +2,49 @@ let localStorageDeleted = StorageManager.get().length === 0;
 
 
 // grid for experiments which use this protein as well
-const grid = $('#experiments-container .grid').isotope({
-    // main isotope options
+const expWithProteinGridIdentifier = '#experiments-container .grid';
+const expWithProteinGrid = $(expWithProteinGridIdentifier).isotope({
     itemSelector: '.grid-item',
-    // set layoutMode
     layoutMode: 'packery',
     packery: {
         gutter: 10
     }
 });
-grid.on('click', '.grid-item', function(){
-    const data = $(this).data('protein');
+expWithProteinGrid.on('click', '.grid-item', function(){
+    const data = $(this).data('grid-item-contents');
     let dot = $(this).children('.selected-curve-dot');
-    console.log('data', data.uniprotId, data.experiment.experiment);
-    const hasBeenAdded = saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
+    console.log('data', data.obj.uniprotId, data.experiment.experiment);
+    const hasBeenAdded = saveExperimentToLocalStorage(data.obj.uniprotId, data.experiment.experiment);
     if(hasBeenAdded) dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
+});
+
+// grid for complexes
+const complexesWithProteinGridIdentifier = '#related-complexes-container .grid';
+const complexesWithProteinGrid = $(complexesWithProteinGridIdentifier).isotope({
+    itemSelector: '.grid-item',
+    layoutMode: 'packery',
+    packery: {
+        gutter: 10
+    }
+});
+complexesWithProteinGrid.on('click', '.grid-item', function(){
+    const data = $(this).data('complex');
+    document.location.href = `/complex?id=${data.complexId}&experiment=${data.experiment}`;
+});
+
+// grid for interactions
+const interactionsGridIdentifier = '#related-proteins-container .grid';
+const interactionsGrid = $(interactionsGridIdentifier).isotope({
+    itemSelector: '.grid-item',
+    layoutMode: 'packery',
+    packery: {
+        gutter: 10
+    }
+});
+interactionsGrid.on('click', '.grid-item', function(){
+    const data = $(this).data('complex');
+    console.log('data', data);
+    // document.location.href = `/complex?id=${data.complexId}&experiment=${data.experiment}`;
 });
 
 // on page drawing finished, start requests
@@ -48,7 +76,7 @@ $(document).ready(() => {
         ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
             .then(complexes => {
                 console.log('complexes', complexes);
-                drawRelatedComplexes(complexes, query.protein);
+                drawRelatedComplexes(complexes, query.experiment);
             })
 
         Promise.all([
@@ -116,6 +144,7 @@ const writeProteinMetaData = ({
         lysate, e_createdAt, e_updatedAt, uploader
     }) => {
     $('#protein-name').text(uniprotId);
+    $('#experiment-number').text('Experiment: '+experiment);
 
     $('#protein-data .uniprot-id .value')
         .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
@@ -154,7 +183,6 @@ const dateTimeStringPrettify = (dateTime) => {
     return `${dt.getDate()}-${dt.getMonth()+1}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
 }
 
-
 /**
  * [drawExperimentsWhichHaveProtein description]
  * @param  {[type]} const [description]
@@ -162,87 +190,108 @@ const dateTimeStringPrettify = (dateTime) => {
  */
 const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
 
-    // Grid
-    grid.empty();
-
-    // Curves
-    curves = [];
-
-    let items = [];
-
-    arr.forEach(function(responseProtein){
-        let proteins = [];
-
-        responseProtein.experiments.forEach(function(experiment){
-            proteins.push({
-                uniprotId: responseProtein.uniprotId,
-                experiments: [experiment]
-            });
-        });
-
-        proteins.forEach(function(protein) {
-            protein.experiments.forEach(expRead => {
-                var html = '';
-
-                html += '<div class="grid-item"' + [protein.uniprotId,expRead.experiment].join('E').toLowerCase() +
-                    ' id="' + [protein.uniprotId,expRead.experiment].join('E').toLowerCase() + '">';
-
-                html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-                html += '<div class="cube"></div>';
-                if(expRead.experiment === parseInt(actualExperiment)){
-                    html += '<div class="experimentNumber" style="font-size: 14;">Experiment '+actualExperiment+' (Actual)</div>';
-                } else {
-                    html += '<div class="experimentNumber" style="font-size: 14;">Experiment ' + expRead.experiment + '</div>';
-                }
-                html += '<div class="selected-curve-dot"></div>';
-                html += '</div>';
-
-                let element = $(html);
-
-                element.data("protein", {
-                    uniprotId: protein.uniprotId,
-                    experiment: expRead
-                });
-
-                items.push(element[0]);
-            })
+    const proteinExperimentObject = [];
+    let index = 0;
+    arr[0].experiments.forEach((experiment, i, a) => {
+        proteinExperimentObject.push({
+            uniprotId: arr[0].uniprotId,
+            experiments: [experiment],
+            index: i
         });
     });
 
-    grid.isotope('insert', items);
+    const toAppend = (obj, exp) => {
+        return [
+            $('<p />')
+                .addClass('grid-item-text')
+                .css({
+                    'position': 'absolute',
+                    'text-align': 'center',
+                    'width': '100%',
+                    'line-height': '35px',
+                    'font-size': '1.2rem'
+                })
+                .text(obj.uniprotId),
+            $('<div />')
+                .addClass(['experimentNumber', 'grid-item-text'])
+                .text(exp.experiment === parseInt(actualExperiment) ?
+                    `Experiment ${actualExperiment} (Actual)`:
+                    `Experiment ${exp.experiment}`
+                ),
+            $('<div />')
+                .addClass('selected-curve-dot')
+        ];
+    };
 
-    arr.forEach(function(responseProtein){
-        let proteins = [];
+    HelperFunctions.drawItemForEveryExperiment(expWithProteinGridIdentifier, proteinExperimentObject, toAppend);
 
-        responseProtein.experiments.forEach(function(experiment){
-            proteins.push({
-                uniprotId: responseProtein.uniprotId,
-                experiments: [experiment]
-            });
+}
+
+const drawRelatedComplexes = (complexes, actualExperiment) => {
+
+    // split up protein/experiments pairs into protein/experiment(single) pairs
+    const proteinExperimentObject = [];
+    let index = 0;
+    complexes.forEach(complex => {
+        const obj = {
+            uniprotId: complex.name,
+            id: complex.id,
+            index: index,
+            proteins: [],
+            total: 0,
+            present: 0
+        };
+        index++;
+
+        complex.proteins.forEach(protein => {
+            if(protein.experiments) {
+                protein.experiments.forEach(experiment => {
+                    if(obj.experiments) {
+                        obj.experiments.push({
+                            experiment: protein.uniprotId,
+                            uniprotId: protein.uniprotId,
+                            reads: experiment.reads
+                        })
+                    } else {
+                        obj.experiments = [{
+                            experiment: protein.uniprotId,
+                            uniprotId: protein.uniprotId,
+                            reads: experiment.reads
+                        }];
+                    }
+                })
+                obj.present++;
+            }
+            obj.total++;
         });
-
-        proteins.forEach(function(protein) {
-            protein.experiments.forEach(expRead => {
-                let curve = new MecuLine({
-                    element: "#"+[protein.uniprotId,expRead.experiment].join('E').toLowerCase(),
-                    width:"200",
-                    height:"200",
-                    limit: 5,
-                    minTemp: 41,
-                    maxTemp: 64,
-                    minRatio: 0.1,
-                    //maxRatio: 1
-                });
-
-                curve.add({
-                    uniprotId: protein.uniprotId,
-                    experiments: [expRead]
-                });
-
-                curves.push(curve);
-            })
-        });
+        proteinExperimentObject.push(obj);
     });
+
+    const toAppend = (obj) => {
+        return [
+            $('<p />')
+                .addClass('grid-item-text')
+                .css({
+                    'position': 'absolute',
+                    'text-align': 'center',
+                    'width': '100%',
+                    'line-height': '35px',
+                    'font-size': '1.2rem',
+                    'transition-property': 'opacity',
+                    'transition-duration': '1s'
+                })
+                .text(obj.uniprotId),
+            $('<div />')
+                .addClass(['experimentNumber', 'grid-item-text'])
+                .css({
+                    'transition-property': 'opacity',
+                    'transition-duration': '1s'
+                })
+                .text(obj.present+'/'+obj.total)
+        ];
+    };
+
+    HelperFunctions.drawItemsAllExperimentsInOneItem(complexesWithProteinGridIdentifier, proteinExperimentObject, toAppend);
 
 }
 
@@ -267,88 +316,68 @@ const saveExperimentToLocalStorage = (protein, experiment) => {
 }
 
 const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment) => {
-    const proteinInteractionContainer = $('#related-proteins-container .container');
+    interactionsGrid.empty();
 
-    const sameCorrelationItem = $('<div />').addClass('same-correlation-item');
-    const correlation = $('<div />').addClass('correlation');
-    const listProteins = $('<div />').addClass('list-proteins');
-    const listProteinItem = $('<div />').addClass('list-protein-item');
-    proteinInteractions.some((interaction, i, a) => {
-        // only show 5 at the moment
-        const onlyShow = 5
-        if(i>(onlyShow-1)) {
-            proteinInteractionContainer.append($('<div />').text('TODO: only showing '+onlyShow+' at the moment... total:'+proteinInteractions.length))
-            return true;
+    const curves = [];
+    const items = [];
+
+    // split up protein/experiments pairs into protein/experiment(single) pairs
+    const proteinExperimentObject = [];
+    let index = 0;
+    proteinInteractions.forEach(interaction => {
+        const obj = {
+            interactor1: interaction.interactor1.uniprotId,
+            uniprotId: interaction.interactor2.uniprotId,
+            index: index,
+            experiments: [],
+            total: 2,
+            present: 1
+        };
+        index++;
+
+        if(interaction.interactor1.experiments) {
+            obj.experiments.push({
+                reads: interaction.interactor1.experiments[0].reads,
+                experiment: interaction.interactor1.uniprotId,
+                uniprotId: interaction.interactor1.uniprotId
+            });
         }
-        const item = sameCorrelationItem.clone();
-        if(proteinsContainedInExperiment.indexOf(interaction.interactor2) >= 0) {
-            item.addClass('in-experiment-contained');
-        } else {
-            item.addClass('not-in-experiment-contained');
+
+        if(interaction.interactor2.experiments) {
+            obj.experiments.push({
+                reads: interaction.interactor2.experiments[0].reads,
+                experiment: interaction.interactor2.uniprotId,
+                uniprotId: interaction.interactor2.uniprotId
+            });
+            obj.present++;
         }
-        let list = Object.keys(interaction).map(k => listProteinItem.clone().text(k+' : '+interaction[k]));
-        proteinInteractionContainer.append(
-            item.append([
-                correlation.clone().text('Correlation: '+interaction.correlation),
-                listProteins.clone().append(list)
-            ])
-        );
-    })
-}
 
-const drawRelatedComplexes = (complexes, actualProtein) => {
-    const relatedComplexesContainer = $('#related-complexes-container .container');
-
-    if(complexes.length === 0) {
-        relatedComplexesContainer.append(
-            $('<div />').text('No complexes found which contain this protein.')
-        );
-        return;
-    }
-
-
-    const text = $('<div />').addClass('text');
-    const value = $('<div />').addClass('value');
-    const complexItem = $('<div />').addClass('complex-item');
-    const complexName = $('<div />').addClass('name');
-    const complexComment = $('<div />').addClass('comment');
-    const complexProteins = $('<div />').addClass('proteins');
-    const complexProteinItem = $('<div />').addClass('protein-item');
-
-    complexes.forEach(complex => {
-        const tmpComplexProteins = $('<div />').addClass('protein-list');
-        complex.proteins.forEach(protein => {
-            let tmp = complexProteinItem.clone().text(protein);
-            if(protein === actualProtein) {
-                tmp.addClass('actual-protein');
-            }
-            tmpComplexProteins.append(tmp);
-        });
-        relatedComplexesContainer.append(
-            complexItem.clone().data('complex-id', complex.id)
-                .append(
-                    complexName.clone().append([
-                        text.clone().text('Name'),
-                        value.clone().text(complex.name)
-                    ])
-                )
-                .append(
-                    complexComment.clone().append([
-                        text.clone().text('Comment'),
-                        value.clone().text(complex.comment || '-')
-                    ])
-                )
-                .append(
-                    complexProteins.clone().append([
-                        text.clone().text('Contained Proteins'),
-                        tmpComplexProteins.addClass('value')
-                    ])
-                )
-        );
+        proteinExperimentObject.push(obj);
     });
 
-    $('#related-complexes-container .container').on('click', '.complex-item', function(e) {
-        const complexId = $(this).data('complex-id');
-        document.location.href = `/complex?id=${complexId}`;
-    })
+    const toAppend = (obj) => {
+        return [
+            $('<p />')
+                .addClass('grid-item-text')
+                .css({
+                    'position': 'absolute',
+                    'text-align': 'center',
+                    'width': '100%',
+                    'line-height': '35px',
+                    'font-size': '1.2rem',
+                    'transition-property': 'opacity',
+                    'transition-duration': '1s'
+                })
+                .text(obj.uniprotId),
+            $('<div />')
+                .addClass(['experimentNumber', 'grid-item-text'])
+                .css({
+                    'transition-property': 'opacity',
+                    'transition-duration': '1s'
+                })
+                .text(obj.present+'/'+obj.total)
+        ];
+    };
+
+    HelperFunctions.drawItemsAllExperimentsInOneItem(interactionsGridIdentifier, proteinExperimentObject, toAppend);
 }

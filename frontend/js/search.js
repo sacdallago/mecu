@@ -151,7 +151,7 @@ const drawProteinCurves = (data) => {
         ];
     };
 
-    HelperFunctions.drawItems('.grid', proteinExperimentObject, toAppend);
+    HelperFunctions.drawItemForEveryExperiment('.grid', proteinExperimentObject, toAppend);
 
 }
 
