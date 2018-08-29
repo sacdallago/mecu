@@ -101,27 +101,12 @@ const drawProtein = (data) => {
 }
 
 const drawProteinCurve = ({uniprotId, experiment, reads}) => {
-    // these 2 functions can eventually be outsourced into own utils(?) file
-    let getHashCode = function(str) {
-        var hash = 0;
-        if (str.length == 0) return hash;
-        for (var i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            hash = hash & hash; // Convert to 32bit integer
-        }
-        return hash;
-    };
-    let intToHSL = function(inputInt) {
-        var shortened = inputInt % 360;
-        return "hsl(" + shortened + ",100%,40%)";
-    };
-
     // creating data series for highcharts
     let series = [];
     series.push({
         name: uniprotId+' '+experiment,
         data: reads.map(r => [r.t, r.r]),
-        color: getHashCode(uniprotId+"-E"+experiment).intToHSL(),
+        color: HelperFunctions.stringToColor(uniprotId+"-E"+experiment),
         marker: {symbol: 'circle'}
     });
 
@@ -151,13 +136,13 @@ const writeProteinMetaData = ({
         .text(uniprotId);
     $('#protein-data .peptides .value').text(peptides);
     $('#protein-data .psms .value').text(psms);
-    $('#protein-data .created .value').text(dateTimeStringPrettify(p_createdAt));
-    $('#protein-data .updated .value').text(dateTimeStringPrettify(p_updatedAt));
+    $('#protein-data .created .value').text(HelperFunctions.dateTimeStringPrettify(p_createdAt));
+    $('#protein-data .updated .value').text(HelperFunctions.dateTimeStringPrettify(p_updatedAt));
 
     $('#experiment-data .description .value').text(description);
     $('#experiment-data .lysate .value').text(lysate);
-    $('#experiment-data .created .value').text(dateTimeStringPrettify(e_createdAt));
-    $('#experiment-data .updated .value').text(dateTimeStringPrettify(e_updatedAt));
+    $('#experiment-data .created .value').text(HelperFunctions.dateTimeStringPrettify(e_createdAt));
+    $('#experiment-data .updated .value').text(HelperFunctions.dateTimeStringPrettify(e_updatedAt));
     $('#experiment-data .uploader .value').attr({'href':'https://plus.google.com/'+uploader})
         .text('Google Plus Profile');
 }
@@ -176,11 +161,6 @@ const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
             )
         }
     })
-}
-
-const dateTimeStringPrettify = (dateTime) => {
-    const dt = new Date(Date.parse(dateTime));
-    return `${dt.getDate()}-${dt.getMonth()+1}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
 }
 
 /**

@@ -110,3 +110,26 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
 }
 
 HelperFunctions.generateRandomString = () => Math.random().toString(36).substring(7);
+
+HelperFunctions.dateTimeStringPrettify = (dateTime) => {
+    const dt = new Date(Date.parse(dateTime));
+    return `${dt.getDate()}-${dt.getMonth()+1}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
+}
+
+HelperFunctions.stringToColor = (string) => {
+    // these 2 functions can eventually be outsourced into own utils(?) file
+    let getHashCode = function(str) {
+        var hash = 0;
+        if (str.length == 0) return hash;
+        for (var i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
+    };
+    let intToHSL = function(inputInt) {
+        var shortened = inputInt % 360;
+        return "hsl(" + shortened + ",100%,40%)";
+    };
+    return getHashCode(string).intToHSL();
+}
