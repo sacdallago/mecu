@@ -8,6 +8,7 @@ HelperFunctions = {};
  */
 HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridItemAppendexesFun) => {
     const gridIdentifier = $(gridIdentifierString);
+    gridIdentifier.empty();
 
     const itemIdentifierPrefix = 'GRIDITEM'+HelperFunctions.generateRandomString();
     const curves = [];
@@ -64,6 +65,7 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
  */
 HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, gridItemAppendexesFun) => {
     const gridIdentifier = $(gridIdentifierString);
+    gridIdentifier.empty();
 
     const itemIdentifierPrefix = 'GRIDITEM'+HelperFunctions.generateRandomString();
     const curves = [];
