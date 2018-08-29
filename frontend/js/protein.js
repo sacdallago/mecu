@@ -28,8 +28,10 @@ const complexesWithProteinGrid = $(complexesWithProteinGridIdentifier).isotope({
     }
 });
 complexesWithProteinGrid.on('click', '.grid-item', function(){
-    const data = $(this).data('complex');
-    document.location.href = `/complex?id=${data.complexId}&experiment=${data.experiment}`;
+    const data = $(this).data('grid-item-contents');
+    const currentUri = URI(window.location.href);
+    const query = currentUri.search(true);
+    document.location.href = `/complex?id=${data.obj.id}&experiment=${query.experiment}`;
 });
 
 // grid for interactions
@@ -42,7 +44,7 @@ const interactionsGrid = $(interactionsGridIdentifier).isotope({
     }
 });
 interactionsGrid.on('click', '.grid-item', function(){
-    const data = $(this).data('complex');
+    const data = $(this).data('grid-item-contents');
     console.log('data', data);
     // document.location.href = `/complex?id=${data.complexId}&experiment=${data.experiment}`;
 });
