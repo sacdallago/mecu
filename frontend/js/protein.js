@@ -189,7 +189,7 @@ const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
         $('.protein-container .other-experiments-container .dropdown .search')
             .css({'padding': '11 20px'})
 
-        const menuContainer = $('.dropdown .menu');
+        const menuContainer = $('#other-experiments .dropdown .menu');
         const otherExperiments = [];
         experiments.forEach(experiment => {
             if(experiment != actualExperiment) {
