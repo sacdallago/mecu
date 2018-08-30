@@ -3,6 +3,6 @@ module.exports = function(context) {
     context.api
         .post('/protein/search/exp/', proteinsController.getProteinsFromExp)
         .get('/protein/:name/experiment/:expid', proteinsController.getSpecProt)
-        .get('/protein/interactions/:uniprotId', proteinsController.getProteinInteractions)
+        .get('/protein/interactions/:uniprotId/exp/:expId', proteinsController.getProteinInteractions)
         ;
 }

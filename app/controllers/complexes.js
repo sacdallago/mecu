@@ -2,8 +2,10 @@
 module.exports = function(context) {
 
     const complexesDao = context.component('daos').module('complexes');
+    const temperatureReadsDao = context.component('daos').module('temperatureReads');
 
     return {
+        
         getById: function(request, response) {
             complexesDao.getComplex(request.params.id)
                 .then(result => response.status(200).send(result))
@@ -12,14 +14,54 @@ module.exports = function(context) {
                     return response.status(500).send({});
                 });
         },
+
         hasProtein: function(request, response) {
             const start = new Date();
+            console.log('request.params', request.params);
             complexesDao.getComplexWhichHasProtein(request.params.uniprotId)
-                .then(r => {
-                    console.log('DURATION getComplexWhichHasProtein', (Date.now()-start)/1000);
-                    return r;
+                .then(result => {
+                    let setOfProteins = new Set();
+                    result.forEach((r,i,a) => {
+                        r.proteins.forEach(p => {
+                            setOfProteins.add(p);
+                        })
+                    })
+                    setOfProteins = Array.from(setOfProteins);
+
+                    return Promise.all([
+                        Promise.resolve(result),
+                        Promise.all(
+                            setOfProteins.map(p =>
+                                temperatureReadsDao.findAndAggregateTempsByIdAndExperiment([{
+                                    uniprotId: p,
+                                    experiment: request.params.expId
+                                }])
+                                .then(r => r.length > 0 ? r[0] : {})
+                            )
+                        )
+                    ])
                 })
-                .then(result => response.status(200).send(result))
+                .then(result => {
+                    const proteinToTemperatureMap = {};
+                    result[1].forEach(tempObj => proteinToTemperatureMap[tempObj.uniprotId] = {
+                        uniprotId: tempObj.uniprotId,
+                        experiments: tempObj.experiments}
+                    );
+                    result[0].forEach(complex => {
+                        complex.proteins.forEach((p,i,a) => {
+                            if(proteinToTemperatureMap[p]) {
+                                complex.proteins[i] = proteinToTemperatureMap[p];
+                            } else {
+                                complex.proteins[i] = {uniprotId: p};
+                            }
+                        })
+                    })
+                    return result[0];
+                })
+                .then(result => {
+                    console.log('DURATION getComplexWhichHasProtein', (Date.now()-start)/1000);
+                    response.status(200).send(result);
+                })
                 .catch(error => {
                     console.error('getById', error);
                     return response.status(500).send([]);

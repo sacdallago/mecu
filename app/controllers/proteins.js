@@ -69,7 +69,42 @@ module.exports = function(context) {
         },
 
         getProteinInteractions: function(request, response) {
+            console.log('request.params', request.params);
             proteinXproteinsDao.getProteinInteraction(request.params.uniprotId)
+                .then(result => {
+                    let setOfProteins = new Set();
+                    result.forEach(r => {
+                        setOfProteins.add(r.interactor1);
+                        setOfProteins.add(r.interactor2);
+                    })
+                    setOfProteins = Array.from(setOfProteins);
+
+                    return Promise.all([
+                        Promise.resolve(result),
+                        temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(
+                            setOfProteins.map(p => ({
+                                uniprotId: p,
+                                experiment: request.params.expId
+                            }))
+                        )
+                    ]);
+                })
+                .then(result => {
+                    const proteinToTemperatureMap = {};
+                    result[1].filter(r => !!r).forEach(tempObj => proteinToTemperatureMap[tempObj.uniprotId] = {
+                        uniprotId: tempObj.uniprotId,
+                        experiments: tempObj.experiments
+                    });
+                    result[0].forEach(interaction => {
+                        interaction.interactor1 =
+                            proteinToTemperatureMap[interaction.interactor1] ||
+                            { uniprotId: interaction.interactor1 };
+                        interaction.interactor2 =
+                            proteinToTemperatureMap[interaction.interactor2] ||
+                            { uniprotId: interaction.interactor2 };
+                    });
+                    return result[0];
+                })
                 .then(result => response.status(200).send(result))
                 .catch(error => {
                     console.error('getProteinInteractions', error);

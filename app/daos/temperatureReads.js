@@ -110,16 +110,14 @@ module.exports = function(context) {
 
         findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs) {
             // create where clause
-
+            console.log('uniprodIdExpIdPairs', uniprodIdExpIdPairs);
             // TODO bad way to create where, refactor!
             let where = ' where (';
             uniprodIdExpIdPairs.forEach((e, i, a) => {
                 let tmp = `(pr."uniprotId" = '`+e.uniprotId+`' AND `;
                 tmp += `pr.experiment = '`+e.experiment+`')`;
 
-                if(i === uniprodIdExpIdPairs.length-1) {
-                    console.log(i);
-                } else {
+                if(i != uniprodIdExpIdPairs.length-1) {
                     tmp+=' OR ';
                 }
                 where += tmp;
@@ -139,7 +137,7 @@ module.exports = function(context) {
                 ) tmp
                 group by tmp."uniprotId"
             `;
-            console.warn(`findAndAggregateTempsByIdAndExperiment still uses SQL query`);
+            // console.warn(`findAndAggregateTempsByIdAndExperiment still uses SQL query`);
             /*
             for the whole database
             Planning time: 0.147 ms

@@ -1,5 +1,11 @@
-.protein-name, .experiments-container, .related-proteins-container, .related-complexes {
+.protein-header, .experiments-container, .related-proteins-container, .related-complexes {
     padding: 20px;
+}
+
+.protein-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 .protein-container {
@@ -55,19 +61,38 @@
     flex-wrap: wrap;
     justify-content: space-between;
 }
-.protein-container .other-experiments-container .other-experiment {
+.protein-container .other-experiments-container {
     margin: 5 0 5 0px;
-    padding: 1 5 1 5px;
     border: 1px solid silver;
     border-radius: 3px;
-    background-color: silver;
+    background-color: white;
+}
+.protein-container .other-experiments-container .dropdown {
+    width: 100%;
 
+    display:flex;
+    justify-content: space-between;
 }
-.protein-container .other-experiments-container .other-experiment a {
-    color: black;
+.protein-container .other-experiments-container .dropdown .dropdown-icon {
+    display: flex;
+    justify-content: center;
 }
-.protein-container .other-experiments-container .other-experiment:hover {
-    background: white;
+.protein-container .other-experiments-container .dropdown .text {
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+
+    display:flex;
+    align-items: center;
+}
+.protein-container .other-experiments-container .dropdown .menu{
+    width: 100%;
+}
+.protein-container .other-experiments-container .dropdown .menu .item {
+    width: 100%;
+}
+.protein-container .other-experiments-container .dropdown .menu .item:hover {
+    background-color: lightgrey;
 }
 
 .experiments-container .grid .selected-curve-dot {
@@ -81,64 +106,26 @@
     border-radius: 10px;
 }
 
-
-.related-proteins-container .container{
+.related-complexes .grid .grid-item .grid-item-text {
+    background-color: rgba(255,255,255,0.5);
+    transition-property: opacity;
+    transition-duration: 1s;
 }
-.related-proteins-container .container .same-correlation-item{
-    display: flex;
-    padding: 5 10 5 10px;
-}
-.related-proteins-container .container .same-correlation-item .correlation{
-    min-width: 200px;
-}
-.related-proteins-container .container .in-experiment-contained{
-    background-color: grey;
-}
-.related-proteins-container .container .not-in-experiment-contained{
-    opacity: 0.5;
+.related-complexes .grid .grid-item:hover .grid-item-text {
+    opacity: 0;
 }
 
-
-.related-complexes .container {
-    margin: 10px;
-    border: 1px solid silver;
-    padding: 10px;
-    background-color: #F5F5F5;
+.related-proteins-container .grid .grid-item .grid-item-text {
+    background-color: rgba(255,255,255,0.5);
+    transition-property: opacity;
+    transition-duration: 1s;
 }
-.related-complexes .container .complex-item {
-    margin: 5 0 5 0px;
-    padding: 10 5 10 5px;
-    min-width: 220px;
-    cursor: pointer;
-    background-color: #EEEEEE;
+.related-proteins-container .grid .grid-item:hover .grid-item-text {
+    opacity: 0;
 }
-.related-complexes .container .complex-item .name, .comment, .proteins {
-    display: flex;
-    align-items: flex-end;
-    border-bottom: 0.5px solid silver;
-}
-.related-complexes .container .text {
-    min-width: 130px;
-}
-.related-complexes .container .value {
-}
-.related-complexes .container .complex-item:hover {
-    background-color: #FAFAFA;
-    border: .1px solid black;
-}
-.related-complexes .container .complex-item .protein-list {
-    display: flex;
-    flex-wrap: wrap;
-}
-.related-complexes .container .complex-item .protein-list .protein-item{
-    width: 80px;
-    padding: 5px;
-    margin: 2 1 2 1px;
-
-    border-radius: 2px;
-    background-color: #E0E0E0;
-    text-align: center;
-}
-.related-complexes .container .complex-item .protein-list .protein-item.actual-protein{
-    background-color: #9E9E9E;
+.related-proteins-container .correlation {
+    position: absolute;
+    bottom: 1px;
+    left: 3px;
+    font-size: 13pt;
 }

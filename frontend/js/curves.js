@@ -106,21 +106,6 @@ function populateGlobalsGraphs(){
     TemperatureService.temperatureReadsToProteinsAndExperimentPairs(proteins)
         .then(data => {
 
-            // these 2 functions can eventually be outsourced into own utils(?) file
-            let getHashCode = function(str) {
-                var hash = 0;
-                if (str.length == 0) return hash;
-                for (var i = 0; i < str.length; i++) {
-                    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-                    hash = hash & hash; // Convert to 32bit integer
-                }
-                return hash;
-            };
-            let intToHSL = function(inputInt) {
-                var shortened = inputInt % 360;
-                return "hsl(" + shortened + ",100%,40%)";
-            };
-
             // creating data series for highcharts
             let series = [];
             data.forEach(protein => {
@@ -128,7 +113,7 @@ function populateGlobalsGraphs(){
                     series.push({
                         name: protein.uniprotId+' '+experiment.experiment,
                         data: experiment.reads.map(r => [r.t, r.r]),
-                        color: getHashCode(protein.uniprotId+"-E"+experiment.experiment).intToHSL(),
+                        color: HelperFunctions.stringToColor(protein.uniprotId+"-E"+experiment.experiment),
                         marker: {symbol: 'circle'}
                     })
                 })
