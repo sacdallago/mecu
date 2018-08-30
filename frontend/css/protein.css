@@ -61,18 +61,38 @@
     flex-wrap: wrap;
     justify-content: space-between;
 }
-.protein-container .other-experiments-container .other-experiment {
+.protein-container .other-experiments-container {
     margin: 5 0 5 0px;
-    padding: 1 5 1 5px;
     border: 1px solid silver;
     border-radius: 3px;
-    background-color: silver;
+    background-color: white;
 }
-.protein-container .other-experiments-container .other-experiment a {
-    color: black;
+.protein-container .other-experiments-container .dropdown {
+    width: 100%;
+
+    display:flex;
+    justify-content: space-between;
 }
-.protein-container .other-experiments-container .other-experiment:hover {
-    background: white;
+.protein-container .other-experiments-container .dropdown .dropdown-icon {
+    display: flex;
+    justify-content: center;
+}
+.protein-container .other-experiments-container .dropdown .text {
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+
+    display:flex;
+    align-items: center;
+}
+.protein-container .other-experiments-container .dropdown .menu{
+    width: 100%;
+}
+.protein-container .other-experiments-container .dropdown .menu .item {
+    width: 100%;
+}
+.protein-container .other-experiments-container .dropdown .menu .item:hover {
+    background-color: lightgrey;
 }
 
 .experiments-container .grid .selected-curve-dot {

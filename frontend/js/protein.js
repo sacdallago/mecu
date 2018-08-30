@@ -56,13 +56,17 @@ $(document).ready(() => {
     console.log('query', query);
     if(query.protein && query.experiment) {
 
-        ProteinService.getSpecificProtein(query.protein, query.experiment)
-            .then(proteinData => {
-                console.log('proteinCurveData', proteinData);
-                if(Object.keys(proteinData).length > 0) {
-                    drawProtein(proteinData);
-                }
-            });
+        // add event, when loading is done
+        // Promise.all([
+
+            ProteinService.getSpecificProtein(query.protein, query.experiment)
+                .then(proteinData => {
+                    console.log('proteinCurveData', proteinData);
+                    if(Object.keys(proteinData).length > 0) {
+                        drawProtein(proteinData);
+                    }
+                })
+        // ])
 
         ExperimentService.experimentsWhichHaveProtein(query.protein)
             .then(exps => {
@@ -90,6 +94,7 @@ $(document).ready(() => {
                 console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
                 drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment);
             })
+
     }
 })
 
@@ -150,19 +155,25 @@ const writeProteinMetaData = ({
 }
 
 const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
-    const otherExperimentsContainer = $('#other-experiments .other-experiments-container');
-    experiments.forEach(e => {
-        if(e != actualExperiment) {
-            otherExperimentsContainer.append(
-                $('<div />').append(
-                        $('<a />')
-                            .attr({'href':`/protein?protein=${uniprotId}&experiment=${e}`})
-                            .text(`Experiment ${e}`)
-                    )
-                    .addClass('other-experiment')
+    const dropDownContainer = $('#other-experiments .other-experiments-container .dropdown')
+        .addClass(['ui', 'search', 'dropdown']);
+    dropDownContainer.dropdown({});
+    $('.protein-container .other-experiments-container .dropdown .search')
+        .css({'padding': '11 20px'})
+
+    const menuContainer = $('.dropdown .menu');
+    const otherExperiments = [];
+    experiments.forEach(experiment => {
+        if(experiment != actualExperiment) {
+            otherExperiments.push(
+                $('<a />')
+                    .addClass('item')
+                    .attr({'data-value':experiment, 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
+                    .text('Experiment '+experiment)
             )
         }
-    })
+    });
+    menuContainer.append(otherExperiments);
 }
 
 /**
