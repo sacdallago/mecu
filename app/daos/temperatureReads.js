@@ -110,7 +110,7 @@ module.exports = function(context) {
 
         findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs) {
             // create where clause
-            console.log('uniprodIdExpIdPairs', uniprodIdExpIdPairs);
+            // console.log('uniprodIdExpIdPairs', uniprodIdExpIdPairs);
             // TODO bad way to create where, refactor!
             let where = ' where (';
             uniprodIdExpIdPairs.forEach((e, i, a) => {
