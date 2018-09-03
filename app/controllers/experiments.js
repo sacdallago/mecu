@@ -142,6 +142,15 @@ module.exports = function(context) {
             }
         },
 
+        getProteinsInExperiment: function(request, response) {
+            temperatureReadsDao.getDistinctProteinsInExperiment(request.params.id)
+                .then(result => response.status(200).send(result))
+                .catch(error => {
+                    console.error('getExperiment', error);
+                    return response.status(500).send(error);
+                });
+        },
+
         getExperiments: function(request, response) {
             experimentsDao.getExperimentsPaged(queryParams(request.query))
                 .then(result => response.status(200).send(result))
@@ -211,8 +220,6 @@ module.exports = function(context) {
         },
 
         getExperimentsWhichHaveProtein: function(request, response) {
-            console.log('request.params.uniprotId', request.params.uniprotId);
-
             experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId)
                 .then(result => response.status(200).send(result.map(e => e.experiment)))
                 .catch(error => {

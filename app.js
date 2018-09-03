@@ -6,6 +6,8 @@ const cluster           = require('cluster');
 const consoleStamp      = require('console-stamp');
 const path              = require('path');
 
+// const seedComplexes =  require('./app/seeds/loadComplexes');
+
 if (cluster.isMaster) {
     // Setup timestamps for logging
     consoleStamp(console,{
@@ -210,17 +212,18 @@ if (cluster.isMaster) {
         context.component('.').module('routes');
 
         // Sync the database --> Write table definitions
-        context.dbConnection.sync().then(function() {
-            // Make the process listen to incoming requests
-            app.listen(app.get('port'), function(){
-                console.log("Express server listening on port ", app.get('port'));
-                console.log("According to your configuration, the webapp is reachable at", address);
+        // TODO throw this out, this should only be done once, or when the table is changed
+        // force: true -> drops table and recreates it...
+        context.dbConnection.sync()
+            .then(() => app.listen( app.get('port'), function(){
+                    console.log("Express server listening on port ", app.get('port'));
+                    console.log("According to your configuration, the webapp is reachable at", address);
+                })
+            ).catch(function(error) {
+                console.error("There was an error while syncronizing the tables between the application and the database.");
+                console.error(error);
+                process.exit(2);
             });
-        }).catch(function(error) {
-            console.error("There was an error while syncronizing the tables between the application and the database.");
-            console.error(error);
-            process.exit(2);
-        });
     });
 
     // Watch in case of file changes, restart worker (basically can keep up server running forever)

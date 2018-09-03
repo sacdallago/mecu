@@ -53,6 +53,8 @@
     },
     "scripts": {
         "start": "node app.js",
+        "create-complex-sql": "node scripts/createComplexesSQL.js scripts/010718corum_complexes.json",
+        "create-protein-sql": "node scripts/createProteinXProteinSQL.js scripts/hippie_current_uniprotID.json",
         "yarn-lock-to-npm": "synp --source-file ./yarn.lock",
         "npm-lock-to-yarn": "synp --source-file package-lock.json"
     }

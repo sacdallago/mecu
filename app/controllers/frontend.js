@@ -45,6 +45,10 @@ module.exports = function(context) {
             return response.render('protein', {title: 'Protein'});
         },
 
+        complex: function(request, response) {
+            return response.render('complex', {title: 'Complex'});
+        },
+
         uploadExperiment: function(request, response) {
             return response.render('experimentUpload', {
                 title: 'Upload'

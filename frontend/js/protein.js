@@ -2,47 +2,118 @@ let localStorageDeleted = StorageManager.get().length === 0;
 
 
 // grid for experiments which use this protein as well
-const grid = $('#experiments-container .grid').isotope({
-    // main isotope options
+const expWithProteinGridIdentifier = '#experiments-container .grid';
+const expWithProteinGrid = $(expWithProteinGridIdentifier).isotope({
     itemSelector: '.grid-item',
-    // set layoutMode
     layoutMode: 'packery',
     packery: {
         gutter: 10
     }
 });
-grid.on('click', '.grid-item', function(){
-    const data = $(this).data('protein');
+expWithProteinGrid.on('click', '.grid-item', function(){
+    const data = $(this).data('grid-item-contents');
     let dot = $(this).children('.selected-curve-dot');
-    dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
-    console.log('data', data.uniprotId, data.experiment.experiment);
-    saveExperimentToLocalStorage(data.uniprotId, data.experiment.experiment);
+    console.log('data', data.obj.uniprotId, data.experiment.experiment);
+    const hasBeenAdded = saveExperimentToLocalStorage(data.obj.uniprotId, data.experiment.experiment);
+    if(hasBeenAdded) dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
 });
 
+// grid for complexes
+const complexesWithProteinGridIdentifier = '#related-complexes-container .grid';
+const complexesWithProteinGrid = $(complexesWithProteinGridIdentifier).isotope({
+    itemSelector: '.grid-item',
+    layoutMode: 'packery',
+    packery: {
+        gutter: 10
+    }
+});
+complexesWithProteinGrid.on('click', '.grid-item', function(){
+    const data = $(this).data('grid-item-contents');
+    const currentUri = URI(window.location.href);
+    const query = currentUri.search(true);
+    document.location.href = `/complex?id=${data.obj.id}&experiment=${query.experiment}`;
+});
+
+// grid for interactions
+const interactionsGridIdentifier = '#related-proteins-container .grid';
+const interactionsGrid = $(interactionsGridIdentifier).isotope({
+    itemSelector: '.grid-item',
+    layoutMode: 'packery',
+    packery: {
+        gutter: 10
+    }
+});
+interactionsGrid.on('click', '.grid-item', function(){
+    const data = $(this).data('grid-item-contents');
+    console.log('data', data);
+    // document.location.href = `/complex?id=${data.complexId}&experiment=${data.experiment}`;
+});
+
+
+// on page drawing finished, start requests
 $(document).ready(() => {
+    let loading = true;
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     console.log('query', query);
     if(query.protein && query.experiment) {
 
-        ProteinService.getSpecificProtein(query.protein, query.experiment)
-            .then(proteinData => {
-                console.log('proteinCurveData', proteinData);
-                if(Object.keys(proteinData).length > 0) {
-                    drawProtein(proteinData);
-                }
-            });
+        Promise.all([
 
-        ExperimentService.experimentsWhichHaveProtein(query.protein)
-            .then(exps => {
-                console.log('exps', exps);
-                drawOtherExperiments(exps, query.protein, query.experiment);
-                TemperatureService.temperatureReads(exps, [query.protein])
-                    .then(reads => {
-                        console.log('reads', reads);
-                        drawExperimentsWhichHaveProtein(reads, query.experiment);
-                    })
-            })
+            // data for protein curve and meta data
+            ProteinService.getSpecificProtein(query.protein, query.experiment)
+                .then(proteinData => {
+                    console.log('proteinCurveData', proteinData);
+                    if(Object.keys(proteinData).length > 0) {
+                        return drawProtein(proteinData);
+                    } else {
+                        return Promise.resolve(true);
+                    }
+                }),
+
+            // list of experiments which have this protein
+            ExperimentService.experimentsWhichHaveProtein(query.protein)
+                .then(exps => {
+                    console.log('exps', exps);
+                    return Promise.all([
+                        // list of experiments, which ahve this protein, but not the actual experiment
+                        drawOtherExperiments(exps, query.protein, query.experiment),
+                        TemperatureService.temperatureReads(exps, [query.protein])
+                            .then(reads => {
+                                console.log('reads', reads);
+                                // protein curves of other experiments
+                                return drawExperimentsWhichHaveProtein(reads, query.experiment);
+                            })
+                    ]);
+                }),
+
+            // list of complexes which have this protein
+            ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
+                .then(complexes => {
+                    console.log('complexes', complexes);
+                    return drawRelatedComplexes(complexes, query.experiment);
+                }),
+
+            // list of protein interactions, which have this protein
+            Promise.all([
+                    ProteinService.getProteinInteractions(query.protein, query.experiment),
+                    ExperimentService.allProteinsContainedInExperiment(query.experiment)
+                ])
+                .then(([proteinInteractions, proteinsContainedInExperiment]) => {
+                    console.log('proteinInteractions', proteinInteractions);
+                    console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
+                    return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment);
+                })
+        ])
+        .then(done => {
+            loading = false;
+            console.log('done', done);
+        })
+        .catch(error => {
+            loading = false;
+            console.error('loading error', error);
+        });
+
     }
 })
 
@@ -51,92 +122,90 @@ $(document).ready(() => {
  * @param  {experiment: number, uniprotId: string, reads: {r:number, t:number}[] } data [description]
  */
 const drawProtein = (data) => {
-    drawProteinCurve(data);
-    writeProteinMetaData(data);
+    return Promise.all([
+        drawProteinCurve(data),
+        writeProteinMetaData(data)
+    ]);
 }
 
 const drawProteinCurve = ({uniprotId, experiment, reads}) => {
-    // these 2 functions can eventually be outsourced into own utils(?) file
-    let getHashCode = function(str) {
-        var hash = 0;
-        if (str.length == 0) return hash;
-        for (var i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            hash = hash & hash; // Convert to 32bit integer
-        }
-        return hash;
-    };
-    let intToHSL = function(inputInt) {
-        var shortened = inputInt % 360;
-        return "hsl(" + shortened + ",100%,40%)";
-    };
+    return new Promise((resolve, reject) => {
+        // creating data series for highcharts
+        let series = [];
+        series.push({
+            name: uniprotId+' '+experiment,
+            data: reads.map(r => [r.t, r.r]),
+            color: HelperFunctions.stringToColor(uniprotId+"-E"+experiment),
+            marker: {symbol: 'circle'}
+        });
 
-    // creating data series for highcharts
-    let series = [];
-    series.push({
-        name: uniprotId+' '+experiment,
-        data: reads.map(r => [r.t, r.r]),
-        color: getHashCode(uniprotId+"-E"+experiment).intToHSL(),
-        marker: {symbol: 'circle'}
+        // configuring and plotting highcharts
+        highChartsCurvesConfigObject['title.text'] = 'TPCA melting curve';
+        highChartsCurvesConfigObject['yAxis.title.text'] = '% alive';
+        highChartsCurvesConfigObject['xAxis.title.text'] = 'Temperature';
+        highChartsCurvesConfigObject['series'] = series;
+        highChartsCurvesConfigObject['tooltip'] = {
+            split: true,
+            distance: 30,
+            padding: 5
+        };
+        highChartsCurvesConfigObject['legend'] = {enabled: false};
+        Highcharts.chart('protein-curve', highChartsCurvesConfigObject);
+        resolve(true);
     });
-
-    // configuring and plotting highcharts
-    highChartsCurvesConfigObject['title.text'] = 'TPCA melting curve';
-    highChartsCurvesConfigObject['yAxis.title.text'] = '% alive';
-    highChartsCurvesConfigObject['xAxis.title.text'] = 'Temperature';
-    highChartsCurvesConfigObject['series'] = series;
-    highChartsCurvesConfigObject['tooltip'] = {
-        split: true,
-        distance: 30,
-        padding: 5
-    };
-    highChartsCurvesConfigObject['legend'] = {enabled: false};
-    Highcharts.chart('protein-curve', highChartsCurvesConfigObject);
 }
 
 const writeProteinMetaData = ({
         uniprotId, peptides, psms, p_createdAt, p_updatedAt, experiment, description,
         lysate, e_createdAt, e_updatedAt, uploader
     }) => {
-    $('#protein-name').text(uniprotId);
+    return new Promise((resolve, reject) => {
+        $('#protein-name').text(uniprotId);
+        $('#experiment-number').text('Experiment: '+experiment);
 
-    $('#protein-data .uniprot-id .value')
+        $('#protein-data .uniprot-id .value')
         .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
-        .text(uniprotId);
-    $('#protein-data .peptides .value').text(peptides);
-    $('#protein-data .psms .value').text(psms);
-    $('#protein-data .created .value').text(dateTimeStringPrettify(p_createdAt));
-    $('#protein-data .updated .value').text(dateTimeStringPrettify(p_updatedAt));
+            .text(uniprotId);
+        $('#protein-data .peptides .value').text(peptides);
+        $('#protein-data .psms .value').text(psms);
+        $('#protein-data .created .value').text(HelperFunctions.dateTimeStringPrettify(p_createdAt));
+        $('#protein-data .updated .value').text(HelperFunctions.dateTimeStringPrettify(p_updatedAt));
 
-    $('#experiment-data .description .value').text(description);
-    $('#experiment-data .lysate .value').text(lysate);
-    $('#experiment-data .created .value').text(dateTimeStringPrettify(e_createdAt));
-    $('#experiment-data .updated .value').text(dateTimeStringPrettify(e_updatedAt));
-    $('#experiment-data .uploader .value').attr({'href':'https://plus.google.com/'+uploader})
-        .text('Google Plus Profile');
+        $('#experiment-data .description .value').text(description);
+        $('#experiment-data .lysate .value').text(lysate);
+        $('#experiment-data .created .value').text(HelperFunctions.dateTimeStringPrettify(e_createdAt));
+        $('#experiment-data .updated .value').text(HelperFunctions.dateTimeStringPrettify(e_updatedAt));
+        $('#experiment-data .uploader .value').attr({'href':'https://plus.google.com/'+uploader})
+            .text('Google Plus Profile');
+        resolve(true);
+    });
 }
 
 const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
-    const otherExperimentsContainer = $('#other-experiments .other-experiments-container');
-    experiments.forEach(e => {
-        if(e != actualExperiment) {
-            otherExperimentsContainer.append(
-                $('<div />').append(
-                        $('<a />')
-                            .attr({'href':`/protein?protein=${uniprotId}&experiment=${e}`})
-                            .text(`Experiment ${e}`)
-                    )
-                    .addClass('other-experiment')
-            )
-        }
-    })
-}
+    return new Promise((resolve, reject) => {
+        const dropDownContainer = $('#other-experiments .other-experiments-container .dropdown')
+            .addClass(['ui', 'search', 'dropdown']);
+        dropDownContainer.dropdown({});
+        $('.protein-container .other-experiments-container .dropdown .search')
+            .css({'padding': '11 20px'})
 
-const dateTimeStringPrettify = (dateTime) => {
-    const dt = new Date(Date.parse(dateTime));
-    return `${dt.getDate()}-${dt.getMonth()+1}-${dt.getFullYear()} ${dt.getHours()}:${dt.getMinutes()}`;
-}
+        const menuContainer = $('#other-experiments .dropdown .menu');
+        const otherExperiments = [];
+        experiments.forEach(experiment => {
+            if(experiment != actualExperiment) {
+                otherExperiments.push(
+                    $('<a />')
+                    .addClass('item')
+                    .attr({'data-value':experiment, 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
+                    .text('Experiment '+experiment)
+                )
+            }
+        });
+        menuContainer.append(otherExperiments);
 
+        resolve(true);
+    });
+}
 
 /**
  * [drawExperimentsWhichHaveProtein description]
@@ -144,95 +213,118 @@ const dateTimeStringPrettify = (dateTime) => {
  * @return {[type]}       [description]
  */
 const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
+    return new Promise((resolve, reject) => {
 
-    // Grid
-    grid.empty();
-
-    // Curves
-    curves = [];
-
-    let items = [];
-
-    arr.forEach(function(responseProtein){
-        let proteins = [];
-
-        responseProtein.experiments.forEach(function(experiment){
-            proteins.push({
-                uniprotId: responseProtein.uniprotId,
-                experiments: [experiment]
+        const proteinExperimentObject = [];
+        let index = 0;
+        arr[0].experiments.forEach((experiment, i, a) => {
+            proteinExperimentObject.push({
+                uniprotId: arr[0].uniprotId,
+                experiments: [experiment],
+                index: i
             });
         });
 
-        proteins.forEach(function(protein) {
-            protein.experiments.forEach(expRead => {
-                var html = '';
+        const toAppend = (obj, exp) => {
+            return [
+                $('<p />')
+                    .addClass('grid-item-text')
+                    .css({
+                        'position': 'absolute',
+                        'text-align': 'center',
+                        'width': '100%',
+                        'line-height': '35px',
+                        'font-size': '1.2rem'
+                    })
+                    .text(obj.uniprotId),
+                $('<div />')
+                    .addClass(['experimentNumber', 'grid-item-text'])
+                    .text(exp.experiment === parseInt(actualExperiment) ?
+                    `Experiment ${actualExperiment} (Actual)`:
+                    `Experiment ${exp.experiment}`
+                ),
+                $('<div />')
+                    .addClass('selected-curve-dot')
+            ];
+        };
 
-                html += '<div class="grid-item"' + [protein.uniprotId,expRead.experiment].join('E').toLowerCase() +
-                    ' id="' + [protein.uniprotId,expRead.experiment].join('E').toLowerCase() + '">';
+        HelperFunctions.drawItemForEveryExperiment(expWithProteinGridIdentifier, proteinExperimentObject, toAppend);
 
-                html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-                html += '<div class="cube"></div>';
-                if(expRead.experiment === parseInt(actualExperiment)){
-                    html += '<div class="experimentNumber">Actual</div>';
-                } else {
-                    html += '<div class="experimentNumber">Experiment ' + expRead.experiment + '</div>';
-                }
-                html += '<div class="selected-curve-dot"></div>';
-                html += '</div>';
-
-                let element = $(html);
-
-                element.data("protein", {
-                    uniprotId: protein.uniprotId,
-                    experiment: expRead
-                });
-
-                items.push(element[0]);
-            })
-        });
-    });
-
-    grid.isotope('insert', items);
-
-    arr.forEach(function(responseProtein){
-        let proteins = [];
-
-        responseProtein.experiments.forEach(function(experiment){
-            proteins.push({
-                uniprotId: responseProtein.uniprotId,
-                experiments: [experiment]
-            });
-        });
-
-        proteins.forEach(function(protein) {
-            protein.experiments.forEach(expRead => {
-                let curve = new MecuLine({
-                    element: "#"+[protein.uniprotId,expRead.experiment].join('E').toLowerCase(),
-                    width:"200",
-                    height:"200",
-                    limit: 5,
-                    minTemp: 41,
-                    maxTemp: 64,
-                    minRatio: 0.1,
-                    //maxRatio: 1
-                });
-
-                curve.add({
-                    uniprotId: protein.uniprotId,
-                    experiments: [expRead]
-                });
-
-                curves.push(curve);
-            })
-        });
+        resolve(true);
     });
 
 }
 
+const drawRelatedComplexes = (complexes, actualExperiment) => {
+    return new Promise((resolve, reject) => {
+        // split up protein/experiments pairs into protein/experiment(single) pairs
+        const proteinExperimentObject = [];
+        let index = 0;
+        complexes.forEach(complex => {
+            const obj = {
+                uniprotId: complex.name,
+                id: complex.id,
+                index: index,
+                proteins: [],
+                total: 0,
+                present: 0
+            };
+            index++;
+
+            complex.proteins.forEach(protein => {
+                if(protein.experiments) {
+                    protein.experiments.forEach(experiment => {
+                        if(obj.experiments) {
+                            obj.experiments.push({
+                                experiment: protein.uniprotId,
+                                uniprotId: protein.uniprotId,
+                                reads: experiment.reads
+                            })
+                        } else {
+                            obj.experiments = [{
+                                experiment: protein.uniprotId,
+                                uniprotId: protein.uniprotId,
+                                reads: experiment.reads
+                            }];
+                        }
+                    })
+                    obj.present++;
+                }
+                obj.total++;
+            });
+            proteinExperimentObject.push(obj);
+        });
+
+        const toAppend = (obj) => {
+            return [
+                $('<p />')
+                    .addClass('grid-item-text')
+                    .css({
+                        'position': 'absolute',
+                        'text-align': 'center',
+                        'width': '100%',
+                        'line-height': '35px',
+                        'font-size': '1.2rem'
+                    })
+                    .text(obj.uniprotId),
+                $('<div />')
+                    .addClass(['experimentNumber', 'grid-item-text'])
+                    .text(obj.present+'/'+obj.total)
+            ];
+        };
+
+        HelperFunctions.drawItemsAllExperimentsInOneItem(complexesWithProteinGridIdentifier, proteinExperimentObject, toAppend);
+
+        resolve(true);
+    });
+}
+
 const saveExperimentToLocalStorage = (protein, experiment) => {
+    let added = true;
     // if the localStorage hasn't been deleted yet and there are some proteins in it
     if(!localStorageDeleted && StorageManager.get().length > 0) {
-        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
+        added = confirm("There are Proteins still in the local storage. Do you want to overwrite them?");
+        if(added) {
             StorageManager.clear();
             console.log('store cleared');
             localStorageDeleted = true;
@@ -244,4 +336,74 @@ const saveExperimentToLocalStorage = (protein, experiment) => {
         console.log('adding', {uniprotId: protein, experiment: experiment});
         StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
     }
+    return added;
+}
+
+const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment) => {
+    return new Promise((resolve,reject) => {
+        interactionsGrid.empty();
+
+        const curves = [];
+        const items = [];
+
+        // split up protein/experiments pairs into protein/experiment(single) pairs
+        const proteinExperimentObject = [];
+        let index = 0;
+        proteinInteractions.forEach(interaction => {
+            const obj = {
+                interactor1: interaction.interactor1.uniprotId,
+                uniprotId: interaction.interactor2.uniprotId,
+                index: index,
+                correlation: interaction.correlation,
+                experiments: [],
+                total: 2,
+                present: 1
+            };
+            index++;
+
+            if(interaction.interactor1.experiments) {
+                obj.experiments.push({
+                    reads: interaction.interactor1.experiments[0].reads,
+                    experiment: interaction.interactor1.uniprotId,
+                    uniprotId: interaction.interactor1.uniprotId
+                });
+            }
+
+            if(interaction.interactor2.experiments) {
+                obj.experiments.push({
+                    reads: interaction.interactor2.experiments[0].reads,
+                    experiment: interaction.interactor2.uniprotId,
+                    uniprotId: interaction.interactor2.uniprotId
+                });
+                obj.present++;
+            }
+
+            proteinExperimentObject.push(obj);
+        });
+
+        const toAppend = (obj) => {
+            return [
+                $('<p />')
+                    .addClass('grid-item-text')
+                    .css({
+                        'position': 'absolute',
+                        'text-align': 'center',
+                        'width': '100%',
+                        'line-height': '35px',
+                        'font-size': '1.2rem'
+                    })
+                    .text(obj.uniprotId),
+                $('<div />')
+                    .addClass(['experimentNumber', 'grid-item-text'])
+                    .text(obj.present+'/'+obj.total),
+                $('<div />')
+                    .addClass(['correlation', 'grid-item-text'])
+                    .text(obj.correlation)
+            ];
+        };
+
+        HelperFunctions.drawItemsAllExperimentsInOneItem(interactionsGridIdentifier, proteinExperimentObject, toAppend);
+
+        resolve(true);
+    });
 }

@@ -1,73 +1,47 @@
-/**
- * Created by chdallago on 1/5/17.
- */
+// External imports
+const json2csv = require('json2csv').parse;
+
+const UPPER_QUERY_LIMIT = 100;
+const queryParams = (query) => {
+    let s;
+    if(query.search && query.search.constructor === Array && query.search.length > 0) {
+        s = [];
+        query.search.forEach(v => v && v.length > 0 ? s.push(v.toUpperCase()) : '');
+    } else {
+        s = (query.search || '').toUpperCase()
+    }
+    let ret = {
+        search: s,
+        limit: query.limit ? (query.limit > UPPER_QUERY_LIMIT ? 10 : query.limit) : UPPER_QUERY_LIMIT,
+        offset: query.offset || 0,
+        sortBy: query.sortBy || 'id',
+        order: query.order ? (isNaN(parseInt(query.order)) ? 1 : parseInt(query.order)) : 1
+    };
+    return ret;
+}
 
 module.exports = function(context) {
 
     // Imports
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
     const proteinReadsDao = context.component('daos').module('proteinReads');
-    const experimentsDao = context.component('daos').module('experiments');
-
-    // External imports
-    const json2csv = require('json2csv').parse;
 
     return {
         searchByUniprotId: function(request, response) {
-            const identifier = request.params.id.toUpperCase();
+            const query = queryParams(request.body);
+            console.log('query', query);
             const start = new Date();
-            if(identifier === undefined){
-                return response.send([]);
+            if(query.search === ''){
+                return response.status(200).send([]);
             } else {
-                return experimentsDao.getExperiments().then(function(experimentIds) {
-                    return proteinReadsDao.findUniprotIdsLike(identifier).then(function(uniprotIds) {
-                        return temperatureReadsDao.findByUniprotId(identifier).then(function(reads){
-                            let result = uniprotIds.map(function (uniprotId) {
-                                let element = {
-                                    uniprotId: uniprotId.get("uniprotId")
-                                };
-
-                                element.experiments = experimentIds
-                                    .map(function(experimentId) {
-                                        let e = {
-                                            experiment: experimentId.get('id')
-                                        };
-
-                                        e.reads = reads
-                                            .filter(function (tempReads) {
-                                                return tempReads.uniprotId === element.uniprotId && tempReads.experiment === e.experiment;
-                                            })
-                                            .map(function(fullObj) {
-                                                return {
-                                                    t: fullObj.temperature,
-                                                    r: fullObj.ratio,
-                                                }
-                                            });
-
-                                        return e;
-                                    })
-                                    .filter(function(experimentRelativeReads){
-                                        return experimentRelativeReads.reads.length > 0;
-                                    });
-
-                                return element;
-                            });
-                            console.log('duration', (Date.now()-start)/1000)
-                            return response.send(result);
-                        })
-                            .catch(function(error){
-                                console.error(error);
-                                return response.status(500).send(error);
-                            });
+                temperatureReadsDao.findAndAggregateTempsBySimilarUniprotId(query)
+                    .then(results => {
+                        console.log('DURATION searchByUniprotId', (Date.now()-start)/1000)
+                        return response.status(200).send(results);
                     })
-                        .catch(function(error){
-                            console.error(error);
-                            return response.status(500).send(error);
-                        });
-                })
-                    .catch(function(error){
-                        console.error(error);
-                        return response.status(500).send(error);
+                    .catch(error => {
+                        console.error('searchByUniprotId', error, query);
+                        return response.status(500).send([]);
                     });
             }
         },

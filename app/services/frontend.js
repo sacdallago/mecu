@@ -8,5 +8,6 @@ module.exports = function(context) {
         .get('/downloads', frontendController.downloads)
         .get('/curves', frontendController.curves)
         .get('/search', frontendController.bulkSearch)
-        .get('/protein', frontendController.protein);
+        .get('/protein', frontendController.protein)
+        .get('/complex', frontendController.complex);
 }
