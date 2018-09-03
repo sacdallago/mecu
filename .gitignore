@@ -47,3 +47,8 @@ config.js
 
 .idea/
 .DS_Store
+
+
+# scripts
+scripts/*.json
+scripts/*.sql

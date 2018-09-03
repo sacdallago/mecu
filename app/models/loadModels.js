@@ -14,7 +14,7 @@ module.exports = function(context) {
             model: proteinXcomplexModel,
             unique: false
         },
-        foreignKey: 'uniprodId',
+        foreignKey: 'uniprotId',
         constraints: false
     });
     complexesModel.belongsToMany(proteinsModel, {
