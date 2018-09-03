@@ -3,6 +3,13 @@ const sequelize = require('sequelize');
 module.exports = function(context) {
 
     const model = context.dbConnection.define('complex', {
+        id: {
+            type: sequelize.INTEGER,
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+            unique: true
+        },
         name: {
             type: sequelize.STRING
         },
