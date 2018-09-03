@@ -6,7 +6,7 @@ const cluster           = require('cluster');
 const consoleStamp      = require('console-stamp');
 const path              = require('path');
 
-const seedComplexes =  require('./app/seeds/loadComplexes');
+// const seedComplexes =  require('./app/seeds/loadComplexes');
 
 if (cluster.isMaster) {
     // Setup timestamps for logging
@@ -215,15 +215,6 @@ if (cluster.isMaster) {
         // TODO throw this out, this should only be done once, or when the table is changed
         // force: true -> drops table and recreates it...
         context.dbConnection.sync()
-            // seeding complexes
-            .then(() => {
-                if(context.constants.seedComplexes) {
-                    return seedComplexes(context, './private/010718corum_complexes.json');
-                } else {
-                    return Promise.resolve();
-                }
-            })
-            // Make the process listen to incoming requests
             .then(() => app.listen( app.get('port'), function(){
                     console.log("Express server listening on port ", app.get('port'));
                     console.log("According to your configuration, the webapp is reachable at", address);

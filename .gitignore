@@ -50,5 +50,5 @@ config.js
 
 
 # scripts
-scripts/data/*
-scripts/sql/*
+scripts/*.json
+scripts/*.sql
