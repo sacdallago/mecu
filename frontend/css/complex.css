@@ -49,3 +49,17 @@
 .data-container .column-right .id-and-names-text {
     word-wrap: break-word;
 }
+
+.curves-grid .grid {
+    padding: 10px;
+}
+.curves-grid .grid .selected-curve-dot {
+    visibility: hidden;
+    width: 20px;
+    background: green;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    margin: 5px;
+    border-radius: 10px;
+}
