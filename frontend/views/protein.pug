@@ -8,7 +8,14 @@ block content
         .protein
             h3.protein-name#protein-name
         .experiment
-            h3.experiment-number#experiment-number
+            .experiment-number#experiment-number
+                .dropdown.dropdown-search
+                    input(type='hidden' name='experiments' value='default').text-input
+                    .text
+                        .value Select
+                    .dropdown-icon
+                        i.dropdown.icon
+                    .menu
 
     .protein-container
         .protein-curve#protein-curve
@@ -60,18 +67,6 @@ block content
                     .separator
                     a.value
             
-            .other-experiments#other-experiments
-                h4.comtainer-info Experiments which contain this protein as well:
-                .other-experiments-container
-                    .dropdown
-                        input(type='hidden' name='experiments').text-input
-                        .text
-                            .value Select
-                        .dropdown-icon
-                            i.dropdown.icon
-                        .menu
-                
-                
     .experiments-container#experiments-container
         h3 Experiments with this Protein
         .info Click to select

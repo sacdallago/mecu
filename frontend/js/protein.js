@@ -1,5 +1,5 @@
 let localStorageDeleted = StorageManager.get().length === 0;
-
+const dropDownSelector = '#experiment-number .dropdown';
 
 // grid for experiments which use this protein as well
 const expWithProteinGridIdentifier = '#experiments-container .grid';
@@ -109,6 +109,7 @@ $(document).ready(() => {
         ])
         .then(done => {
             loading = false;
+            $(dropDownSelector).dropdown('restore defaults');
             console.log('done', done);
         })
         .catch(error => {
@@ -163,7 +164,6 @@ const writeProteinMetaData = ({
     }) => {
     return new Promise((resolve, reject) => {
         $('#protein-name').text(uniprotId);
-        $('#experiment-number').text('Experiment: '+experiment);
 
         $('#protein-data .uniprot-id .value')
         .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
@@ -185,13 +185,11 @@ const writeProteinMetaData = ({
 
 const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
     return new Promise((resolve, reject) => {
-        const dropDownContainer = $('#other-experiments .other-experiments-container .dropdown')
-            .addClass(['ui', 'search', 'dropdown']);
+        const dropDownContainer = $(dropDownSelector).addClass(['ui', 'search', 'dropdown']);
         dropDownContainer.dropdown({});
-        $('.protein-container .other-experiments-container .dropdown .search')
-            .css({'padding': '11 20px'})
+        $('#experiment-number .dropdown .search').css({'padding': '11 20px'})
 
-        const menuContainer = $('#other-experiments .dropdown .menu');
+        const menuContainer = $('#experiment-number .dropdown .menu');
         const otherExperiments = [];
         experiments.forEach(experiment => {
             if(experiment != actualExperiment) {
