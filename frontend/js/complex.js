@@ -1,3 +1,23 @@
+let localStorageDeleted = StorageManager.get().length === 0;
+
+// grid proteins from the complex
+const proteinCurvesGridIdentifier = '#curves-grid .grid';
+const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
+    itemSelector: '.grid-item',
+    layoutMode: 'packery',
+    packery: {
+        gutter: 10
+    }
+});
+proteinCurvesGrid.on('click', '.grid-item', function(){
+    const data = $(this).data('grid-item-contents');
+    let dot = $(this).children('.selected-curve-dot');
+    console.log('data', data.obj.uniprotId, data.experiment.experiment);
+    const hasBeenAdded = saveExperimentToLocalStorage(data.obj.uniprotId, data.experiment.experiment);
+    if(hasBeenAdded) dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
+});
+
+
 $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
@@ -24,6 +44,7 @@ $(document).ready(() => {
             .then(([done, proteinCurves]) => {
                 console.log('proteinCurves', proteinCurves);
                 drawCombinedProteinCurves(proteinCurves);
+                drawCurvesItems(proteinCurves);
                 return done;
             })
             .then(done => {
@@ -198,4 +219,52 @@ const drawCombinedProteinCurves = (proteins) => {
 
         resolve(true);
     })
+}
+
+
+const drawCurvesItems = (proteins) => {
+    return new Promise((resolve, reject) => {
+
+        const toAppend = (obj, exp) => {
+            return [
+                $('<p />')
+                    .addClass('grid-item-text')
+                    .css({
+                        'position': 'absolute',
+                        'text-align': 'center',
+                        'width': '100%',
+                        'line-height': '35px',
+                        'font-size': '1.2rem'
+                    })
+                    .text(obj.uniprotId),
+                $('<div />')
+                    .addClass('selected-curve-dot')
+            ];
+        };
+
+        HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteins, toAppend);
+
+        resolve(true);
+    })
+}
+
+
+const saveExperimentToLocalStorage = (protein, experiment) => {
+    let added = true;
+    // if the localStorage hasn't been deleted yet and there are some proteins in it
+    if(!localStorageDeleted && StorageManager.get().length > 0) {
+        added = confirm("There are Proteins still in the local storage. Do you want to overwrite them?");
+        if(added) {
+            StorageManager.clear();
+            console.log('store cleared');
+            localStorageDeleted = true;
+            console.log('adding', {uniprotId: protein, experiment: experiment});
+            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+        }
+    // else just add the protein/experiment pair
+    } else {
+        console.log('adding', {uniprotId: protein, experiment: experiment});
+        StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+    }
+    return added;
 }
