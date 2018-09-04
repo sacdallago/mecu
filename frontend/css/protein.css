@@ -106,26 +106,16 @@
     border-radius: 10px;
 }
 
-.related-complexes .grid .grid-item .grid-item-text {
-    background-color: rgba(255,255,255,0.5);
-    transition-property: opacity;
-    transition-duration: 1s;
-}
-.related-complexes .grid .grid-item:hover .grid-item-text {
-    opacity: 0;
+.related-complexes .grid .grid-item svg{
+    opacity: 0.6;
 }
 
-.related-proteins-container .grid .grid-item .grid-item-text {
-    background-color: rgba(255,255,255,0.5);
-    transition-property: opacity;
-    transition-duration: 1s;
-}
-.related-proteins-container .grid .grid-item:hover .grid-item-text {
-    opacity: 0;
+.related-proteins-container .grid .grid-item svg {
+    opacity: 0.6;
 }
 .related-proteins-container .correlation {
     position: absolute;
     bottom: 1px;
-    left: 3px;
+    right: 3px;
     font-size: 13pt;
 }
