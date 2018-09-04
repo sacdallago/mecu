@@ -1,7 +1,6 @@
 .data-container {
     display: flex;
     flex-wrap: wrap;
-    height: 700px;
 }
 .data-container > * {
     width: 50%;
@@ -9,6 +8,7 @@
 }
 .data-container .column-left {
     min-width: 300px;
+    max-height: 700px;
 }
 
 .data-container .column-right .column-right {
@@ -40,10 +40,12 @@
 }
 .data-container .column-right .id-and-names-list-item {
     display: flex;
-    flex-wrap: wrap;
 
     border-bottom: 0.5px dashed silver;
 }
 .data-container .column-right .id-and-names-id {
     min-width: 80px;
+}
+.data-container .column-right .id-and-names-text {
+    word-wrap: break-word;
 }

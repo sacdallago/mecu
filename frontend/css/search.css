@@ -6,7 +6,7 @@
     width: 700px;
     height: 40px;
     border: 0.5px solid silver;
-    z-index: 1000;
+    z-index: 0;
     opacity: 0.8;
 }
 .search-header .search .field {
