@@ -1,5 +1,5 @@
 let localStorageDeleted = StorageManager.get().length === 0;
-
+const dropDownSelector = '#experiment-number .dropdown';
 
 // grid for experiments which use this protein as well
 const expWithProteinGridIdentifier = '#experiments-container .grid';
@@ -46,7 +46,9 @@ const interactionsGrid = $(interactionsGridIdentifier).isotope({
 interactionsGrid.on('click', '.grid-item', function(){
     const data = $(this).data('grid-item-contents');
     console.log('data', data);
-    // document.location.href = `/complex?id=${data.complexId}&experiment=${data.experiment}`;
+    if(data.obj.experiments.length > 0) {
+        document.location.href = `/protein?protein=${data.obj.uniprotId}&experiment=${data.obj.experimentId}`;
+    }
 });
 
 
@@ -102,11 +104,12 @@ $(document).ready(() => {
                 .then(([proteinInteractions, proteinsContainedInExperiment]) => {
                     console.log('proteinInteractions', proteinInteractions);
                     console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
-                    return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment);
+                    return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, query.experiment);
                 })
         ])
         .then(done => {
             loading = false;
+            $(dropDownSelector).dropdown('restore defaults');
             console.log('done', done);
         })
         .catch(error => {
@@ -161,7 +164,6 @@ const writeProteinMetaData = ({
     }) => {
     return new Promise((resolve, reject) => {
         $('#protein-name').text(uniprotId);
-        $('#experiment-number').text('Experiment: '+experiment);
 
         $('#protein-data .uniprot-id .value')
         .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
@@ -183,21 +185,27 @@ const writeProteinMetaData = ({
 
 const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
     return new Promise((resolve, reject) => {
-        const dropDownContainer = $('#other-experiments .other-experiments-container .dropdown')
-            .addClass(['ui', 'search', 'dropdown']);
+        const dropDownContainer = $(dropDownSelector).addClass(['ui', 'search', 'dropdown']);
         dropDownContainer.dropdown({});
-        $('.protein-container .other-experiments-container .dropdown .search')
-            .css({'padding': '11 20px'})
+        $('#experiment-number .dropdown .search').css({'padding': '11 20px'})
 
-        const menuContainer = $('#other-experiments .dropdown .menu');
+        const menuContainer = $('#experiment-number .dropdown .menu');
         const otherExperiments = [];
         experiments.forEach(experiment => {
             if(experiment != actualExperiment) {
                 otherExperiments.push(
                     $('<a />')
-                    .addClass('item')
-                    .attr({'data-value':experiment, 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
-                    .text('Experiment '+experiment)
+                        .addClass('item')
+                        .attr({'data-value':experiment, 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
+                        .text('Experiment '+experiment)
+                )
+            } else {
+                otherExperiments.push(
+                    $('<a />')
+                        .addClass('item')
+                        .attr({'data-value':'default', 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
+                        .text('Experiment '+experiment)
+
                 )
             }
         });
@@ -304,7 +312,8 @@ const drawRelatedComplexes = (complexes, actualExperiment) => {
                         'text-align': 'center',
                         'width': '100%',
                         'line-height': '35px',
-                        'font-size': '1.2rem'
+                        'font-size': '1.2rem',
+                        'z-index': 100
                     })
                     .text(obj.uniprotId),
                 $('<div />')
@@ -339,7 +348,7 @@ const saveExperimentToLocalStorage = (protein, experiment) => {
     return added;
 }
 
-const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment) => {
+const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment, experimentId) => {
     return new Promise((resolve,reject) => {
         interactionsGrid.empty();
 
@@ -351,6 +360,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
         let index = 0;
         proteinInteractions.forEach(interaction => {
             const obj = {
+                experimentId: experimentId,
                 interactor1: interaction.interactor1.uniprotId,
                 uniprotId: interaction.interactor2.uniprotId,
                 index: index,
@@ -360,14 +370,6 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
                 present: 1
             };
             index++;
-
-            if(interaction.interactor1.experiments) {
-                obj.experiments.push({
-                    reads: interaction.interactor1.experiments[0].reads,
-                    experiment: interaction.interactor1.uniprotId,
-                    uniprotId: interaction.interactor1.uniprotId
-                });
-            }
 
             if(interaction.interactor2.experiments) {
                 obj.experiments.push({
@@ -393,9 +395,6 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
                         'font-size': '1.2rem'
                     })
                     .text(obj.uniprotId),
-                $('<div />')
-                    .addClass(['experimentNumber', 'grid-item-text'])
-                    .text(obj.present+'/'+obj.total),
                 $('<div />')
                     .addClass(['correlation', 'grid-item-text'])
                     .text(obj.correlation)

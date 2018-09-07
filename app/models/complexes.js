@@ -84,6 +84,9 @@ module.exports = function(context) {
             type: sequelize.DATE(3),
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP(3)'),
             onUpdate: sequelize.literal('CURRENT_TIMESTAMP(3)')
+        },
+        deletedAt: {
+            type: sequelize.DATE(3)
         }
     }, {
         timestamps: false
