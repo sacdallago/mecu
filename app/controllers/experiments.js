@@ -19,17 +19,24 @@ const queryParams = (query) => {
 module.exports = function(context) {
 
     // Imports
+    const proteinsModel = context.component('models').module('proteins');
     const experimentsDao = context.component('daos').module('experiments');
-    const temperatureReadsDao = context.component('daos').module('temperatureReads');
     const proteinReadsDao = context.component('daos').module('proteinReads');
+    const temperatureReadsDao = context.component('daos').module('temperatureReads');
+    const proteinXExperimentModel = context.component('models').module('proteinXexperiments');
+    const experimentXProteinReadModel = context.component('models').module('experimentXproteinReads');
+    const proteinXProteinReadModel = context.component('models').module('proteinXproteinReads');
+    const proteinXTemperatureReadModel = context.component('models').module('proteinXtemperatureReads');
+    const experimentXTemperatureReadModel = context.component('models').module('experimentXtemperatureReads');
 
     return {
         uploadExperiment: function(request, response) {
+            const uploadExperimentStartTime = new Date();
             if(request.is('multipart/form-data')) {
                 const form = new formidable.IncomingForm();
 
                 form.parse(request, function(error, fields, files) {
-                    var data = files.data;
+                    let data = files.data;
                     const lysate = function(){
                         if(fields.lysate !== undefined){
                             return fields.lysate == "on";
@@ -75,62 +82,137 @@ module.exports = function(context) {
                             uploader: request.user.get('googleId')
                         };
 
-                        return context.dbConnection.transaction(function(transaction){
-                            return experimentsDao.create(newExperiment, {transaction: transaction}).then(function(experiment){
+                        return context.dbConnection.transaction(transaction => {
+                            // create the initial experiment
+                            return experimentsDao.create(newExperiment, {transaction: transaction, returning: true})
+                                .then(experiment => {
 
-                                // TODO - this can be implemented as a view if sequelize ever supports this, or once the Postgres equivalent of ON DUPLICATE IGNORE will be approved in sequelize https://github.com/sequelize/sequelize/pull/6325
-//                                let proteins = data.map(function(element){
-//                                    return {
-//                                        uniprotId: element.uniprotId,
-//                                        primaryGene: element.primaryGene
-//                                    }
-//                                });
+                                    let proteinList = new Set();
 
-                                let proteinReads = data.map(function(element){
-                                     result = {
-                                        uniprotId: element.uniprotId,
-                                        experiment: experiment.id,
-                                        peptides: element.peptides,
-                                        psms: element.psms,
-                                    };
+                                    let proteinReads = data.map(element => {
+                                        proteinList.add(element.uniprotId);
+                                        return {
+                                            uniprotId: element.uniprotId,
+                                            experiment: experiment.id,
+                                            peptides: element.peptides,
+                                            psms: element.psms,
+                                            totalExpt: isNaN(element.totalExpt) ? undefined : element.totalExpt
+                                        };
+                                    });
+                                    proteinList = Array.from(proteinList);
 
-                                    result.totalExpt = isNaN(element.totalExpt) ? undefined : element.totalExpt;
-
-                                    return result;
-                                });
-
-                                return proteinReadsDao.bulkCreate(proteinReads, {transaction: transaction}).then(function(){
-                                    let meltingReads = data
-                                        .map(function(element){
-                                            return element.reads.map(function(tempRead){
-                                                tempRead.uniprotId= element.uniprotId;
-                                                tempRead.experiment= experiment.id;
-                                                return tempRead;
-                                            });
-                                        })
-                                        .reduce(function(elements,element){
-                                            return elements.concat(element);
+                                    let meltingReads = data.map(element => {
+                                        return element.reads.map(tempRead => {
+                                            tempRead.uniprotId = element.uniprotId;
+                                            tempRead.experiment = experiment.id;
+                                            return tempRead;
                                         });
+                                    }).reduce((elements,element) => elements.concat(element));
 
-                                    return temperatureReadsDao.bulkCreate(meltingReads, {transaction: transaction}).then(function(){
-                                        return true;
+                                    // create proteins, necessary for the rest of the m-to-n relationships
+                                    let p = Promise.resolve();
+                                    const proteinsCreateStartTime = new Date();
+                                    proteinList.forEach(protein => {
+                                        p = p.then(() => proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}));
+                                    });
+
+                                    return p
+                                        // Promise.all(
+                                        //     proteinList.map(protein =>
+                                        //         proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}})
+                                        //             // HACK: UGLY FUCKING HARD HACK
+                                        //             // the timeout for sequelize querys can be set initially in the settings, however, setting it to 2min for every query is bad practice
+                                        //             // the problem is, the timer starts when the promise is executed (e.g. proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}))
+                                        //             // this means, in this map (here), there could X querys executed parallel, but the db driver can only handle so much at a time, resulting in some
+                                        //             // querys to wait forever, which will then time out...
+                                        //             // this is the only fast (BAD) solution i found to be working
+                                        //             // with more than 8k proteins to be added, this fails as well
+                                        //             // CORRECT WAY: use .bulkCreate, which fails when the protein already exists (postgres ON DUPLICATE DO NOTHING is not yet supported by sequelize yay)
+                                        //             // CORRECT WAY2: use .findOrCreate sequentially (this takes, for 8100 proteins, about 100 seconds, if all proteins have to be created (O.O), otherwise 8 seconds)
+                                        //             // decided to do it the correct2 way, it works, but takes a long time
+                                        //             .catch(() => proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}))
+                                        //     )
+                                        // )
+                                        .then(() => {
+                                            console.log(`DURATION proteinsModel.findOrCreate(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
+                                        })
+                                        // protein X experiment table
+                                        .then(() => proteinXExperimentModel.bulkCreate(
+                                                proteinList.map(protein => ({
+                                                    uniprotId: protein,
+                                                    experimentId: experiment.id
+                                                })),
+                                                {transaction: transaction, returning: true}
+                                            )
+                                        )
+                                        .then(proteinsXExperimentsCreated => {
+
+                                            return Promise.all([
+                                                // proteinReads
+                                                proteinReadsDao.bulkCreate(proteinReads, {transaction: transaction, returning: true})
+                                                    .then(proteinReadsDaoBulkCreateResult => {
+
+                                                        const experimentXProteinRead = [];
+                                                        const proteinXProteinRead = [];
+                                                        proteinReadsDaoBulkCreateResult.forEach(proteinRead => {
+                                                            experimentXProteinRead.push({
+                                                                experimentId: experiment.id,
+                                                                proteinReadId: proteinRead.dataValues.id
+                                                            });
+                                                            proteinXProteinRead.push({
+                                                                uniprotId: proteinRead.dataValues.uniprotId,
+                                                                proteinReadId: proteinRead.dataValues.id
+                                                            });
+                                                        });
+                                                        return Promise.all([
+                                                            // experiment X proteinReads
+                                                            experimentXProteinReadModel.bulkCreate(experimentXProteinRead, {transaction: transaction, returning: true}),
+                                                            // protein X proteinReads
+                                                            proteinXProteinReadModel.bulkCreate(proteinXProteinRead, {transaction: transaction, returning: true})
+                                                        ]);
+                                                    }),
+                                                // temperatureReads
+                                                temperatureReadsDao.bulkCreate(meltingReads, {transaction: transaction, returning: true})
+                                                    .then(temperatureReadsDaoBulkCreateResult => {
+
+                                                        const experimentXTemperatureRead = [];
+                                                        const proteinXTemperatureRead = [];
+                                                        temperatureReadsDaoBulkCreateResult.forEach(temperatureRead => {
+                                                            experimentXTemperatureRead.push({
+                                                                experimentId: experiment.id,
+                                                                temperatureReadId: temperatureRead.dataValues.id
+                                                            });
+                                                            proteinXTemperatureRead.push({
+                                                                uniprotId: temperatureRead.dataValues.uniprotId,
+                                                                temperatureReadId: temperatureRead.dataValues.id
+                                                            });
+                                                        });
+                                                        return Promise.all([
+                                                            // experiment X temperatureReads
+                                                            experimentXTemperatureReadModel.bulkCreate(experimentXTemperatureRead, {transaction: transaction, returning: true}),
+                                                            // protein X temperatureReads
+                                                            proteinXTemperatureReadModel.bulkCreate(proteinXTemperatureRead,{transaction: transaction, returning: true})
+                                                        ]);
+                                                    })
+                                            ]);
                                     });
                                 });
+                        })
+                        .then(result => {
+                            console.log('DURATION TOTAL uploadExperiment', (Date.now()-uploadExperimentStartTime)/1000);
+                            return response.status(201).render('success', {
+                                title: 'Success',
+                                message: "Your data has been added to the database!"
                             });
                         })
-                            .then(function(result){
-                                return response.status(201).render('success', {
-                                    title: 'Success',
-                                    message: "Your data has been added to the database!"
-                                });
-                            })
-                            .catch(function(error){
-                                return response.status(500).render('error', {
-                                    title: 'Error',
-                                    message: "Unable to create experiment",
-                                    error: error
-                                });
+                        .catch(error => {
+                            console.error(`uploadExperiment`, error.message, error);
+                            return response.status(500).render('error', {
+                                title: 'Error',
+                                message: "Unable to create experiment",
+                                error: JSON.stringify(error)
                             });
+                        });
                     });
                 });
             } else {
