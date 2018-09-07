@@ -1,9 +1,10 @@
 const fs = require('fs');
+const FILE_TO_CREATE_NAME = 'PROTEINXPROTEIN.sql';
 
 const load = function(filePath) {
     return loadFileAndParseAttributes(filePath)
         .then(data => createInsertIntoFile(data))
-        .then(() => console.log(`created files:\n\t\tP_1_protein.sql\n\t\tP_2_proteinXprotein.sql\nExecute in this order!`))
+        .then(() => console.log(`created files:\n\t\t${FILE_TO_CREATE_NAME}\n`))
         .catch(e => console.error('Problem seeding protein x protein', e));
 }
 
@@ -85,16 +86,16 @@ const createInsertIntoFile = (data) => {
             protein_string += `INSERT INTO public.proteins VALUES `+
             `('${protein}', '${new Date().toUTCString()}', '${new Date().toUTCString()}')  ON CONFLICT DO NOTHING;\n`;
         });
-        fs.writeFileSync('scripts/P_2_proteinXprotein.sql', protein_proteins_string, {flag: 'w'}, function (err) {
+        fs.writeFileSync('scripts/'+FILE_TO_CREATE_NAME, protein_string, {flag: 'w'}, function (err) {
             if (err) {
                 console.log('appending error', err)
             }
         });
-        fs.writeFileSync('scripts/P_1_protein.sql', protein_string, {flag: 'w'}, function (err) {
+        fs.appendFileSync('scripts/'+FILE_TO_CREATE_NAME, protein_proteins_string, function (err) {
             if (err) {
                 console.log('appending error', err)
             }
-        })
+        });
     } catch(e) {
         console.log('e', e);
     }

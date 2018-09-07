@@ -86,7 +86,6 @@ module.exports = function(context) {
                     GROUP BY pr."experiment", pr."uniprotId"
                 ) t;
             `;
-            console.warn(`findAndAggregateTempsBySimilarUniprotId still uses SQL query`);
             return Promise.all([
                     context.dbConnection.query(
                         sqlQuery,

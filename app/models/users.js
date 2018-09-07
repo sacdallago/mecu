@@ -20,6 +20,9 @@ module.exports = function(context) {
             type: sequelize.BOOLEAN,
             allowNull: false,
             defaultValue: false
+        },
+        deletedAt: {
+            type: sequelize.DATE(3)
         }
     });
 };

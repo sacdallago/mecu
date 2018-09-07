@@ -39,5 +39,8 @@ module.exports = function(context) {
                 deferrable: sequelize.Deferrable.INITIALLY_IMMEDIATE
             }
         },
+        deletedAt: {
+            type: sequelize.DATE(3)
+        }
     });
 };

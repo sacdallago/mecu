@@ -1,4 +1,6 @@
 const fs = require('fs');
+const FILE_TO_CREATE_NAME = 'COMPLEXES.sql';
+
 
 const load = function(filePath) {
 
@@ -8,9 +10,7 @@ const load = function(filePath) {
             return complexes;
         })
         .then(complexes => createComplexesAndMtoNSQL(complexes))
-        .then(() => {
-            console.log(`Created files:\n\t\tscripts/C_1_proteins.sql\n\t\tscripts/C_2_complexes.sql\n\t\tscripts/C_3_proteinXcomplexes.sql\nExecute them in this order!`)
-        })
+        .then(() => console.log(`Created files:\n\t\tscripts/${FILE_TO_CREATE_NAME}\n`))
         .catch(e => console.error('Problem seeding', e));
 }
 
@@ -104,7 +104,7 @@ const createProteinSql = (proteins) => {
         `('${protein}', '${new Date().toUTCString()}', '${new Date().toUTCString()}')  ON CONFLICT DO NOTHING;\n`;
     });
 
-    fs.writeFileSync('scripts/C_1_proteins.sql', protein_string, {flag: 'w'}, function (err) {
+    fs.writeFileSync('scripts/'+FILE_TO_CREATE_NAME, protein_string, {flag: 'w'}, function (err) {
         if (err) {
             console.log('appending error', err)
         }
@@ -159,12 +159,12 @@ const createComplexesAndMtoNSQL = (complexes) => {
         })
     });
 
-    fs.writeFileSync('scripts/C_2_complexes.sql', complexes_string, {flag: 'w'}, function (err) {
+    fs.appendFileSync('scripts/'+FILE_TO_CREATE_NAME, complexes_string, function (err) {
         if (err) {
             console.log('appending error', err)
         }
     });
-    fs.writeFileSync('scripts/C_3_proteinXcomplex.sql', m_to_n_string, {flag: 'w'}, function (err) {
+    fs.appendFileSync('scripts/'+FILE_TO_CREATE_NAME, m_to_n_string, function (err) {
         if (err) {
             console.log('appending error', err)
         }
