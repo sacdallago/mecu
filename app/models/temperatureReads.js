@@ -23,30 +23,11 @@ module.exports = function(context) {
             type: sequelize.INTEGER,
             unique: '_id',
             allowNull: false,
-            onDelete: "CASCADE",
-            onUpdate: "CASCADE",
-            references: {
-                // This is a reference to another model
-                model: experimentsModel,
-
-                // This is the column name of the referenced model
-                key: 'id',
-
-                // This declares when to check the foreign key constraint. PostgreSQL only.
-                deferrable: sequelize.Deferrable.INITIALLY_IMMEDIATE
-            }
         },
         uniprotId: {
             type: sequelize.STRING,
             unique: '_id',
             allowNull: false,
-//            TODO - Reference can be used when postgres ignore duplicate will be implemented, follow https://github.com/sequelize/sequelize/pull/6325
-//            references: {
-//                model: proteinsModel,
-//                key: 'uniprotId',
-//                deferrable: sequelize.Deferrable.INITIALLY_IMMEDIATE,
-//                onDelete: "CASCADE"
-//            }
         },
         temperature: {
             type: sequelize.INTEGER,
