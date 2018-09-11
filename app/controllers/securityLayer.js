@@ -6,7 +6,7 @@
 module.exports = function(context) {
     return {
         allowedPostRequests: function(request, response, next){
-            if(request.user.get("allowPost") == true){
+            if(request.user.get('allowPost') == true){
                 next();
             } else {
                 response.status(403).render('error', {

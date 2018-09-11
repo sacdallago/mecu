@@ -233,6 +233,28 @@ module.exports = function(context) {
                 });
         },
 
+        getExperiment: function(request, response) {
+            console.log('request.params', request.params);
+            experimentsDao.findExperiment(request.params.id)
+                .then(r => {
+                    console.log('r', r);
+                    return r;
+                })
+                .then(toSend => {
+                    console.log('t', toSend.private)
+                    if(toSend.private === true && toSend.uploader !== request.user.get('uploader')){
+                        console.error('not the owner of the experiment');
+                        throw new Error('Not the owner of the experiment')
+                    }
+                    return toSend;
+                })
+                .then(toSend => response.status(200).send(toSend))
+                .catch(error => {
+                    console.error('getExperiment', error);
+                    return response.status(500).send(error);
+                });
+        },
+
         getExperiments: function(request, response) {
             experimentsDao.getExperimentsPaged(queryParams(request.query))
                 .then(result => response.status(200).send(result))
