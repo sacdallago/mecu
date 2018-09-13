@@ -238,16 +238,16 @@ module.exports = function(context) {
         getExperiment: function(request, response) {
             console.log('request.params', request.params);
             experimentsDao.findExperiment(request.params.id)
-                .then(r => {
-                    console.log('r', r);
-                    return r;
-                })
                 .then(toSend => {
-                    console.log('t', toSend.private)
-                    if(toSend.private === true && toSend.uploader !== request.user.get('uploader')){
+                    if(toSend.private === true && toSend.uploader !== request.user.get('googleId')){
                         console.error('not the owner of the experiment');
-                        throw new Error('Not the owner of the experiment')
+                        toSend = {error: 'You are not the owner of the experiment and the experiment is not open to be viewed by others'};
                     }
+
+                    if(toSend.uploader === request.user.get('googleId')){
+                        toSend.isUploader = true;
+                    }
+
                     return toSend;
                 })
                 .then(toSend => response.status(200).send(toSend))
