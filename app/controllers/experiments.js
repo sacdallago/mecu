@@ -39,13 +39,13 @@ module.exports = function(context) {
                     let data = files.data;
                     const lysate = function(){
                         if(fields.lysate !== undefined){
-                            return fields.lysate == "on";
+                            return fields.lysate == 'on';
                         }
-                        return false
+                        return false;
                     }();
-                    const description = fields.description;
+                    const name = fields.description;
 
-                    if(error || data === undefined || lysate === undefined || description === undefined){
+                    if(error || data === undefined || lysate === undefined || name === undefined){
                         response.status(403).render('error', {
                             title: 'Error',
                             message: "Unable to post request",
@@ -76,8 +76,10 @@ module.exports = function(context) {
                         data = mecuUtils.parse(data);
 
                         let newExperiment = {
-                            lysate: lysate,
-                            description: description,
+                            name: name,
+                            metaData: {
+                                lysate: lysate
+                            },
                             rawData: data,
                             uploader: request.user.get('googleId')
                         };
