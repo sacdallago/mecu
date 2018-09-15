@@ -1,11 +1,37 @@
 extends base
 
 block postStyles
-    //- link(rel='stylesheet', href='/public/css/experiment.css')
+    link(rel='stylesheet', href='/public/css/experiment.css')
     link(rel='stylesheet', href='/public/css/pagination.css')
 
 block content
-    h3 Experiment
+    h3
+        span Experiment: 
+        span#experiment-id
+    .experiment-container#experiment-container
+        .name
+            .text Name
+            .value 
+        .uploader
+            .text Uploader
+            .value 
+        .is-private
+            .text Is private
+            .value 
+            
+    .meta-data#meta-data
+        .description
+            .text Description
+            .value
+        .lysate
+            .text Lysate
+            .value 
+    
+    .save-experiment-button-container#save-experiment-button-container
+    
+    .experiment-statistics#experiment-statistics
+    
+    .error-container#error-container
 
 block settings
     .divider

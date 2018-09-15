@@ -1,0 +1,66 @@
+.experiment-container, .meta-data, .save-experiment-button-container {
+    border: 0.5px solid silver;
+    padding: 10px;
+    margin: 5px;
+    background-color: #EEEEEE;
+}
+
+.save-experiment-button-container {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+}
+
+.experiment-container > *, .meta-data > * {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    min-height: 2.3em;
+    max-height: 4em;
+    border-bottom: 0.5px solid silver;
+    padding: 2px;
+}
+
+.experiment-container .name .value {
+    width:100%;
+}
+.experiment-container .name .value input {
+    text-align: right;
+}
+.experiment-container .uploader .value a {
+    word-break: break-all;
+}
+
+.text {
+    min-width: 150px;
+}
+.value {
+
+}
+.description {
+    min-height: 100px;
+}
+.description .value {
+    width: 100%;
+}
+
+input {
+    width: 100%;
+    border: none;
+}
+textarea {
+    resize: none;
+    width: 100%;
+    border: none;
+    min-height: 100px;
+}
+select {
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid lightgrey;
+    background-color: #EEEEEE;
+}
+select:focus {
+    outline: none;
+}

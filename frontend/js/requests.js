@@ -67,6 +67,23 @@ ExperimentService.paginatedExperiments = (queryObj) => {
             return [];
         });
 }
+ExperimentService.updateExperiment = (id, experiment) => {
+    return fetch( // edge and IE do not support https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams , consider polyfills?
+            `/api/experiment/${id}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify(experiment)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ExperimentService.updateExperiment: ', error, id, experiment);
+            return [];
+        });
+}
 ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
     return fetch(`/api/experiments/containing/${uniprotId}`)
         .then(resp => resp.json())
