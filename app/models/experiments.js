@@ -6,7 +6,7 @@ module.exports = function(context) {
 
     return context.dbConnection.define('experiment', {
         name: {
-            type: sequelize.STRING,
+            type: sequelize.TEXT,
             allowNull: false
         },
         metaData: {
