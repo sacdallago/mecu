@@ -257,6 +257,23 @@ module.exports = function(context) {
                 });
         },
 
+        updateExperiment: function(request, response) {
+            console.log('request.params', request.params);
+            console.log('request.body', request.body);
+            if(request.params.id && request.body) {
+                let experimentToUpdate = request.body;
+                delete experimentToUpdate.id;
+                experimentsDao.update(request.params.id, experimentToUpdate)
+                    .then(([amountUpdated, updatedArray]) => updatedArray.length > 0 ? updatedArray[0]: {})
+                    .then(toSend => response.status(200).send(toSend))
+                    .catch(error => {
+                        console.error('updateExperiment', error);
+                        return response.status(500).send(error);
+                    });
+
+            }
+        },
+
         getExperiments: function(request, response) {
             experimentsDao.getExperimentsPaged(queryParams(request.query))
                 .then(result => response.status(200).send(result))

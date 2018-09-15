@@ -25,6 +25,18 @@ module.exports = function(context) {
                 .then(result => result.length > 0 ? result[0].dataValues : {})
         },
 
+        update: function(id, update) {
+            return experimentsModel.update(
+                update,
+                {
+                    returning: true,
+                    where: {
+                        id: id
+                    }
+                }
+            );
+        },
+
         getExperimentsPaged: function(options) {
             // add search if necessary
             return Promise.all([

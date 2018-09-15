@@ -7,6 +7,7 @@ module.exports = function(context) {
         // .get('/experiment/:id', experimentsController.getExperiment) // to implement if necessary
         .get('/experiment/raw/:id', experimentsController.getRawData)
         .get('/experiment/:id', securityController.loggedIn, experimentsController.getExperiment)
+        .post('/experiment/:id', securityController.loggedIn, experimentsController.updateExperiment)
         .post('/experiment', securityController.loggedIn, securityController.allowedPostRequests, experimentsController.uploadExperiment)
         .get('/experiments', experimentsController.getExperiments)
         .get('/experiments/proteins/:id', experimentsController.getProteinsInExperiment)
