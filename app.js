@@ -214,6 +214,7 @@ if (cluster.isMaster) {
         // Sync the database --> Write table definitions
         // TODO throw this out, this should only be done once, or when the table is changed
         // force: true -> drops table and recreates it...
+        // context.dbConnection.sync({force: true}) // this DROPS ALL TABLES and recreates them
         context.dbConnection.sync()
             .then(() => app.listen( app.get('port'), function(){
                     console.log("Express server listening on port ", app.get('port'));

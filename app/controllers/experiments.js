@@ -39,13 +39,13 @@ module.exports = function(context) {
                     let data = files.data;
                     const lysate = function(){
                         if(fields.lysate !== undefined){
-                            return fields.lysate == "on";
+                            return fields.lysate == 'on';
                         }
-                        return false
+                        return false;
                     }();
-                    const description = fields.description;
+                    const name = fields.description;
 
-                    if(error || data === undefined || lysate === undefined || description === undefined){
+                    if(error || data === undefined || lysate === undefined || name === undefined){
                         response.status(403).render('error', {
                             title: 'Error',
                             message: "Unable to post request",
@@ -76,8 +76,10 @@ module.exports = function(context) {
                         data = mecuUtils.parse(data);
 
                         let newExperiment = {
-                            lysate: lysate,
-                            description: description,
+                            name: name,
+                            metaData: {
+                                lysate: lysate
+                            },
                             rawData: data,
                             uploader: request.user.get('googleId')
                         };
@@ -231,6 +233,45 @@ module.exports = function(context) {
                     console.error('getExperiment', error);
                     return response.status(500).send(error);
                 });
+        },
+
+        getExperiment: function(request, response) {
+            console.log('request.params', request.params);
+            experimentsDao.findExperiment(request.params.id)
+                .then(toSend => {
+                    if(toSend.private === true && toSend.uploader !== request.user.get('googleId')){
+                        console.error('not the owner of the experiment');
+                        toSend = {error: 'You are not the owner of the experiment and the experiment is not open to be viewed by others'};
+                    }
+
+                    if(toSend.uploader === request.user.get('googleId')){
+                        toSend.isUploader = true;
+                    }
+
+                    return toSend;
+                })
+                .then(toSend => response.status(200).send(toSend))
+                .catch(error => {
+                    console.error('getExperiment', error);
+                    return response.status(500).send(error);
+                });
+        },
+
+        updateExperiment: function(request, response) {
+            console.log('request.params', request.params);
+            console.log('request.body', request.body);
+            if(request.params.id && request.body) {
+                let experimentToUpdate = request.body;
+                delete experimentToUpdate.id;
+                experimentsDao.update(request.params.id, experimentToUpdate)
+                    .then(([amountUpdated, updatedArray]) => updatedArray.length > 0 ? updatedArray[0]: {})
+                    .then(toSend => response.status(200).send(toSend))
+                    .catch(error => {
+                        console.error('updateExperiment', error);
+                        return response.status(500).send(error);
+                    });
+
+            }
         },
 
         getExperiments: function(request, response) {

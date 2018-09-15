@@ -49,6 +49,14 @@ module.exports = function(context) {
             return response.render('complex', {title: 'Complex'});
         },
 
+        experiments: function(request, response) {
+            return response.render('experiments', {title: 'Experiments'});
+        },
+
+        experiment: function(request, response) {
+            return response.render('experiment', {title: `Experiment ${request.query.id}`});
+        },
+
         uploadExperiment: function(request, response) {
             return response.render('experimentUpload', {
                 title: 'Upload'

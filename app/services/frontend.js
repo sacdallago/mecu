@@ -9,5 +9,7 @@ module.exports = function(context) {
         .get('/curves', frontendController.curves)
         .get('/search', frontendController.bulkSearch)
         .get('/protein', frontendController.protein)
-        .get('/complex', frontendController.complex);
+        .get('/complex', frontendController.complex)
+        .get('/experiments', frontendController.experiments)
+        .get('/experiment', frontendController.experiment);
 }
