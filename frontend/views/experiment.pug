@@ -8,7 +8,7 @@ block content
     h3
         span Experiment: 
         span#experiment-id
-    .experiment-container#experiment-container
+    .experiment-container.data-container#experiment-container
         .name
             .text Name
             .value 
@@ -19,7 +19,7 @@ block content
             .text Is private
             .value 
             
-    .meta-data#meta-data
+    .meta-data.data-container#meta-data
         .description
             .text Description
             .value
@@ -27,15 +27,16 @@ block content
             .text Lysate
             .value 
     
-    .save-experiment-button-container#save-experiment-button-container
+    .save-experiment-button-container.data-container#save-experiment-button-container
     
-    .experiment-statistics#experiment-statistics
+    .experiment-statistics.data-container#experiment-statistics
     
-    .error-container#error-container
+    .error-container.data-container#error-container
 
 block settings
     .divider
     a(href='/search').item Search
+    a(href='/experiments').item Search Experiments
     a(href='/curves').item Selected Curves
 
 block scripts

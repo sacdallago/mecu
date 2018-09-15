@@ -1,4 +1,4 @@
-.experiment-container, .meta-data, .save-experiment-button-container {
+.data-container {
     border: 0.5px solid silver;
     padding: 10px;
     margin: 5px;
@@ -24,6 +24,9 @@
 
 .experiment-container .name .value {
     width:100%;
+}
+.experiment-container .name .value {
+    text-align: right;
 }
 .experiment-container .name .value input {
     text-align: right;

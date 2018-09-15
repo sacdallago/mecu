@@ -1,12 +1,12 @@
 const experimentContainerIdentifier = '#experiment-container';
 const metaDataContaierIdentifier = '#meta-data';
-const errorContainerIdentifier = '#error-container';
 const saveExperimentButtonContainerIdentifier = '#save-experiment-button-container';
+const experimentsStatisticsContainerIdentifier = '#experiment-statistics';
+const errorContainerIdentifier = '#error-container';
 
 $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
-    console.log('query', query);
     if(query.id) {
 
         $('#experiment-id').text(query.id);
@@ -27,6 +27,8 @@ const drawError = (error) => {
     $(experimentContainerIdentifier).css({'display':'none'});
     $(metaDataContaierIdentifier).css({'display':'none'});
     $(errorContainerIdentifier).append($('<div />').text(error));
+    $(saveExperimentButtonContainerIdentifier).removeClass('data-container');
+    $(experimentsStatisticsContainerIdentifier).removeClass('data-container');
 };
 
 const drawExperiment = (experiment) => {
@@ -50,6 +52,10 @@ const drawExperimentConstant = (experiment) => {
     // meta-data
     $(metaDataContaierIdentifier+' .description .value').text(experiment.metaData.description);
     $(metaDataContaierIdentifier+' .lysate .value').text(experiment.metaData.lysate === true ? 'yes' : 'no');
+
+    $(saveExperimentButtonContainerIdentifier).removeClass('data-container');
+    $(experimentsStatisticsContainerIdentifier).removeClass('data-container');
+    $(errorContainerIdentifier).removeClass('data-container');
 }
 
 const drawExperimentMutable = (experiment) => {
@@ -78,6 +84,9 @@ const drawExperimentMutable = (experiment) => {
     );
 
     drawSaveButton();
+
+    $(experimentsStatisticsContainerIdentifier).removeClass('data-container');
+    $(errorContainerIdentifier).removeClass('data-container');
 }
 
 const drawSaveButton = () => {
