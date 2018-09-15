@@ -11,13 +11,13 @@ module.exports = function(context) {
 
         getExperiments: function(options = {}){
             return experimentsModel.findAll({
-                attributes: ['id', 'lysate', 'description', 'uploader'],
+                attributes: ['id', 'name', 'uploader'],
             });
         },
 
         findExperiment: function(id) {
             return experimentsModel.findAll({
-                    attributes: ['id', 'lysate', 'description', 'metaData', 'uploader', 'private', 'createdAt', 'updatedAt'],
+                    attributes: ['id', 'name', 'metaData', 'uploader', 'private', 'createdAt', 'updatedAt'],
                     where: {
                         id: id
                     }
@@ -30,7 +30,7 @@ module.exports = function(context) {
             return Promise.all([
                     experimentsModel.count(),
                     experimentsModel.findAll({
-                        attributes: ['id', 'lysate', 'description', 'uploader'],
+                        attributes: ['id', 'name', 'metaData', 'uploader'],
                         limit: options.limit,
                         offset: options.offset,
                         order: [

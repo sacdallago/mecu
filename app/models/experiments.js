@@ -5,12 +5,7 @@ module.exports = function(context) {
     const userModel = context.component('models').module('users');
 
     return context.dbConnection.define('experiment', {
-        lysate: {
-            type: sequelize.BOOLEAN,
-            defaultValue: false,
-            allowNull: false
-        },
-        description: {
+        name: {
             type: sequelize.STRING,
             allowNull: false
         },
