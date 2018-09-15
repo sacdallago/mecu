@@ -11,6 +11,7 @@ const pullPaginatedExperiments = (query, page) => {
     return ExperimentService.paginatedExperiments(query)
         .then(result => {
             // draw the data retrieved onto the experiments table
+            console.log('result', result);
             drawExperimentsTable(result.data, 'exp-table-cb');
 
             return result;
@@ -50,8 +51,7 @@ const drawExperimentsTable = (data, checkboxIdentifier) => {
         let cbAttriutes = {'id':'cbE'+exp.id, 'data-id':exp.id};
 
         row.append(td.clone().text(exp.id));
-        row.append(td.clone().text(exp.description));
-        row.append(td.clone().text(exp.lysate));
+        row.append(td.clone().text(exp.name));
         row.append(
             td.clone().append(
                 link.clone()
