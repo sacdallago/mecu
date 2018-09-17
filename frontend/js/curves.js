@@ -1,11 +1,3 @@
-/**
- * Created by chdallago on 1/13/17.
- */
-
- // $.fn.api.settings.api = {
- //     'get list of proteins with experiments and data': '/api/protein/search/exp/'
- // };
-
 const grid = $('.isoGrid').isotope({
     // main isotope options
     itemSelector: '.grid-item',
@@ -18,22 +10,26 @@ const grid = $('.isoGrid').isotope({
 
 grid.on('click', '.grid-item', function(){
     let self = this;
-    return StorageManager.toggle($(this).data('protein'), function(inStorage, added, removed) {
-        if(added === 0){
-            $(self).removeClass('inStore');
-        } else if(removed === 0) {
-            $(self).addClass('inStore');
-        } else {
-            if ($(self).hasClass('inStore')){
+    return StorageManager.toggle(
+        $(this).data('protein'),
+        function(inStorage, added, removed) {
+            if(added === 0){
                 $(self).removeClass('inStore');
+            } else if(removed === 0) {
+                $(self).addClass('inStore');
+            } else {
+                if ($(self).hasClass('inStore')){
+                    $(self).removeClass('inStore');
+                }
+                if (!$(self).hasClass('partiallyInStore')){
+                    $(self).addClass('partiallyInStore');
+                }
             }
-            if (!$(self).hasClass('partiallyInStore')){
-                $(self).addClass('partiallyInStore');
-            }
-        }
 
-        loadProteins();
-    });
+            loadProteins();
+            populateGlobalsGraphs();
+        }
+    );
 });
 
 function loadProteins() {
@@ -42,6 +38,9 @@ function loadProteins() {
 
     // load stored proteins
     let proteins = StorageManager.get();
+    if(proteins.length === 0) {
+        return;
+    }
 
     // move into own (utils?) file
     let createIdOfProt = (protein) => {
@@ -149,7 +148,6 @@ populateGlobalsGraphs();
 loadProteins();
 
 // Change Distance Metrics logic
-
 $('.ui.button.manhattan').on('click', function(event){
     event.preventDefault();
 
