@@ -5,7 +5,7 @@ module.exports = function(context) {
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
 
     return {
-        
+
         getById: function(request, response) {
             complexesDao.getComplex(request.params.id)
                 .then(result => response.status(200).send(result))
@@ -55,7 +55,7 @@ module.exports = function(context) {
                                 complex.proteins[i] = {uniprotId: p};
                             }
                         })
-                    })
+                    });
                     return result[0];
                 })
                 .then(result => {

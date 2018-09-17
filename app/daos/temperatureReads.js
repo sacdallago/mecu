@@ -108,22 +108,23 @@ module.exports = function(context) {
         },
 
         findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs) {
-            // create where clause
-            // console.log('uniprodIdExpIdPairs', uniprodIdExpIdPairs);
-            // TODO bad way to create where, refactor!
-            let where = ' where (';
-            uniprodIdExpIdPairs.forEach((e, i, a) => {
-                let tmp = `(pr."uniprotId" = '`+e.uniprotId+`' AND `;
-                tmp += `pr.experiment = '`+e.experiment+`')`;
 
-                if(i != uniprodIdExpIdPairs.length-1) {
-                    tmp+=' OR ';
-                }
-                where += tmp;
+            const replacements = {};
+            let whereClause = 'WHERE (';
+            uniprodIdExpIdPairs.forEach((v,i,a) => {
+                if(i != 0) {
+                    whereClause += ' or '
+                };
+                let replStrExp = 'Exp'+i;
+                let replStrPrt = 'Prt'+i;
+                whereClause += `(pr."uniprotId" = :${replStrPrt} AND pr."experiment" = :${replStrExp})`;
+                replacements[replStrPrt] = v.uniprotId;
+                replacements[replStrExp] = v.experiment;
             });
-            where += ')';
             if(uniprodIdExpIdPairs.length === 0) {
-                where = '';
+                whereClause = '';
+            } else {
+                whereClause += ') ';
             }
 
             const query = `
@@ -131,12 +132,12 @@ module.exports = function(context) {
                 from (
                   SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
                   FROM "temperatureReads" pr
-                  `+where+`
+                  ${whereClause}
                   GROUP BY pr."experiment", pr."uniprotId"
                 ) tmp
                 group by tmp."uniprotId"
             `;
-            // console.warn(`findAndAggregateTempsByIdAndExperiment still uses SQL query`);
+            // console.warn(`findAndAggregateTempsByIdAndExperiment SQL query: ${query}`);
             /*
             for the whole database
             Planning time: 0.147 ms
@@ -145,51 +146,11 @@ module.exports = function(context) {
 
             return context.dbConnection.query(
                 query,
+                {replacements: replacements},
                 {type: sequelize.QueryTypes.SELECT}
-            );
+            )
+            .then(r => r.length > 0 ? r[0] : {});
 
-            // TODO better solution for the above query, but subquerys are not supported
-            // find better way to impl
-            //
-            // let where = {
-            //     [sequelize.Op.or]: uniprodIdExpIdPairs
-            // };
-            //
-            //
-            // return temperatureReadsModel.findAll({
-            //     raw: true,
-            //     attributes: [
-            //         'experiment',
-            //         'uniprotId',
-            //         [
-            //             sequelize.fn(
-            //                 'json_agg',
-            //                 sequelize.fn(
-            //                     'json_build_object',
-            //                     't',
-            //                     'temperature',
-            //                     'reads',
-            //                     'reads'
-            //                 )
-            //             ),
-            //             'reads'
-            //         ]
-            //     ],
-            //     where: where,
-            //     group: ['experiment', 'uniprotId']
-            // });
-
-            /*
-            select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as reads
-            from (
-              SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
-              FROM "temperatureReads" pr
-              where (pr."uniprotId" = 'A0AVT1' and pr.experiment = '1') or (pr.experiment = '2' and pr."uniprotId" = 'A0AVF1')
-              GROUP BY pr."experiment", pr."uniprotId"
-            ) tmp
-            group by tmp."uniprotId"
-            ;
-             */
         },
 
         getSingleProteinXExperiment: function(proteinName, experimentId) {

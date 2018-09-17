@@ -43,27 +43,30 @@ module.exports = function(context) {
                     experimentsDao.findExperiment(request.params.expid)
                 ])
                 .then(([tempData, proteinData, experimentData]) => {
-                    if(tempData.length > 0 && proteinData.length > 0 && experimentData.length > 0) {
+
+                    if(tempData.length > 0) {
                         response.send({
                             uniprotId: tempData[0].uniprotId,
                             experiment: tempData[0].experiment,
                             reads: tempData[0].reads,
-                            psms: proteinData[0].psms,
-                            peptides: proteinData[0].peptides,
-                            p_createdAt: proteinData[0].createdAt,
-                            p_updatedAt: proteinData[0].updatedAt,
-                            lysate: experimentData[0].lysate,
-                            description: experimentData[0].description,
-                            uploader: experimentData[0].uploader,
-                            e_createdAt: experimentData[0].createdAt,
-                            e_updatedAt: experimentData[0].updatedAt
+                            psms: proteinData.psms,
+                            peptides: proteinData.peptides,
+                            p_createdAt: proteinData.createdAt,
+                            p_updatedAt: proteinData.updatedAt,
+                            lysate: experimentData.metaData.lysate,
+                            name: experimentData.name,
+                            description: experimentData.metaData.description,
+                            uploader: experimentData.uploader,
+                            e_createdAt: experimentData.createdAt,
+                            e_updatedAt: experimentData.updatedAt
                         });
                     } else {
-                        throw Error('no data found', tempData, proteinData);
+                        console.log('getSpecProt: no experimentXprotein data found', request.params.name, request.params.expid);
+                        response.status(200).send({});
                     }
                 })
                 .catch(err => {
-                    console.error('getProteinsFromExp', err);
+                    console.error('getSpecProt', err);
                     response.send({});
                 });
         },
