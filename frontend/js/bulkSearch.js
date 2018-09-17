@@ -17,6 +17,7 @@ const pullPaginatedExperiments = (query, page) => {
     return ExperimentService.paginatedExperiments(query)
         .then(result => {
             // draw the data retrieved onto the experiments table
+            console.log('experiments data', result.data);
             drawExperimentsTable(result.data, 'exp-table-cb');
 
             // add event handlers to the checkboxes of the experiments table
@@ -94,9 +95,8 @@ const drawExperimentsTable = (data, checkboxIdentifier) => {
                 ])
             )
         );
-        row.append(td.clone().text(exp.id));
-        row.append(td.clone().text(exp.description));
-        row.append(td.clone().text(exp.lysate));
+        row.append(td.clone().text(exp.name));
+        row.append(td.clone().text(exp.metaData.description));
         row.append(
             td.clone().append(
                 link.clone()
