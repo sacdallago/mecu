@@ -95,6 +95,7 @@ const drawExperimentsTable = (data, checkboxIdentifier) => {
                 ])
             )
         );
+        row.append(td.clone().text(exp.id));
         row.append(td.clone().text(exp.name));
         row.append(td.clone().text(exp.metaData.description));
         row.append(
