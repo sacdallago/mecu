@@ -159,7 +159,7 @@ const drawProteinCurve = ({uniprotId, experiment, reads}) => {
 }
 
 const writeProteinMetaData = ({
-        uniprotId, peptides, psms, p_createdAt, p_updatedAt, experiment, description,
+        uniprotId, peptides, psms, p_createdAt, p_updatedAt, experiment, name, description,
         lysate, e_createdAt, e_updatedAt, uploader
     }) => {
     return new Promise((resolve, reject) => {
@@ -173,6 +173,7 @@ const writeProteinMetaData = ({
         $('#protein-data .created .value').text(HelperFunctions.dateTimeStringPrettify(p_createdAt));
         $('#protein-data .updated .value').text(HelperFunctions.dateTimeStringPrettify(p_updatedAt));
 
+        $('#experiment-data .name .value').text(name);
         $('#experiment-data .description .value').text(description);
         $('#experiment-data .lysate .value').text(lysate);
         $('#experiment-data .created .value').text(HelperFunctions.dateTimeStringPrettify(e_createdAt));
@@ -274,6 +275,7 @@ const drawRelatedComplexes = (complexes, actualExperiment) => {
                 id: complex.id,
                 index: index,
                 proteins: [],
+                experiments: [],
                 total: 0,
                 present: 0
             };

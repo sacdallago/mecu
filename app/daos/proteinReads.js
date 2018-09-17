@@ -23,7 +23,8 @@ module.exports = function(context) {
                     uniprotId,
                     experiment
                 }
-            });
+            })
+            .then(r => r.length > 0 ? r[0].dataValues : {} );
         },
 
         findUniprotIds: function(uniprotIds, transaction) {
