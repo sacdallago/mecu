@@ -103,9 +103,12 @@ let globalGraph;
 
 function populateGlobalsGraphs(){
     let proteins = StorageManager.splitUpProteins(StorageManager.get());
+    if(proteins.length === 0) {
+        return;
+    }
+
     TemperatureService.temperatureReadsToProteinsAndExperimentPairs(proteins)
         .then(data => {
-
             // creating data series for highcharts
             let series = [];
             data.forEach(protein => {
