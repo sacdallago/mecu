@@ -204,9 +204,8 @@ const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
                 otherExperiments.push(
                     $('<a />')
                         .addClass('item')
-                        .attr({'data-value':'default', 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
+                        .attr({'data-value':'default'})
                         .text('Experiment '+experiment)
-
                 )
             }
         });
