@@ -132,7 +132,13 @@ function populateGlobalsGraphs(){
                 distance: 30,
                 padding: 5
             };
-            Highcharts.chart('curvesGraph', highChartsCurvesConfigObject);
+            Highcharts.chart('curves-chart', highChartsCurvesConfigObject);
+
+            $('.highcharts-series, .highcharts-background').bind('mousedown', function () {
+                console.log('click');
+                $('.curves-graph-container').toggleClass('modal');
+                $('.chart').highcharts().reflow();
+            });
 
             // plot distances
             globalGraph = new MecuGraph({element: "#nodesGraph"});
