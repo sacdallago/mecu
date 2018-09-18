@@ -248,9 +248,9 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                 $('<div />')
                     .addClass(['experimentNumber', 'grid-item-text'])
                     .text(exp.experiment === parseInt(actualExperiment) ?
-                    `Experiment ${actualExperiment} (Actual)`:
-                    `Experiment ${exp.experiment}`
-                ),
+                        `Experiment ${actualExperiment} (Actual)`:
+                        `Experiment ${exp.experiment}`
+                    ),
                 $('<div />')
                     .addClass('selected-curve-dot')
             ];

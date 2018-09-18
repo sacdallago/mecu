@@ -1,17 +1,21 @@
-const grid = $('.isoGrid').isotope({
-    // main isotope options
+const proteinCurvesGridIdentifier = '.isoGrid';
+const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
     itemSelector: '.grid-item',
-    // set layoutMode
     layoutMode: 'packery',
     packery: {
         gutter: 10
     }
 });
 
-grid.on('click', '.grid-item', function(){
+proteinCurvesGrid.on('click', '.grid-item', function(){
     let self = this;
+    const content = $(this).data('grid-item-contents');
+    console.log('item contents', content);
     return StorageManager.toggle(
-        $(this).data('protein'),
+        [{
+            uniprotId: content.obj.uniprotId,
+            experiment: content.experiment.experiment
+        }],
         function(inStorage, added, removed) {
             if(added === 0){
                 $(self).removeClass('inStore');
@@ -34,7 +38,7 @@ grid.on('click', '.grid-item', function(){
 
 function loadProteins() {
     // Grid
-    grid.empty();
+    proteinCurvesGrid.empty();
 
     // load stored proteins
     let proteins = StorageManager.get();
@@ -49,53 +53,41 @@ function loadProteins() {
 
     TemperatureService.temperatureReadsToProteinsAndExperimentPairs(StorageManager.splitUpProteins(proteins))
         .then(proteins => {
-            curves = [];
 
-            let items = [];
-
-            proteins.forEach(function(protein) {
-                var html = `<div class="grid-item" id="${createIdOfProt(protein)}">`; //"${protein.experiments.map(e => e.experiment).join('E')}"
-                html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-
-                if(protein.experiments.length === 1){
-                    html += '<div class="experimentNumber">' + protein.experiments[0].experiment + '</div>';
-                } else {
-                    // html += '<div class="curvesCount">' + protein.reads.length + '</div>';
-                }
-                html += '</div>';
-
-                var element = $(html);
-                element.data("protein", protein);
-                StorageManager.has(protein, function(storage, hasCount) {
-                    if(hasCount === protein.experiments.length){
-                        element.addClass('inStore');
-                    } else if(hasCount > 0) {
-                        element.addClass('partiallyInStore');
-                    }
+            const proteinExperimentObject = [];
+            let index = 0;
+            proteins.forEach(protein => {
+                protein.experiments.forEach((experiment, i, a) => {
+                    proteinExperimentObject.push({
+                        uniprotId: protein.uniprotId,
+                        experiments: [experiment],
+                        index: i
+                    });
                 });
-                items.push(element[0]);
             });
 
-            grid.isotope('insert', items);
+            const toAppend = (obj, exp) => {
+                return [
+                    $('<p />')
+                        .addClass('grid-item-text')
+                        .css({
+                            'position': 'absolute',
+                            'text-align': 'center',
+                            'width': '100%',
+                            'line-height': '35px',
+                            'font-size': '1.2rem'
+                        })
+                        .text(obj.uniprotId),
+                    $('<div />')
+                        .addClass(['experimentNumber', 'grid-item-text'])
+                        .text(`Experiment ${exp.experiment}`),
+                    $('<div />')
+                        .addClass('selected-curve-dot')
+                ];
+            };
 
-            // adding lines to the above created divs
-            proteins.forEach(function(protein) {
-                // TODO the creation of the div and the addition of the MecuLine should be done in one
-                // swoop (this step and the step before) -> rework MecuLine?
-                let curve = new MecuLine({
-                    element: '#'+createIdOfProt(protein), // "#"+
-                    width:"200",
-                    height:"200",
-                    limit: 5,
-                    minTemp: 40,
-                    maxTemp: 65,
-                    minRatio: 0.1
-                });
-
-                curve.add(protein);
-                curves.push(curve);
-            });
-        })
+            HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend);
+        });
 };
 
 let globalGraph;
@@ -103,6 +95,8 @@ let globalGraph;
 function populateGlobalsGraphs(){
     let proteins = StorageManager.splitUpProteins(StorageManager.get());
     if(proteins.length === 0) {
+        $('#curves-chart').empty();
+        $('#nodesGraph').empty();
         return;
     }
 
@@ -132,7 +126,14 @@ function populateGlobalsGraphs(){
                 distance: 30,
                 padding: 5
             };
-            Highcharts.chart('curvesGraph', highChartsCurvesConfigObject);
+            Highcharts.chart('curves-chart', highChartsCurvesConfigObject);
+
+            // click binding for the fullscreen
+            $('.highcharts-series, .highcharts-background').bind('mousedown', function () {
+                console.log('click');
+                $('.curves-graph-container').toggleClass('modal');
+                $('.chart').highcharts().reflow();
+            });
 
             // plot distances
             globalGraph = new MecuGraph({element: "#nodesGraph"});
