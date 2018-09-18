@@ -4,7 +4,7 @@ block content
     h1 Submit a new experiment
     form.ui.form(method="post", action="/api/experiment", enctype="multipart/form-data")
         .field
-            label Description
+            label Name
             input(type="text", name="description")
         .field
             label Source
@@ -23,6 +23,7 @@ block content
 block settings
     .divider
     a(href='/search').item Search
+    a(href='/experiments').item Search Experiments
 
 block scripts
     - var delta = 50

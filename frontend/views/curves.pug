@@ -9,7 +9,8 @@ block content
     .ui.vertically.divided.grid
         .two.column.row
             .column
-                #curvesGraph
+                .curves-graph-container
+                    #curves-chart.chart
             .column
                 #nodesGraph
                 .space
@@ -28,12 +29,15 @@ block content
                 .ui.button.dice Dice coefficient
                 .ui.button.cosine Cosine
     h1 Selected Proteins
-    .isoGrid
+    .grid-container
+        .text Click to remove
+        .isoGrid
     .space
 
 block settings
     .divider
     a(href='/search').item Search
+    a(href='/experiments').item Search Experiments
 
 block scripts
     - var delta = 50

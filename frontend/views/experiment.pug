@@ -1,0 +1,47 @@
+extends base
+
+block postStyles
+    link(rel='stylesheet', href='/public/css/experiment.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
+
+block content
+    h3
+        span Experiment: 
+        span#experiment-id
+    .experiment-container.data-container#experiment-container
+        .name
+            .text Name
+            .value 
+        .uploader
+            .text Uploader
+            .value 
+        .is-private
+            .text Is private
+            .value 
+            
+    .meta-data.data-container#meta-data
+        .description
+            .text Description
+            .value
+        .lysate
+            .text Lysate
+            .value 
+    
+    .save-experiment-button-container.data-container#save-experiment-button-container
+    
+    .experiment-statistics.data-container#experiment-statistics
+    
+    .error-container.data-container#error-container
+
+block settings
+    .divider
+    a(href='/search').item Search
+    a(href='/experiments').item Search Experiments
+    a(href='/curves').item Selected Curves
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/js/experiment.js")
+    script(type="text/javascript", src="/public/js/pagination.js")

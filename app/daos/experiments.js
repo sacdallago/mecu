@@ -1,9 +1,3 @@
-/**
- * experiments DAO
- *
- * Created by Christian Dallago on 20170103 .
- */
-
 module.exports = function(context) {
 
     // Imports
@@ -17,17 +11,30 @@ module.exports = function(context) {
 
         getExperiments: function(options = {}){
             return experimentsModel.findAll({
-                attributes: ['id', 'lysate', 'description', 'uploader'],
+                attributes: ['id', 'name', 'uploader'],
             });
         },
 
         findExperiment: function(id) {
             return experimentsModel.findAll({
-                attributes: ['id', 'lysate', 'description', 'uploader', 'createdAt', 'updatedAt'],
-                where: {
-                    id
+                    attributes: ['id', 'name', 'metaData', 'uploader', 'private', 'createdAt', 'updatedAt'],
+                    where: {
+                        id: id
+                    }
+                })
+                .then(result => result.length > 0 ? result[0].dataValues : {})
+        },
+
+        update: function(id, update) {
+            return experimentsModel.update(
+                update,
+                {
+                    returning: true,
+                    where: {
+                        id: id
+                    }
                 }
-            })
+            );
         },
 
         getExperimentsPaged: function(options) {
@@ -35,7 +42,7 @@ module.exports = function(context) {
             return Promise.all([
                     experimentsModel.count(),
                     experimentsModel.findAll({
-                        attributes: ['id', 'lysate', 'description', 'uploader'],
+                        attributes: ['id', 'name', 'metaData', 'uploader'],
                         limit: options.limit,
                         offset: options.offset,
                         order: [
