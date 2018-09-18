@@ -1,11 +1,8 @@
 .two.column.row{
     max-height: 500px
 }
-.column:nth-child(1) {
-    height: 100%;
-}
-.column:nth-child(2) {
-    height: 70%;
+.column {
+    height: 90%;
 }
 .curves-graph-container {
     height: 100%;
