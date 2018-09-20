@@ -31,6 +31,7 @@ module.exports = function(context) {
 
     return {
         uploadExperiment: function(request, response) {
+            console.log('uploading experiment');
             const uploadExperimentStartTime = new Date();
             if(request.is('multipart/form-data')) {
                 const form = new formidable.IncomingForm();
