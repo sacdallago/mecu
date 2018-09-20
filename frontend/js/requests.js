@@ -140,10 +140,11 @@ ComplexService.getAllComplexesWhichContainProtein = (uniprotId, experimentId) =>
 
 ExternalService = {};
 ExternalService.getUniprotIdsFromText = (text) => {
+    const limit = 10;
     const urlEncodedText = encodeURIComponent(text);
     console.log('urlEncodedText', urlEncodedText);
     return fetch(
-            `https://www.uniprot.org/uniprot/?format=tab&columns=id&limit=7&query=${urlEncodedText}`
+            `https://www.uniprot.org/uniprot/?format=tab&columns=id&limit=${limit}&query=${urlEncodedText}`
         )
         .then(response => response.text())
         // parse the text
