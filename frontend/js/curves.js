@@ -167,30 +167,15 @@ $('.ui.button.supremum').on('click', function(event){
     globalGraph.changeDistanceMetric(Disi.supremum);
 });
 
-$('.ui.button.tanimoto').on('click', function(event){
-    event.preventDefault();
-
-    globalGraph.changeDistanceMetric(function(A,B) {
-        return 10*(1-Disi.tanimoto(A,B));
-    });
-});
-
-$('.ui.button.dice').on('click', function(event){
-    event.preventDefault();
-
-    globalGraph.changeDistanceMetric(function(A,B) {
-        return 10*(1-Disi.dice(A,B));
-    });
-});
-
-$('.ui.button.cosine').on('click', function(event){
-    event.preventDefault();
-
-    globalGraph.changeDistanceMetric(function(A,B) {
-        return 20*(1-Disi.cosine(A,B));
-    });
-});
 
 $('.ui.dropdown.button.minkowski').dropdown({
-    action: 'nothing'
+    action: function(e) {
+        const rank = $('#rank').val();
+        if(rank) {
+            console.log('setting minkowski rank: ', $('#rank').val());
+            event.preventDefault();
+            globalGraph.changeDistanceMetric((a,b) => Disi.minkowski(a,b,rank));
+        }
+
+    }
 });
