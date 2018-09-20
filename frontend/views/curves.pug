@@ -16,18 +16,15 @@ block content
                 .space
                 .ui.button.manhattan Manhattan
                 .ui.button.euclidian Euclidian
+                .ui.button.supremum Supremum
                 .ui.top.right.search.pointing.dropdown.button.minkowski Minkowski
                     .menu
                         .item
                             .ui.input
-                                input(type="number", name="rank", placeholder="3")
+                                input(type="number", name="rank", placeholder="3")#rank
                         .item
                             .ui.attached.button.submit Save
 
-                .ui.button.supremum Supremum
-                .ui.button.tanimmoto Tanimoto
-                .ui.button.dice Dice coefficient
-                .ui.button.cosine Cosine
     h1 Selected Proteins
     .grid-container
         .text Click to remove
@@ -41,6 +38,7 @@ block settings
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src="/public/modules/disi/build/disi.js")
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/curves.js")
