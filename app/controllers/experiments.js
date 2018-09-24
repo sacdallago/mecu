@@ -3,6 +3,7 @@ const json2csv = require('json2csv').parse;
 const mecuUtils = require('mecu-utils');
 const fs = require('fs');
 const formidable = require('formidable');
+const sequelize = require('sequelize');
 
 
 const UPPER_QUERY_LIMIT = 10;
@@ -116,28 +117,24 @@ module.exports = function(context) {
                                     let p = Promise.resolve();
                                     const proteinsCreateStartTime = new Date();
                                     proteinList.forEach(protein => {
-                                        p = p.then(() => proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}));
+                                        p = p.then(() => context.dbConnection.query(
+                                            `INSERT INTO public.proteins("uniprotId", "createdAt", "updatedAt") VALUES (:uniprotId, :createdAt, :updatedAt) ON CONFLICT DO NOTHING;`,
+                                            {
+                                                replacements: {
+                                                    uniprotId: protein,
+                                                    createdAt: new Date(),
+                                                    updatedAt: new Date()
+                                                }
+                                            },
+                                            {
+                                                type: sequelize.QueryTypes.INSERT
+                                            }
+                                        ))
                                     });
 
                                     return p
-                                        // Promise.all(
-                                        //     proteinList.map(protein =>
-                                        //         proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}})
-                                        //             // HACK: UGLY FUCKING HARD HACK
-                                        //             // the timeout for sequelize querys can be set initially in the settings, however, setting it to 2min for every query is bad practice
-                                        //             // the problem is, the timer starts when the promise is executed (e.g. proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}))
-                                        //             // this means, in this map (here), there could X querys executed parallel, but the db driver can only handle so much at a time, resulting in some
-                                        //             // querys to wait forever, which will then time out...
-                                        //             // this is the only fast (BAD) solution i found to be working
-                                        //             // with more than 8k proteins to be added, this fails as well
-                                        //             // CORRECT WAY: use .bulkCreate, which fails when the protein already exists (postgres ON DUPLICATE DO NOTHING is not yet supported by sequelize yay)
-                                        //             // CORRECT WAY2: use .findOrCreate sequentially (this takes, for 8100 proteins, about 100 seconds, if all proteins have to be created (O.O), otherwise 8 seconds)
-                                        //             // decided to do it the correct2 way, it works, but takes a long time
-                                        //             .catch(() => proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}))
-                                        //     )
-                                        // )
                                         .then(() => {
-                                            console.log(`DURATION proteinsModel.findOrCreate(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
+                                            console.log(`DURATION proteinsModel.create(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
                                         })
                                         // protein X experiment table
                                         .then(() => proteinXExperimentModel.bulkCreate(
