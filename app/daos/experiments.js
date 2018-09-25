@@ -1,3 +1,5 @@
+const sequelize = require('sequelize');
+
 module.exports = function(context) {
 
     // Imports
@@ -9,17 +11,27 @@ module.exports = function(context) {
             return experimentsModel.create(item, options);
         },
 
-        getExperiments: function(options = {}){
+        getExperiments: function(options = {}, uploader){
             return experimentsModel.findAll({
-                attributes: ['id', 'name', 'uploader'],
+                attributes: ['id', 'name', 'metaData', 'uploader'],
+                where: {
+                    [sequelize.Op.or]: [
+                        {private: false},
+                        {uploader: uploader}
+                    ]
+                }
             });
         },
 
-        findExperiment: function(id) {
+        findExperiment: function(id, uploader) {
             return experimentsModel.findAll({
                     attributes: ['id', 'name', 'metaData', 'uploader', 'private', 'createdAt', 'updatedAt'],
                     where: {
-                        id: id
+                        id: id,
+                        [sequelize.Op.or]: [
+                            {private: false},
+                            {uploader: uploader}
+                        ]
                     }
                 })
                 .then(result => result.length > 0 ? result[0].dataValues : {})
@@ -37,12 +49,25 @@ module.exports = function(context) {
             );
         },
 
-        getExperimentsPaged: function(options) {
+        getExperimentsPaged: function(options, uploader) {
             // add search if necessary
             return Promise.all([
-                    experimentsModel.count(),
+                    experimentsModel.count({
+                        where: {
+                            [sequelize.Op.or]: [
+                                {private: false},
+                                {uploader: uploader}
+                            ]
+                        }
+                    }),
                     experimentsModel.findAll({
                         attributes: ['id', 'name', 'metaData', 'uploader'],
+                        where: {
+                            [sequelize.Op.or]: [
+                                {private: false},
+                                {uploader: uploader}
+                            ]
+                        },
                         limit: options.limit,
                         offset: options.offset,
                         order: [
@@ -53,26 +78,55 @@ module.exports = function(context) {
                 .then(([count, result]) => ({count, data:result}));
         },
 
-        getRawData: function(id){
+        getRawData: function(id, uploader){
             if(id !== undefined) {
-                return experimentsModel.findById(id, {
-                    attributes: ['rawData', 'id']
-                });
+                return experimentsModel.findById(
+                    id,
+                    {
+                        attributes: ['rawData', 'id'],
+                        where: {
+                            [sequelize.Op.or]: [
+                                {private: false},
+                                {uploader: uploader}
+                            ]
+                        }
+                    }
+                );
             } else {
-                return experimentsModel.findAll({
-                    attributes: ['rawData', 'id']
-                });
+                return experimentsModel.findAll(
+                    {
+                        attributes: ['rawData', 'id'],
+                        where: {
+                            [sequelize.Op.or]: [
+                                {private: false},
+                                {uploader: uploader}
+                            ]
+                        }
+                    }
+                );
             }
         },
 
-        getExperimentsWhichHaveProtein: function(uniprotId) {
-            return temperatureReadsModel.findAll({
-                attributes: ['experiment'],
-                where: {
-                    uniprotId
-                },
-                group: ['experiment', 'uniprotId']
-            })
+        getExperimentsWhichHaveProtein: function(uniprotId, uploader) {
+            const query = `
+                SELECT "uniprotId", "experimentId"
+                FROM protein_experiments pe, experiments e
+                WHERE
+                    pe."uniprotId" = :uniprotId and
+                    pe."experimentId" = e.id and
+                    (e.private = false or e.uploader = :uploader);
+            `;
+            return context.dbConnection.query(
+                    query,
+                    {
+                        replacements: {
+                            uniprotId,
+                            uploader
+                        }
+                    },
+                    {type: sequelize.QueryTypes.SELECT}
+                )
+                .then(r => r.length > 0 ? r[0] : []);
         }
     };
 };

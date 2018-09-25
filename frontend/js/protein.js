@@ -80,7 +80,14 @@ $(document).ready(() => {
                     return Promise.all([
                         // list of experiments, which ahve this protein, but not the actual experiment
                         drawOtherExperiments(exps, query.protein, query.experiment),
-                        TemperatureService.temperatureReads(exps, [query.protein])
+                        TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                                exps.map(exp =>
+                                    ({
+                                        uniprotId: query.protein,
+                                        experiment: exp
+                                    })
+                                )
+                            )
                             .then(reads => {
                                 console.log('reads', reads);
                                 // protein curves of other experiments

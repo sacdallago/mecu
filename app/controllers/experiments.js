@@ -3,7 +3,9 @@ const json2csv = require('json2csv').parse;
 const mecuUtils = require('mecu-utils');
 const fs = require('fs');
 const formidable = require('formidable');
+const sequelize = require('sequelize');
 
+const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
 
 const UPPER_QUERY_LIMIT = 10;
 const queryParams = (query) => {
@@ -19,7 +21,7 @@ const queryParams = (query) => {
 module.exports = function(context) {
 
     // Imports
-    const proteinsModel = context.component('models').module('proteins');
+    const proteinsDao = context.component('daos').module('proteins');
     const experimentsDao = context.component('daos').module('experiments');
     const proteinReadsDao = context.component('daos').module('proteinReads');
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
@@ -82,7 +84,7 @@ module.exports = function(context) {
                                 lysate: lysate
                             },
                             rawData: data,
-                            uploader: request.user.get('googleId')
+                            uploader: extractUserGoogleId(request)
                         };
 
                         return context.dbConnection.transaction(transaction => {
@@ -112,32 +114,12 @@ module.exports = function(context) {
                                         });
                                     }).reduce((elements,element) => elements.concat(element));
 
-                                    // create proteins, necessary for the rest of the m-to-n relationships
-                                    let p = Promise.resolve();
                                     const proteinsCreateStartTime = new Date();
-                                    proteinList.forEach(protein => {
-                                        p = p.then(() => proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}));
-                                    });
 
-                                    return p
-                                        // Promise.all(
-                                        //     proteinList.map(protein =>
-                                        //         proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}})
-                                        //             // HACK: UGLY FUCKING HARD HACK
-                                        //             // the timeout for sequelize querys can be set initially in the settings, however, setting it to 2min for every query is bad practice
-                                        //             // the problem is, the timer starts when the promise is executed (e.g. proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}))
-                                        //             // this means, in this map (here), there could X querys executed parallel, but the db driver can only handle so much at a time, resulting in some
-                                        //             // querys to wait forever, which will then time out...
-                                        //             // this is the only fast (BAD) solution i found to be working
-                                        //             // with more than 8k proteins to be added, this fails as well
-                                        //             // CORRECT WAY: use .bulkCreate, which fails when the protein already exists (postgres ON DUPLICATE DO NOTHING is not yet supported by sequelize yay)
-                                        //             // CORRECT WAY2: use .findOrCreate sequentially (this takes, for 8100 proteins, about 100 seconds, if all proteins have to be created (O.O), otherwise 8 seconds)
-                                        //             // decided to do it the correct2 way, it works, but takes a long time
-                                        //             .catch(() => proteinsModel.findOrCreate({where: {uniprotId: protein}, defaults: {uniprotId: protein}}))
-                                        //     )
-                                        // )
+                                    // create proteins, necessary for the rest of the m-to-n relationships
+                                    return proteinsDao.bulkCreate(proteinList)
                                         .then(() => {
-                                            console.log(`DURATION proteinsModel.findOrCreate(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
+                                            console.log(`DURATION proteinsDao.bulkCreate(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
                                         })
                                         // protein X experiment table
                                         .then(() => proteinXExperimentModel.bulkCreate(
@@ -238,14 +220,14 @@ module.exports = function(context) {
 
         getExperiment: function(request, response) {
             console.log('request.params', request.params);
-            experimentsDao.findExperiment(request.params.id)
+            experimentsDao.findExperiment(request.params.id, extractUserGoogleId(request))
                 .then(toSend => {
-                    if(toSend.private === true && toSend.uploader !== request.user.get('googleId')){
+                    if(toSend.private === true && toSend.uploader !== extractUserGoogleId(request)){
                         console.error('not the owner of the experiment');
                         toSend = {error: 'You are not the owner of the experiment and the experiment is not open to be viewed by others'};
                     }
 
-                    if(toSend.uploader === request.user.get('googleId')){
+                    if(toSend.uploader === extractUserGoogleId(request)){
                         toSend.isUploader = true;
                     }
 
@@ -276,7 +258,7 @@ module.exports = function(context) {
         },
 
         getExperiments: function(request, response) {
-            experimentsDao.getExperimentsPaged(queryParams(request.query))
+            experimentsDao.getExperimentsPaged(queryParams(request.query), extractUserGoogleId(request))
                 .then(result => response.status(200).send(result))
                 .catch(error => {
                     console.error('getExperiments', error);
@@ -295,7 +277,7 @@ module.exports = function(context) {
                 return response.status(400).send(error);
             }
 
-            experimentsDao.getRawData(identifier)
+            experimentsDao.getRawData(identifier, extractUserGoogleId(request))
                 .then(function(rawData){
                     if (rawData.constructor !== Array) {
                         rawData = [rawData];
@@ -344,8 +326,8 @@ module.exports = function(context) {
         },
 
         getExperimentsWhichHaveProtein: function(request, response) {
-            experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId)
-                .then(result => response.status(200).send(result.map(e => e.experiment)))
+            experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId, extractUserGoogleId(request))
+                .then(result => response.status(200).send(result.map(e => e.experimentId)))
                 .catch(error => {
                     console.error('getExperiments', error);
                     return response.status(500).send(error);

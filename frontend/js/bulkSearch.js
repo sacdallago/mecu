@@ -59,7 +59,16 @@ const fetchMeltingCurves = function(experiments, proteins){
     experiments = experiments.sort();
     proteins = proteins.sort();
 
-    TemperatureService.temperatureReads(experiments, proteins)
+    const arr = [];
+    experiments.forEach(e =>
+        proteins.forEach(p => arr.push({uniprotId: p, experiment: e}))
+    )
+
+    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(arr)
+        .then(data => {
+            console.log('data', data);
+            return data;
+        })
         .then(data => drawProteinXExperimentHeatmap(experiments, proteins, data));
 };
 

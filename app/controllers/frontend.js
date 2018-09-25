@@ -1,3 +1,4 @@
+const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
 
 module.exports = function(context) {
     // Imports
@@ -65,7 +66,7 @@ module.exports = function(context) {
         },
 
         downloads: function(request, response) {
-            return experimentsDao.getExperiments()
+            return experimentsDao.getExperiments({}, extractUserGoogleId(request))
                 .then(function(experiments) {
                     return response.render('downloads', {
                         title: 'Download',

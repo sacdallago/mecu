@@ -16,25 +16,25 @@ block content
             each experiment in experiments
                 tr
                     td= experiment.id
-                    td= experiment.description
-                    td= experiment.lysate
+                    td= experiment.name
+                    td= experiment.metaData.lysate ? 'yes' : 'no'
                     td
                         a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
                     td
                         ul(style="margin: 0")
                             li
                                 | [SUGGESTED]&nbsp;
-                                a(target="_blank", href="/api/experiment/" + experiment.id) JSON data (Protein + melting curves)
+                                a(target="_blank", href="/api/experiment/raw/" + experiment.id) JSON data (Protein + melting curves)
                             li
                                 |
-                                a(target="_blank", href="/api/experiment/" + experiment.id + "?format=tsv") TSV data (Protein)
+                                a(target="_blank", href="/api/experiment/raw/" + experiment.id + "?format=tsv") TSV data (Protein)
                                 |  and&nbsp;
-                                a(target="_blank", href="/api/reads/temperatures?e=" + experiment.id + "&format=tsv") TSV data (Melting curves)
+                                a(target="_blank", href="/api/reads/temperatures/raw?e=" + experiment.id + "&format=tsv") TSV data (Melting curves)
                             li
                                 |
-                                a(target="_blank", href="/api/experiment/" + experiment.id + "?format=csv") CSV data (Protein)
+                                a(target="_blank", href="/api/experiment/raw/" + experiment.id + "?format=csv") CSV data (Protein)
                                 |  and&nbsp;
-                                a(target="_blank", href="/api/reads/temperatures?e=" + experiment.id + "&format=csv") CSV data (Melting curves)
+                                a(target="_blank", href="/api/reads/temperatures/raw?e=" + experiment.id + "&format=csv") CSV data (Melting curves)
             tr(style="background: #f1f6f8")
                 td All
                 td --
@@ -44,18 +44,24 @@ block content
                     ul(style="margin: 0")
                         li
                             | [SUGGESTED]&nbsp;
-                            a(target="_blank", href="/api/experiment/") JSON data (Protein + melting curves)
+                            a(target="_blank", href="/api/experiment/raw") JSON data (Protein + melting curves)
                         li
                             |
-                            a(target="_blank", href="/api/experiment/?format=tsv") TSV data (Protein)
+                            a(target="_blank", href="/api/experiment/raw?format=tsv") TSV data (Protein)
                             |  and&nbsp;
-                            a(target="_blank", href="/api/reads/temperatures?format=tsv") TSV data (Melting curves)
+                            a(target="_blank", href="/api/reads/temperatures/raw?format=tsv") TSV data (Melting curves)
                         li
                             |
-                            a(target="_blank", href="/api/experiment/?format=csv") CSV data (Protein)
+                            a(target="_blank", href="/api/experiment/raw?format=csv") CSV data (Protein)
                             |  and&nbsp;
-                            a(target="_blank", href="/api/reads/temperatures?format=csv") CSV data (Melting curves)
+                            a(target="_blank", href="/api/reads/temperatures/raw?format=csv") CSV data (Melting curves)
 
     .space
     p You can download the data by right clicking on the link and selecting the option "Save as" or "Download Linked file As".
     .space
+
+block settings
+    .divider
+    a(href='/search').item Search
+    a(href='/experiments').item Search Experiments
+    a(href='/curves').item Selected Curves

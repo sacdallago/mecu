@@ -1,3 +1,5 @@
+const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
+
 
 module.exports = function(context) {
 
@@ -32,10 +34,13 @@ module.exports = function(context) {
                         Promise.resolve(result),
                         Promise.all(
                             setOfProteins.map(p =>
-                                temperatureReadsDao.findAndAggregateTempsByIdAndExperiment([{
-                                    uniprotId: p,
-                                    experiment: request.params.expId
-                                }])
+                                temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(
+                                    [{
+                                        uniprotId: p,
+                                        experiment: request.params.expId
+                                    }],
+                                    extractUserGoogleId(request)
+                                )
                                 .then(r => r.length > 0 ? r[0] : {})
                             )
                         )
@@ -59,11 +64,11 @@ module.exports = function(context) {
                     return result[0];
                 })
                 .then(result => {
-                    console.log('DURATION getComplexWhichHasProtein', (Date.now()-start)/1000);
+                    console.log('DURATION hasProtein', (Date.now()-start)/1000);
                     response.status(200).send(result);
                 })
                 .catch(error => {
-                    console.error('getById', error);
+                    console.error('hasProtein', error);
                     return response.status(500).send([]);
                 });
         }
