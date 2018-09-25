@@ -100,7 +100,7 @@ const drawSaveButton = () => {
             name: $('#name').val(),
             private: $('#private-select').find(':selected').text(),
             metaData: {
-                lysate: $('#lysate-select').find(':selected').text(),
+                lysate: $('#lysate-select').find(':selected').text() === 'yes' ? true : false,
                 description: $('#description').val()
             }
         };

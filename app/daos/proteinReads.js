@@ -1,9 +1,3 @@
-/**
- * proteinReads DAO
- *
- * Created by Christian Dallago on 20170103 .
- */
-
 const sequelize = require('sequelize');
 
 module.exports = function(context) {

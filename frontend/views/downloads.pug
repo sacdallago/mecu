@@ -16,8 +16,8 @@ block content
             each experiment in experiments
                 tr
                     td= experiment.id
-                    td= experiment.description
-                    td= experiment.lysate
+                    td= experiment.name
+                    td= experiment.metaData.lysate ? 'yes' : 'no'
                     td
                         a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
                     td
@@ -59,3 +59,9 @@ block content
     .space
     p You can download the data by right clicking on the link and selecting the option "Save as" or "Download Linked file As".
     .space
+
+block settings
+    .divider
+    a(href='/search').item Search
+    a(href='/experiments').item Search Experiments
+    a(href='/curves').item Selected Curves

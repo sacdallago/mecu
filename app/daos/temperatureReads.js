@@ -86,6 +86,7 @@ module.exports = function(context) {
                     GROUP BY pr."experiment", pr."uniprotId"
                 ) t;
             `;
+            const start = new Date();
             return Promise.all([
                     context.dbConnection.query(
                         sqlQuery,
@@ -102,6 +103,10 @@ module.exports = function(context) {
                         {type: sequelize.QueryTypes.SELECT}
                     )
                 ])
+                .then(r => {
+                    console.log(`DURATION findAndAggregateTempsBySimilarUniprotId (PAGINATED)  ${(Date.now()-start)/1000} ms`);
+                    return r;
+                })
                 .then(([results, total]) => {
                     return {total: total[0][0].count || 0, data: results[0] || []};
                 });
