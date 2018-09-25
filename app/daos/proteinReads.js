@@ -10,36 +10,29 @@ module.exports = function(context) {
             return proteinReadsModel.bulkCreate(items, options);
         },
 
-        findProteinExperiment: function(uniprotId, experiment) {
-            return proteinReadsModel.findAll({
-                attributes: ['uniprotId', 'experiment', 'peptides', 'psms', 'createdAt', 'updatedAt'],
-                where: {
-                    uniprotId,
-                    experiment
-                }
-            })
-            .then(r => r.length > 0 ? r[0].dataValues : {} );
-        },
-
-        findUniprotIds: function(uniprotIds, transaction) {
-            if(transaction){
-                return proteinReadsModel.findAll({
-                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: uniprotIds
-                        },
-                        transaction: transaction
-                    }
-                );
-            } else {
-                return proteinReadsModel.findAll({
-                        attributes: [[context.dbConnection.fn('DISTINCT', context.dbConnection.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: uniprotIds
+        findProteinExperiment: function(uniprotId, experiment, uploader) {
+            const query = `
+            SELECT pr."uniprotId", pr.experiment, pr.peptides, pr.psms, pr."createdAt", pr."updatedAt"
+            FROM "proteinReads" pr, "experiment_proteinReads" e_pr, experiments e
+            WHERE
+                pr."uniprotId" = :uniprotId AND
+                pr.id = e_pr."proteinReadId" AND
+                e_pr."experimentId" = e.id AND
+                e.id = :experimentId AND
+                (e.private = false or e.uploader = :uploader);
+            `;
+            return context.dbConnection.query(
+                    query,
+                    {
+                        replacements: {
+                            uniprotId,
+                            experimentId: experiment,
+                            uploader
                         }
-                    }
-                );
-            }
-        },
+                    },
+                    {type: sequelize.QueryTypes.SELECT}
+                )
+                .then(([result, metadata]) => result.length > 0 ? result[0] : {});
+        }
     };
 };

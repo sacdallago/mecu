@@ -1,6 +1,8 @@
 // External imports
 const json2csv = require('json2csv').parse;
 
+const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
+
 const UPPER_QUERY_LIMIT = 100;
 const queryParams = (query) => {
     let s;
@@ -34,7 +36,7 @@ module.exports = function(context) {
             if(query.search === ''){
                 return response.status(200).send([]);
             } else {
-                temperatureReadsDao.findAndAggregateTempsBySimilarUniprotId(query)
+                temperatureReadsDao.findAndAggregateTempsBySimilarUniprotId(query, extractUserGoogleId(request))
                     .then(results => {
                         console.log('DURATION searchByUniprotId', (Date.now()-start)/1000)
                         return response.status(200).send(results);
@@ -46,7 +48,7 @@ module.exports = function(context) {
             }
         },
 
-        getTemperatures: function(request, response) {
+        getTemperaturesRaw: function(request, response) {
             let experimentId;
 
             if(request.query.e !== undefined){
@@ -61,7 +63,7 @@ module.exports = function(context) {
             const uniprotId = request.query.p;
             const format = request.query.format;
 
-            return temperatureReadsDao.findByUniprotIdAndExperiment(uniprotId, experimentId)
+            return temperatureReadsDao.findByUniprotIdAndExperiment(uniprotId, experimentId, extractUserGoogleId(request))
                 .then(function(temperatureReads) {
 
                     if(temperatureReads.length < 1){
@@ -70,10 +72,10 @@ module.exports = function(context) {
 
                     temperatureReads = temperatureReads.map(function(read) {
                         return {
-                            experiment : read.get('experiment'),
-                            uniprotId : read.get('uniprotId'),
-                            temperature : read.get('temperature'),
-                            ratio : read.get('ratio')
+                            experiment : read.experiment,
+                            uniprotId : read.uniprotId,
+                            temperature : read.temperature,
+                            ratio : read.ratio
                         }
                     });
 
@@ -107,43 +109,6 @@ module.exports = function(context) {
                     console.error(error);
                     return response.status(500).send(error);
                 });
-        },
-
-        // P55072
-        getByUniProtIdsAndExperiments: function(request, response) {
-            const uniprotIds = request.body.proteins;
-            const experiments = request.body.experiments;
-
-            return Promise.all([
-                proteinReadsDao.findUniprotIds(uniprotIds),
-                temperatureReadsDao.findByUniprotIdAndExperiment(uniprotIds, experiments)
-            ]).then(([proteins, reads]) => {
-
-                let result = proteins.map((newUniProtId) => {
-                    let element = {uniprotId: newUniProtId.get('uniprotId')};
-
-                    element.experiments = experiments.map((experimentId) => {
-                            let e = {experiment: experimentId};
-
-                            e.reads = reads.filter(tempReads =>
-                                    tempReads.uniprotId == element.uniprotId &&
-                                    tempReads.experiment == e.experiment
-                                )
-                                .map(fullObj => ({t:fullObj.temperature, r: fullObj.ratio}));
-
-                            return e;
-                        })
-                        .filter(e => e.reads.length > 0);
-
-                    return element;
-                });
-
-                return response.send(result);
-            })
-            .catch(function(error){
-                console.error(error);
-                return response.status(500).send(error);
-            });
         }
     }
 };

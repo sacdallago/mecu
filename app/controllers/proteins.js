@@ -1,3 +1,5 @@
+const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
+
 module.exports = function(context) {
 
     // Imports
@@ -28,7 +30,7 @@ module.exports = function(context) {
                 protExpArray = [];
             }
 
-            temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray)
+            temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray, extractUserGoogleId(request))
                 .then(r => response.status(200).send(r))
                 .catch(err => {
                     console.error('getProteinsFromExp', err);
@@ -38,9 +40,9 @@ module.exports = function(context) {
 
         getSpecProt: function(request, response) {
             Promise.all([
-                    temperatureReadsDao.getSingleProteinXExperiment(request.params.name, request.params.expid),
-                    proteinReadsDao.findProteinExperiment(request.params.name, request.params.expid),
-                    experimentsDao.findExperiment(request.params.expid)
+                    temperatureReadsDao.getSingleProteinXExperiment(request.params.name, request.params.expid, extractUserGoogleId(request)),
+                    proteinReadsDao.findProteinExperiment(request.params.name, request.params.expid, extractUserGoogleId(request)),
+                    experimentsDao.findExperiment(request.params.expid, extractUserGoogleId(request))
                 ])
                 .then(([tempData, proteinData, experimentData]) => {
 
@@ -72,7 +74,7 @@ module.exports = function(context) {
         },
 
         getProteinInteractions: function(request, response) {
-            console.log('request.params', request.params);
+            
             proteinXproteinsDao.getProteinInteraction(request.params.uniprotId)
                 .then(result => {
                     let setOfProteins = new Set();
@@ -88,7 +90,8 @@ module.exports = function(context) {
                             setOfProteins.map(p => ({
                                 uniprotId: p,
                                 experiment: request.params.expId
-                            }))
+                            })),
+                            extractUserGoogleId(request)
                         )
                     ]);
                 })

@@ -1,3 +1,5 @@
+const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
+
 
 module.exports = function(context) {
 
@@ -32,10 +34,13 @@ module.exports = function(context) {
                         Promise.resolve(result),
                         Promise.all(
                             setOfProteins.map(p =>
-                                temperatureReadsDao.findAndAggregateTempsByIdAndExperiment([{
-                                    uniprotId: p,
-                                    experiment: request.params.expId
-                                }])
+                                temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(
+                                    [{
+                                        uniprotId: p,
+                                        experiment: request.params.expId
+                                    }],
+                                    extractUserGoogleId(request)
+                                )
                                 .then(r => r.length > 0 ? r[0] : {})
                             )
                         )

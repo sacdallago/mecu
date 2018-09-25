@@ -16,24 +16,6 @@ TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
             return [];
         });
 }
-TemperatureService.temperatureReads = (experiments, proteins) => {
-    return fetch('/api/reads/temperature', {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify({
-                experiments: experiments,
-                proteins: proteins
-            })
-        })
-        .then(res => res.json())
-        .catch(error => {
-            console.error('Request error for TemperatureService.temperatureReads: ', error, experiments, proteins);
-            return [];
-        })
-}
 TemperatureService.queryUniprotIdReceiveTemperatureReads = (query) => {
     return fetch('/api/reads/temperature/search', {
             headers: {

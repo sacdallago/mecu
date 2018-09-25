@@ -16,41 +16,45 @@ module.exports = function(context) {
             return temperatureReadsModel.bulkCreate(items, options);
         },
 
-        findByUniprotIdAndExperiment: function(uniprotId, experimentId) {
-            let where = {};
+        findByUniprotIdAndExperiment: function(uniprotId, experimentId, uploader) {
+            const replacements = {
+                uploader: uploader,
+                private: false
+            };
+            let whereClause = `
+                where
+                (e.private = false or e.uploader = :uploader) and
+                tr."uniprotId" = p."uniprotId" and
+                tr.experiment = e.id
+            `
             if(uniprotId !== undefined){
-                where.uniprotId = uniprotId;
+                whereClause += `p."uniprotId" = :uniprotId and`;
+                replacements.uniprotId = uniprotId;
             }
             if(experimentId !== undefined){
-                where.experiment = experimentId;
+                whereClause += `e.id = :experimentId`;
+                replacements.experiment = experimentId;
             }
-            return temperatureReadsModel.findAll({
-                    attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
-                    where: where
-                }
-            );
+            const query = `
+                SELECT e.id, p."uniprotId", temperature, ratio
+                FROM "temperatureReads" tr, proteins p, experiments e
+                ${whereClause};
+            `;
+            return context.dbConnection.query(
+                    query,
+                    {replacements: replacements},
+                    {type: sequelize.QueryTypes.SELECT}
+                )
+                .then(r => r.length > 0 ? r[0] : []);
         },
 
-        findByUniprotIdsAndExperiments: function(uniprotIds, experimentIds) {
-            let where = {};
-            if(uniprotId !== undefined){
-                where.uniprotId = uniprotIds;
-            }
-            if(experimentId !== undefined){
-                where.experiment = experimentIds;
-            }
-            return temperatureReadsModel.findAll({
-                    attributes: ['experiment', 'uniprotId', 'temperature', 'ratio'],
-                    where: where
-                }
-            );
-        },
-
-        findAndAggregateTempsBySimilarUniprotId: function(query) {
+        findAndAggregateTempsBySimilarUniprotId: function(query, uploader) {
             let replacements = {
                 search: query.search+'%',
                 offset: query.offset,
-                limit: query.limit
+                limit: query.limit,
+                isPrivate: false,
+                uploader: uploader
             };
             let whereClause = '';
             if(query.search.constructor === Array) {
@@ -59,31 +63,43 @@ module.exports = function(context) {
                         whereClause += ' or '
                     };
                     let replStr = 'search'+i;
-                    whereClause += 'pr."uniprotId" like :'+replStr;
+                    whereClause += 'p."uniprotId" like :'+replStr;
                     replacements[replStr] = v;
                 })
             } else {
-                whereClause = 'pr."uniprotId" like :search';
+                whereClause = 'p."uniprotId" like :search';
             }
             const sqlQuery = `
-                select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
-                from (
-                    SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
-                    FROM "temperatureReads" pr
-                    where ${whereClause}
-                    GROUP BY pr."experiment", pr."uniprotId"
-                    order by "uniprotId" asc, experiment asc
-                    offset :offset
-                    limit :limit
+                SELECT tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) AS experiments
+                FROM (
+                    SELECT tr.experiment, tr."uniprotId", json_agg(json_build_object('t', tr.temperature, 'r', tr.ratio) ORDER BY temperature) AS reads
+                    FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
+                    WHERE
+                        e.id = e_tr."experimentId" AND
+                        (e.private = :isPrivate or e.uploader = :uploader) AND
+                        e_tr."temperatureReadId" = tr.id AND
+                        p_tr."uniprotId" = p."uniprotId" AND
+                        p_tr."temperatureReadId" = tr.id AND
+                        ${whereClause}
+                    GROUP BY tr."experiment", tr."uniprotId"
+                    ORDER BY "uniprotId" asc, experiment asc
+                    OFFSET :offset
+                    LIMIT :limit
                 ) tmp
                 group by tmp."uniprotId";
             `;
             const sqlQueryTotal = `
-                select count(*) from (
-                    select count(*)
-                    FROM "temperatureReads" pr
-                    where ${whereClause}
-                    GROUP BY pr."experiment", pr."uniprotId"
+                SELECT count(*) FROM (
+                    SELECT count(*)
+                    FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
+                    WHERE
+                        e.id = e_tr."experimentId" AND
+                        (e.private = :isPrivate or e.uploader = :uploader) AND
+                        e_tr."temperatureReadId" = tr.id AND
+                        p_tr."uniprotId" = p."uniprotId" AND
+                        p_tr."temperatureReadId" = tr.id AND
+                        ${whereClause}
+                    GROUP BY tr."experiment", tr."uniprotId"
                 ) t;
             `;
             const start = new Date();
@@ -112,72 +128,95 @@ module.exports = function(context) {
                 });
         },
 
-        findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs) {
-
-            const replacements = {};
-            let whereClause = 'WHERE (';
+        findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs, uploader) {
+            if(uniprodIdExpIdPairs.length === 0) {
+                return Promise.resolve([]);
+            }
+            const replacements = {
+                uploader: uploader,
+                isPrivate: false
+            };
+            let whereClause = '(';
             uniprodIdExpIdPairs.forEach((v,i,a) => {
                 if(i != 0) {
                     whereClause += ' or '
                 };
                 let replStrExp = 'Exp'+i;
                 let replStrPrt = 'Prt'+i;
-                whereClause += `(pr."uniprotId" = :${replStrPrt} AND pr."experiment" = :${replStrExp})`;
+                whereClause += `(p."uniprotId" = :${replStrPrt} AND e."id" = :${replStrExp})`;
                 replacements[replStrPrt] = v.uniprotId;
                 replacements[replStrExp] = v.experiment;
             });
-            if(uniprodIdExpIdPairs.length === 0) {
-                whereClause = '';
-            } else {
-                whereClause += ') ';
-            }
+            whereClause += ') ';
 
             const query = `
-                select tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) as experiments
-                from (
-                  SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio) order by temperature) as reads
-                  FROM "temperatureReads" pr
-                  ${whereClause}
-                  GROUP BY pr."experiment", pr."uniprotId"
+                SELECT tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) AS experiments
+                FROM (
+                    SELECT tr.experiment, tr."uniprotId", json_agg(json_build_object('t', tr.temperature, 'r', tr.ratio) ORDER BY temperature) AS reads
+                    FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
+                    WHERE
+                        e.id = e_tr."experimentId" AND
+                        (e.private = :isPrivate or e.uploader = :uploader) AND
+                        e_tr."temperatureReadId" = tr.id AND
+                        p_tr."uniprotId" = p."uniprotId" AND
+                        p_tr."temperatureReadId" = tr.id AND
+                        ${whereClause}
+                    GROUP BY tr."experiment", tr."uniprotId"
                 ) tmp
-                group by tmp."uniprotId"
+                GROUP BY tmp."uniprotId";
             `;
-            // console.warn(`findAndAggregateTempsByIdAndExperiment SQL query: ${query}`);
             /*
             for the whole database
             Planning time: 0.147 ms
             Execution time: 1377.891 ms
              */
 
+            const start = new Date();
             return context.dbConnection.query(
-                query,
-                {replacements: replacements},
-                {type: sequelize.QueryTypes.SELECT}
-            )
-            .then(r => r.length > 0 ? r[0] : {});
+                    query,
+                    {replacements: replacements},
+                    {type: sequelize.QueryTypes.SELECT}
+                )
+                .then(r => {
+                    console.log(`DURATION findAndAggregateTempsByIdAndExperiment  ${(Date.now()-start)/1000} ms`);
+                    return r;
+                })
+                .then(r => r.length > 0 ? r[0] : []);
 
         },
 
-        getSingleProteinXExperiment: function(proteinName, experimentId) {
-             const query = `
-                 SELECT pr.experiment, pr."uniprotId", json_agg(json_build_object('t', pr.temperature, 'r', pr.ratio)) as reads
-                 FROM "temperatureReads" pr
-                 where pr."uniprotId" = :proteinName and pr.experiment = :experimentId
-                 GROUP BY pr."experiment", pr."uniprotId"
-             `;
-             console.warn(`getSingleProteinXExperiment still uses SQL query`);
-             // console.log('query', query);
-             return context.dbConnection.query(
-                     query,
-                     {
-                         replacements: {
-                             proteinName: proteinName,
-                             experimentId: experimentId
-                         }
-                     },
-                     {type: sequelize.QueryTypes.SELECT}
-                 )
-                 .then(result => result[0]);
+        getSingleProteinXExperiment: function(proteinName, experimentId, uploader) {
+            const query = `
+                SELECT tr.experiment, tr."uniprotId", json_agg(json_build_object('t', tr.temperature, 'r', tr.ratio)) as reads
+                FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
+                where
+                    e.id = :experimentId and
+                    (e.private = :isPrivate or e.uploader = :uploader) AND
+                    e.id = e_tr."experimentId" and
+                    e_tr."temperatureReadId" = tr.id and
+                    p."uniprotId" = :proteinName and
+                    p_tr."uniprotId" = p."uniprotId" and
+                    p_tr."temperatureReadId" = tr.id
+                GROUP BY tr."experiment", tr."uniprotId";
+            `;
+            const start = new Date();
+            return context.dbConnection.query(
+                 query,
+                 {
+                     replacements: {
+                         proteinName: proteinName,
+                         experimentId: experimentId,
+                         isPrivate: false,
+                         uploader: uploader
+                     }
+                 },
+                 {type: sequelize.QueryTypes.SELECT}
+             )
+             .then(r => {
+                 console.log(`DURATION getSingleProteinXExperiment  ${(Date.now()-start)/1000} ms`);
+                 return r;
+             })
+             .then(result => result[0]);
         },
 
         getDistinctProteinsInExperiment: function(experimentId) {

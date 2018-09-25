@@ -220,14 +220,14 @@ module.exports = function(context) {
 
         getExperiment: function(request, response) {
             console.log('request.params', request.params);
-            experimentsDao.findExperiment(request.params.id)
+            experimentsDao.findExperiment(request.params.id, extractUserGoogleId(request))
                 .then(toSend => {
-                    if(toSend.private === true && toSend.uploader !== request.user.get('googleId')){
+                    if(toSend.private === true && toSend.uploader !== extractUserGoogleId(request)){
                         console.error('not the owner of the experiment');
                         toSend = {error: 'You are not the owner of the experiment and the experiment is not open to be viewed by others'};
                     }
 
-                    if(toSend.uploader === request.user.get('googleId')){
+                    if(toSend.uploader === extractUserGoogleId(request)){
                         toSend.isUploader = true;
                     }
 
@@ -258,7 +258,7 @@ module.exports = function(context) {
         },
 
         getExperiments: function(request, response) {
-            experimentsDao.getExperimentsPaged(queryParams(request.query))
+            experimentsDao.getExperimentsPaged(queryParams(request.query), extractUserGoogleId(request))
                 .then(result => response.status(200).send(result))
                 .catch(error => {
                     console.error('getExperiments', error);
@@ -277,7 +277,7 @@ module.exports = function(context) {
                 return response.status(400).send(error);
             }
 
-            experimentsDao.getRawData(identifier)
+            experimentsDao.getRawData(identifier, extractUserGoogleId(request))
                 .then(function(rawData){
                     if (rawData.constructor !== Array) {
                         rawData = [rawData];
@@ -326,8 +326,8 @@ module.exports = function(context) {
         },
 
         getExperimentsWhichHaveProtein: function(request, response) {
-            experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId)
-                .then(result => response.status(200).send(result.map(e => e.experiment)))
+            experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId, extractUserGoogleId(request))
+                .then(result => response.status(200).send(result.map(e => e.experimentId)))
                 .catch(error => {
                     console.error('getExperiments', error);
                     return response.status(500).send(error);
