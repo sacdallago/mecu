@@ -5,6 +5,7 @@ const fs = require('fs');
 const formidable = require('formidable');
 const sequelize = require('sequelize');
 
+const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
 
 const UPPER_QUERY_LIMIT = 10;
 const queryParams = (query) => {
@@ -20,7 +21,7 @@ const queryParams = (query) => {
 module.exports = function(context) {
 
     // Imports
-    const proteinsModel = context.component('models').module('proteins');
+    const proteinsDao = context.component('daos').module('proteins');
     const experimentsDao = context.component('daos').module('experiments');
     const proteinReadsDao = context.component('daos').module('proteinReads');
     const temperatureReadsDao = context.component('daos').module('temperatureReads');
@@ -83,7 +84,7 @@ module.exports = function(context) {
                                 lysate: lysate
                             },
                             rawData: data,
-                            uploader: request.user.get('googleId')
+                            uploader: extractUserGoogleId(request)
                         };
 
                         return context.dbConnection.transaction(transaction => {
@@ -113,28 +114,12 @@ module.exports = function(context) {
                                         });
                                     }).reduce((elements,element) => elements.concat(element));
 
-                                    // create proteins, necessary for the rest of the m-to-n relationships
-                                    let p = Promise.resolve();
                                     const proteinsCreateStartTime = new Date();
-                                    proteinList.forEach(protein => {
-                                        p = p.then(() => context.dbConnection.query(
-                                            `INSERT INTO public.proteins("uniprotId", "createdAt", "updatedAt") VALUES (:uniprotId, :createdAt, :updatedAt) ON CONFLICT DO NOTHING;`,
-                                            {
-                                                replacements: {
-                                                    uniprotId: protein,
-                                                    createdAt: new Date(),
-                                                    updatedAt: new Date()
-                                                }
-                                            },
-                                            {
-                                                type: sequelize.QueryTypes.INSERT
-                                            }
-                                        ))
-                                    });
 
-                                    return p
+                                    // create proteins, necessary for the rest of the m-to-n relationships
+                                    return proteinsDao.bulkCreate(proteinList)
                                         .then(() => {
-                                            console.log(`DURATION proteinsModel.create(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
+                                            console.log(`DURATION proteinsDao.bulkCreate(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
                                         })
                                         // protein X experiment table
                                         .then(() => proteinXExperimentModel.bulkCreate(
