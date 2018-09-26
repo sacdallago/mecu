@@ -60,73 +60,79 @@ $(document).ready(() => {
     console.log('query', query);
     if(query.protein && query.experiment) {
 
-        Promise.all([
-
-            // data for protein curve and meta data
-            ProteinService.getSpecificProtein(query.protein, query.experiment)
-                .then(proteinData => {
-                    console.log('proteinCurveData', proteinData);
-                    if(Object.keys(proteinData).length > 0) {
-                        return drawProtein(proteinData);
-                    } else {
-                        return Promise.resolve(true);
-                    }
-                }),
+        // data for protein curve and meta data
+        const proteinCurveAndMetaData = ProteinService.getSpecificProtein(query.protein, query.experiment)
+            .then(proteinData => {
+                console.log('proteinCurveData', proteinData);
+                if(Object.keys(proteinData).length > 0) {
+                    return drawProtein(proteinData);
+                } else {
+                    return Promise.resolve(true);
+                }
+            });
 
             // list of experiments which have this protein
-            ExperimentService.experimentsWhichHaveProtein(query.protein)
-                .then(exps => {
-                    console.log('exps', exps);
-                    return Promise.all([
-                        // list of experiments, which ahve this protein, but not the actual experiment
-                        drawOtherExperimentsSelect(exps, query.protein, query.experiment),
-                        TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                                exps.map(exp =>
-                                    ({
-                                        uniprotId: query.protein,
-                                        experiment: exp.experimentId
-                                    })
-                                )
+        const otherExperimentsAndSelect = ExperimentService.experimentsWhichHaveProtein(query.protein)
+            .then(exps => {
+                console.log('exps', exps);
+                return Promise.all([
+                    // list of experiments, which ahve this protein, but not the actual experiment
+                    drawOtherExperimentsSelect(exps, query.protein, query.experiment),
+                    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                            exps.map(exp =>
+                                ({
+                                    uniprotId: query.protein,
+                                    experiment: exp.experimentId
+                                })
                             )
-                            .then(reads => {
-                                console.log('reads', reads);
-                                // protein curves of other experiments
-                                return drawExperimentsWhichHaveProtein(reads, query.experiment);
-                            })
-                    ]);
-                }),
+                        )
+                        .then(reads => {
+                            console.log('reads', reads);
+                            // protein curves of other experiments
+                            return drawExperimentsWhichHaveProtein(reads, query.experiment);
+                        })
+                ]);
+            });
 
             // list of complexes which have this protein
-            ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
-                .then(complexes => {
-                    console.log('complexes', complexes);
-                    return drawRelatedComplexes(complexes, query.experiment);
-                }),
+        const complexes = ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
+            .then(complexes => {
+                console.log('complexes', complexes);
+                return drawRelatedComplexes(complexes, query.experiment);
+            });
 
             // list of protein interactions, which have this protein
-            Promise.all([
-                    ProteinService.getProteinInteractions(query.protein, query.experiment),
-                    ExperimentService.allProteinsContainedInExperiment(query.experiment)
-                ])
-                .then(([proteinInteractions, proteinsContainedInExperiment]) => {
-                    console.log('proteinInteractions', proteinInteractions);
-                    console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
-                    return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, query.experiment);
-                })
-        ])
-        .then(done => {
-            loading = false;
-            $(dropDownSelector).dropdown({
-                match: 'both',
-                fullTextSearch: true,
-                glyphWidth: 3.0
+        const ppi = Promise.all([
+                ProteinService.getProteinInteractions(query.protein, query.experiment),
+                ExperimentService.allProteinsContainedInExperiment(query.experiment)
+            ])
+            .then(([proteinInteractions, proteinsContainedInExperiment]) => {
+                console.log('proteinInteractions', proteinInteractions);
+                console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
+                return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, query.experiment);
             });
-            console.log('done', done);
-        })
-        .catch(error => {
-            loading = false;
-            console.error('loading error', error);
-        });
+
+        proteinCurveAndMetaData
+            .then(() => console.log('proteinCurveAndMetaData'))
+            .then(() => otherExperimentsAndSelect)
+            .then(() => console.log('otherExperimentsAndSelect'))
+            .then(() => complexes)
+            .then(() => console.log('complexes'))
+            .then(() => ppi)
+            .then(() => console.log('ppi'))
+            .then(() => {
+                loading = false;
+                $(dropDownSelector).dropdown({
+                    match: 'both',
+                    fullTextSearch: true,
+                    glyphWidth: 3.0
+                });
+                console.log('done');
+            })
+            .catch(error => {
+                loading = false;
+                console.error('loading error', error);
+            });
 
     }
 })
