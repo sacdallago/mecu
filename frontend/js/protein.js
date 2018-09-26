@@ -79,12 +79,12 @@ $(document).ready(() => {
                     console.log('exps', exps);
                     return Promise.all([
                         // list of experiments, which ahve this protein, but not the actual experiment
-                        drawOtherExperiments(exps, query.protein, query.experiment),
+                        drawOtherExperimentsSelect(exps, query.protein, query.experiment),
                         TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
                                 exps.map(exp =>
                                     ({
                                         uniprotId: query.protein,
-                                        experiment: exp
+                                        experiment: exp.experimentId
                                     })
                                 )
                             )
@@ -116,7 +116,11 @@ $(document).ready(() => {
         ])
         .then(done => {
             loading = false;
-            $(dropDownSelector).dropdown('restore defaults');
+            $(dropDownSelector).dropdown({
+                match: 'both',
+                fullTextSearch: true,
+                glyphWidth: 3.0
+            });
             console.log('done', done);
         })
         .catch(error => {
@@ -170,8 +174,6 @@ const writeProteinMetaData = ({
         lysate, e_createdAt, e_updatedAt, uploader
     }) => {
     return new Promise((resolve, reject) => {
-        $('#protein-name').text(uniprotId);
-
         $('#protein-data .uniprot-id .value')
         .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
             .text(uniprotId);
@@ -191,8 +193,9 @@ const writeProteinMetaData = ({
     });
 }
 
-const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
+const drawOtherExperimentsSelect = (experiments, uniprotId, actualExperiment) => {
     return new Promise((resolve, reject) => {
+
         const dropDownContainer = $(dropDownSelector).addClass(['ui', 'search', 'dropdown']);
         dropDownContainer.dropdown({});
         $('#experiment-number .dropdown .search').css({'padding': '11 20px'})
@@ -200,19 +203,19 @@ const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
         const menuContainer = $('#experiment-number .dropdown .menu');
         const otherExperiments = [];
         experiments.forEach(experiment => {
-            if(experiment != actualExperiment) {
+            if(experiment.experimentId != actualExperiment) {
                 otherExperiments.push(
                     $('<a />')
                         .addClass('item')
-                        .attr({'data-value':experiment, 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
-                        .text('Experiment '+experiment)
+                        .attr({'data-value':experiment.name, 'href':`/protein?protein=${uniprotId}&experiment=${experiment.experimentId}`})
+                        .text(experiment.name)
                 )
             } else {
                 otherExperiments.push(
                     $('<a />')
                         .addClass('item')
                         .attr({'data-value':'default'})
-                        .text('Experiment '+experiment)
+                        .text(experiment.name)
                 )
             }
         });
