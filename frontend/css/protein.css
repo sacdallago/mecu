@@ -129,3 +129,9 @@
     right: 3px;
     font-size: 13pt;
 }
+.related-proteins-container .cube-text-middle {
+    position: absolute;
+    top: 46%;
+    left: 36px;
+    font-size: 13pt;
+}

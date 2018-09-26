@@ -401,7 +401,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
         });
 
         const toAppend = (obj) => {
-            return [
+            const ret = [
                 $('<p />')
                     .addClass('grid-item-text')
                     .css({
@@ -411,11 +411,24 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
                         'line-height': '35px',
                         'font-size': '1.2rem'
                     })
-                    .text(obj.uniprotId),
+                    .text(obj.uniprotId)
+            ];
+
+            if(obj.present === 1) {
+                ret.push(
+                    $('<div />')
+                        .addClass(['cube-text-middle', 'grid-item-text'])
+                        .text('No data available')
+                )
+            }
+
+            ret.push(
                 $('<div />')
                     .addClass(['correlation', 'grid-item-text'])
                     .text(obj.correlation)
-            ];
+                );
+
+            return ret;
         };
 
         HelperFunctions.drawItemsAllExperimentsInOneItem(interactionsGridIdentifier, proteinExperimentObject, toAppend);
