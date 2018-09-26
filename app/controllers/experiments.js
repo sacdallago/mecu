@@ -332,6 +332,19 @@ module.exports = function(context) {
                     console.error('getExperiments', error);
                     return response.status(500).send(error);
                 });
+        },
+
+        getExperimentsWhichHaveComplex: function(request, response) {
+            const start = new Date();
+            experimentsDao.getExperimentsWhichHaveComplex(request.params.complexId, extractUserGoogleId(request))
+                .then(result => {
+                    console.log('DURATION getExperimentsWhichHaveComplex', (Date.now()-start)/1000);
+                    response.status(200).send(result);
+                })
+                .catch(error => {
+                    console.error('hasProtein', error);
+                    return response.status(500).send([]);
+                });
         }
     }
 };
