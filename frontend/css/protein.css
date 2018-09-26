@@ -20,10 +20,10 @@
     flex-direction: column;
     justify-content: space-around;
 
-    height: 480px;
     padding: 10px;
 }
 .protein-container .protein-curve {
+    height: 480px;
     min-width: 70%;
     position:relative;
 }
