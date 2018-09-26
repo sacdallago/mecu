@@ -109,7 +109,7 @@ module.exports = function(context) {
 
         getExperimentsWhichHaveProtein: function(uniprotId, uploader) {
             const query = `
-                SELECT "uniprotId", "experimentId"
+                SELECT "experimentId", name
                 FROM protein_experiments pe, experiments e
                 WHERE
                     pe."uniprotId" = :uniprotId and

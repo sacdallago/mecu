@@ -327,7 +327,7 @@ module.exports = function(context) {
 
         getExperimentsWhichHaveProtein: function(request, response) {
             experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId, extractUserGoogleId(request))
-                .then(result => response.status(200).send(result.map(e => e.experimentId)))
+                .then(result => response.status(200).send(result))
                 .catch(error => {
                     console.error('getExperiments', error);
                     return response.status(500).send(error);
