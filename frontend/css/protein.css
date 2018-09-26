@@ -20,12 +20,11 @@
     flex-direction: column;
     justify-content: space-around;
 
-    width: 50%;
-    min-width: 300px;
     height: 480px;
     padding: 10px;
 }
 .protein-container .protein-curve {
+    min-width: 70%;
     position:relative;
 }
 .protein-container .protein-curve #chart {
@@ -47,7 +46,12 @@
         .experiment-data > *:not(.container-info) {
     display: flex;
     justify-content: space-between;
-    border-bottom: 0.5px solid silver;
+    padding: 5 0 5 0px;
+}
+.protein-container .meta-data-container .experiment-data .name .value {
+    max-width: 200px;
+    word-break: break-word;
+    text-align: right;
 }
 .protein-container .meta-data-container .experiment-data .description .value {
     word-break: break-word;
