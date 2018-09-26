@@ -1,4 +1,5 @@
 let localStorageDeleted = StorageManager.get().length === 0;
+const dropDownSelector = '#experiment-number .dropdown';
 
 // grid proteins from the complex
 const proteinCurvesGridIdentifier = '#curves-grid .grid';
@@ -22,32 +23,43 @@ $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     console.log('query', query);
-    if(query.id) {
+    if(query.id && query.experiment) {
         let loading = true;
 
-        ComplexService.getComplexById(query.id)
+        const complexData = ComplexService.getComplexById(query.id);
+        const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(query.id);
+        const temperatureReadsToProteins = (complex) =>
+            TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                    complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment })
+                )
+            );
+
+        complexData
             .then(complex => {
                 console.log('complex', complex);
                 return complex;
             })
-            .then(complex => Promise.all([
-                drawComplexMetadata(complex),
-                TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                    complex.proteins.map(protein =>
-                        ({
-                            uniprotId: protein,
-                            experiment: query.experiment
-                        })
-                    )
-                )
-            ]))
+            .then(complex =>
+                Promise.all([
+                    drawComplexMetadata(complex, query.experiment),
+                    temperatureReadsToProteins(complex)
+                ])
+            )
             .then(([done, proteinCurves]) => {
                 console.log('proteinCurves', proteinCurves);
                 drawCombinedProteinCurves(proteinCurves);
                 drawCurvesItems(proteinCurves);
                 return done;
             })
+            .then(() => experimentsWhichHaveComplex)
+            .then(exps => drawOtherExperimentsSelect(exps, query.id, query.experiment))
             .then(done => {
+                $(dropDownSelector).dropdown({
+                    match: 'both',
+                    fullTextSearch: true,
+                    glyphWidth: 3.0,
+                    placeholder: 'default'
+                });
                 loading = false;
                 console.log('done', done);
             })
@@ -58,11 +70,8 @@ $(document).ready(() => {
     }
 });
 
-const drawComplexMetadata = (complex) => {
+const drawComplexMetadata = (complex, experimentId) => {
     return new Promise((resolve, reject) => {
-        const complexNameDiv = $('#complex-name');
-        complexNameDiv.text(complex.name);
-
 
         const dataContainer = $('#data-container .column-right');
 
@@ -129,6 +138,10 @@ const drawComplexMetadata = (complex) => {
 
         dataContainer.append([
             itemContainer.clone().append([
+                text.clone().text('Experiment'),
+                value.clone().text(experimentId)
+            ]),
+            itemContainer.clone().append([
                 text.clone().text('Purification Method'),
                 value.clone().text(complex.purificationMethod)
             ]),
@@ -185,6 +198,38 @@ const drawComplexMetadata = (complex) => {
         //         updatedAt 2018-08-24T17:04:04.840Z\n
         //         `)
         // );
+        resolve(true);
+    });
+}
+
+const drawOtherExperimentsSelect = (experiments, complexId, actualExperiment) => {
+    return new Promise((resolve, reject) => {
+
+        const dropDownContainer = $(dropDownSelector).addClass(['ui', 'search', 'dropdown']);
+        dropDownContainer.dropdown({});
+        $('#experiment-number .dropdown .search').css({'padding': '11 20px'})
+
+        const menuContainer = $('#experiment-number .dropdown .menu');
+        const otherExperiments = [];
+        experiments.forEach(experiment => {
+            if(experiment.id != actualExperiment) {
+                otherExperiments.push(
+                    $('<a />')
+                        .addClass('item')
+                        .attr({'data-value':experiment.name, 'href':`/complex?id=${complexId}&experiment=${experiment.id}`})
+                        .text(experiment.name)
+                )
+            } else {
+                otherExperiments.push(
+                    $('<a />')
+                        .addClass('item')
+                        .attr({'data-value':'default'})
+                        .text(experiment.name)
+                )
+            }
+        });
+        menuContainer.append(otherExperiments);
+
         resolve(true);
     });
 }

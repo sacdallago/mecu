@@ -67,10 +67,18 @@ ExperimentService.updateExperiment = (id, experiment) => {
         });
 }
 ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
-    return fetch(`/api/experiments/containing/${uniprotId}`)
+    return fetch(`/api/experiments/containing/protein/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
             console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, uniprotId);
+            return [];
+        });
+}
+ExperimentService.experimentsWhichHaveComplex = (complexId) => {
+    return fetch(`/api/experiments/containing/complex/${complexId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ExperimentService.experimentsWhichHaveComplex: ', error, complexId);
             return [];
         });
 }

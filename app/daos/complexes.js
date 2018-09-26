@@ -1,11 +1,11 @@
 const sequelize = require('sequelize');
 
-module.exports = function(context) {
+module.exports = (context) => {
     // Imports
     const complexesModel = context.component('models').module('complexes');
 
     return {
-        getComplex: function(id) {
+        getComplex: (id) => {
             return complexesModel.findAll({
                 where: {
                     id
@@ -14,7 +14,7 @@ module.exports = function(context) {
             .then(complexArray => complexArray.length >= 1 ? complexArray[0] : {});
         },
 
-        getComplexWhichHasProtein: function(uniprotId) {
+        getComplexWhichHasProtein: (uniprotId) => {
             const query = `
                 select c.id, c.name, c.comment, c.proteins
                 from complexes c, proteins p, protein_complexes cp
