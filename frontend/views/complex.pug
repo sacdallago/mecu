@@ -4,7 +4,16 @@ block postStyles
         link(rel='stylesheet', href='/public/css/complex.css')
 
 block content
-    h3.complex-name#complex-name
+    .complex-header
+        .complex-name
+        .experiment-number#experiment-number
+            .dropdown.dropdown-search
+                input(type='hidden' name='experiments' value='default').text-input
+                .text
+                    .value Select
+                .dropdown-icon
+                    i.dropdown.icon
+                .menu
         
     .data-container#data-container
         .column-left
