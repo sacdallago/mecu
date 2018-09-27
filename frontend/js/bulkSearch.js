@@ -109,10 +109,13 @@ const drawExperimentsTable = (data, checkboxIdentifier) => {
             )
         );
         row.append(td.clone().text(exp.id));
-        row.append(td.clone().text(exp.name));
-        row.append(td.clone().text(exp.metaData.description));
+        row.append(td.clone().addClass('name').text(exp.name));
+        row.append(td.clone().addClass('description').text(
+            exp.metaData.description && exp.metaData.description.length > 200 ?
+            exp.metaData.description.slice(0,200)+'...' :
+            exp.metaData.description));
         row.append(
-            td.clone().append(
+            td.clone().addClass('uploader').append(
                 link.clone()
                     .attr({'href':'https://plus.google.com/'+exp.uploader})
                     .text('Google Plus Profile')

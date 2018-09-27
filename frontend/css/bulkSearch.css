@@ -1,7 +1,21 @@
+
 .maxWidth {
     width: 100%
 }
 
+.ui.table td {
+    padding: 5px !important;
+}
+.table .name {
+    max-width: 400px;
+}
+.table .uploader {
+    min-width: 118px;
+}
+
+.ui.input.search {
+    border: silver 1px solid;
+}
 .textarea {
     height: 6em;
     border-radius: 3px;
