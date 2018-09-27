@@ -5,7 +5,7 @@ block postStyles
     link(rel='stylesheet', href='/public/css/pagination.css')
 
 block content
-    h3 1. Select experiments
+    .modal#add-protein-modal
     table.ui.celled.table
         thead
             tr
@@ -34,6 +34,11 @@ block content
     
     .heatmap-container
         .heatmap#heatmap
+        .show-button
+            a.ui.disabled.button#show-button(href='/curves')
+                i.eye.icon
+                span Analyze
+        
         .legend
             .l-item.c1 
                 .sample
@@ -54,5 +59,7 @@ block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/js/bulkSearch.js")
+    script(type="text/javascript", src="/public/js/modal.js")
+    script(type="text/javascript", src="/public/js/helper.js")
     script(type="text/javascript", src="/public/js/pagination.js")
+    script(type="text/javascript", src="/public/js/bulkSearch.js")

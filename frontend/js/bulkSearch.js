@@ -1,3 +1,6 @@
+const modalIdentifier = '#add-protein-modal';
+const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+const showButtonIdentifier = '#show-button';
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
 const ITEM_PER_PAGE_COUNT = 3;
@@ -318,8 +321,38 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
                 click: function(e) {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : '');
-                    saveExperimentToLocalStorage(tmpList, experiments[e.point.x]);
-                    drawProteinXExperimentHeatmap(experiments, proteins, data);
+
+                    ModalService.listenForDecision(
+                        modalIdentifier,
+                        ['custom-modal-event-no', 'custom-modal-event-yes', 'custom-modal-event-add'],
+                        (event) => {
+                            switch(event.type) {
+                                case 'custom-modal-event-no':
+                                    console.log('doing nothing...');
+                                    break;
+                                case 'custom-modal-event-yes':
+                                    console.log('overwriting...');
+                                    StorageManager.clear();
+                                    StorageManager.toggle(
+                                        tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                        () => {}
+                                    );
+                                    drawProteinXExperimentHeatmap(experiments, proteins, data);
+                                    enableShowButton();
+                                    break;
+                                case 'custom-modal-event-add':
+                                    console.log('adding...');
+                                    StorageManager.add(
+                                        tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                        () => {}
+                                    );
+                                    drawProteinXExperimentHeatmap(experiments, proteins, data);
+                                    enableShowButton();
+                                    break;
+                            }
+                        }
+                    );
+
                 }
             },
             heatmap: {
@@ -343,25 +376,8 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
 
-const saveExperimentToLocalStorage = (proteinList, experiment) => {
-    // if the localStorage hasn't been deleted yet and there are some proteins in it
-    if(!localStorageDeleted && StorageManager.get().length > 0) {
-        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
-            StorageManager.clear();
-            console.log('store cleared');
-            localStorageDeleted = true;
-            proteinList.forEach(protein => {
-                // console.log('adding', {uniprotId: protein, experiment: experiment});
-                StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
-            });
-        }
-    // else just add the protein/experiment pair
-    } else {
-        proteinList.forEach(protein => {
-            // console.log('adding', {uniprotId: protein, experiment: experiment});
-            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
-        });
-    }
+const enableShowButton = () => {
+    $(showButtonIdentifier).removeClass('disabled').addClass('green');
 }
 
 
