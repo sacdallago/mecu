@@ -6,7 +6,8 @@ block postStyles
 
 block content
     .modal#add-protein-modal
-    table.ui.celled.table
+    h3.step 1. Select experiments
+    .step-description Select experiments of which the contents you want to inspect.
     table.ui.celled.small.table
         thead
             tr
@@ -19,7 +20,8 @@ block content
     
     .pagination#pagination-component
             
-    h3 2. Input proteins
+    h3.step 2. Input proteins
+    .step-description Input UniProt identifier of proteins. Saved proteins are automatically added.
     .text-center
         .ui.input.search.maxWidth
             textarea(name="prot", placeholder="P12004 P12023").inline.prompt.maxWidth.textarea.protein-list
@@ -30,12 +32,13 @@ block content
             strong 0
         |  Protein identifiers matched by your input
     .space
-    h3 3. Check statistics
-    .space
-    p Input at least one protein and select at least one experiment to get started.
+
+    h3.step 3. Check statistics
+    .step-description
     
     .heatmap-container
-        .heatmap#heatmap
+        .heatmap#heatmap Here you will see a which experiment has which protein.
+        
         .show-button
             a.ui.disabled.button#show-button(href='/curves')
                 i.eye.icon
@@ -44,10 +47,10 @@ block content
         .legend
             .l-item.c1 
                 .sample
-                .text Protein is not contained
+                .text Protein is not contained in the experiment
             .l-item.c2 
                 .sample
-                .text Protein is contained
+                .text Protein is contained in the experiment
             .l-item.c3 
                 .sample
                 .text Protein is saved for visualization

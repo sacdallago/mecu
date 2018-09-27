@@ -3,6 +3,10 @@
     width: 100%
 }
 
+.step {
+    margin-bottom: 3px !important;
+}
+
 .ui.table td {
     padding: 5px !important;
 }
@@ -29,8 +33,11 @@
 .heatmap-container {
     display: flex;
     flex-direction: column;
+    padding-bottom: 20px;
 }
-
+.heatmap-container > *{
+    margin: 5 0 5 0px;
+}
 .heatmap-container .legend {
     display: flex;
     justify-content: space-between;
