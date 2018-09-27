@@ -50,13 +50,11 @@ const drawPaginationComponent = (actualPage, totalPages) => {
  * @return { {uniprotId: string, experiments:{experiment: number, reads: {t: number, r: number}[] }[] }[] } list of proteins with the according experiments
  */
 const fetchMeltingCurves = function(experiments, proteins){
-    const tableBodyIdentifier = '#result-table tbody';
-    const tableHeadIdentifier = '#result-table thead tr th:not(:first-child)';
 
     // always empty table before new request
-    $(tableBodyIdentifier).empty();
-    $(tableHeadIdentifier).remove();
     if(experiments.length < 1 || proteins.length < 1){
+        $('#heatmap').empty();
+        $('#heatmap').text('Here you will see a which experiment has which protein.');
         return;
     }
 
