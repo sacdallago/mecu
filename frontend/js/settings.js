@@ -4,6 +4,11 @@
 $('.dropdown').dropdown();
 
 highChartsCurvesConfigObject = {
+    chart: {
+        title: undefined,
+        backgroundColor: '#fbfbfb'
+    },
+
     title: {
         text: ''
     },
