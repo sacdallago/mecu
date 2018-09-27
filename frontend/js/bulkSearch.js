@@ -1,3 +1,4 @@
+const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
 const modalIdentifier = '#add-protein-modal';
 const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
 const showButtonIdentifier = '#show-button';
@@ -393,5 +394,8 @@ $('textarea.inline.prompt.maxWidth.textarea')
         selectedProteins = new Set(matches);
         matchCount.text(selectedProteins.size);
 
-        fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
+        HelperFunctions.delay(
+            () => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)),
+            DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME
+        );
     });
