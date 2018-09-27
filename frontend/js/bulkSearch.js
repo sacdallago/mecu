@@ -386,10 +386,26 @@ const enableShowButton = () => {
     $(showButtonIdentifier).removeClass('disabled').addClass('green');
 }
 
+const populateProteinSearch = () => {
+    const text = Array.from(selectedProteins).reduce((acc,c) => acc+=(c+' '), '');
+    $('textarea.protein-list').val(text);
+}
 
 $(document)
-    .ready(() => pullPaginatedExperiments(experimentsQuery)
+    .ready(() => Promise.resolve()
+        .then(() => {
+            // populate selectedProteins and selectedExperiments with the data from localStorage
+            const storageData = StorageManager.get('proteins');
+
+            storageData.forEach(proteinWithExperimentsList => {
+                selectedProteins.add(proteinWithExperimentsList.uniprotId);
+                proteinWithExperimentsList.experiment.forEach(experiment => selectedExperiments.add(experiment));
+            });
+        })
+        .then(() => populateProteinSearch())
+        .then(() => pullPaginatedExperiments(experimentsQuery))
         .then(result => drawPaginationComponent(1, result.count))
+        .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
     );
 
 $('textarea.inline.prompt.maxWidth.textarea')
