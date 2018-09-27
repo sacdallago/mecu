@@ -68,7 +68,7 @@ const fetchMeltingCurves = function(experiments, proteins){
 
     TemperatureService.temperatureReadsToProteinsAndExperimentPairs(arr)
         .then(data => {
-            console.log('data', data);
+            console.log('temperatureReadsToProteinsAndExperimentPairs', data);
             return data;
         })
         .then(data => drawProteinXExperimentHeatmap(experiments, proteins, data));
@@ -238,7 +238,7 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     }));
     // console.log('contained/selected/total', contained, selected, total);
 
-    let colorAxis = {}
+    let colorAxis = {};
     // none contained (selected not interesting)
     if(contained == 0) {
         // console.log('none contained (selected not interesting)')
@@ -307,16 +307,18 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
         data: s
     }));
     highChartsHeatMapConfigObj.tooltip = {
+        useHTML: true,
         formatter: function () {
             if (this.point.value >= 1) {
-                return `Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> has Protein
-                <b>${this.series.yAxis.categories[this.point.y]}</b> in it <b>`;
+                return `<div class="custom-chart-tooltip">Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> has Protein
+                <b>${this.series.yAxis.categories[this.point.y]}</b> in it <b></div>`;
             } else {
-                return `Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> does <b>NOT</b> have
-                <b>${this.series.yAxis.categories[this.point.y]}</b> Protein in it <b>`;
+                return `<div class="custom-chart-tooltip">Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> does <b>NOT</b> have
+                <b>${this.series.yAxis.categories[this.point.y]}</b> Protein in it <b></div>`;
             }
         }
     };
+
     highChartsHeatMapConfigObj.plotOptions = {
         series: {
             events: {
