@@ -375,8 +375,6 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
         {'style':`height:${115+rowSize*proteins.length}px; width:${100+colSize*experiments.length}px`}
     );
 
-    $('.heatmap-container .legend').css('visibility', 'visible');
-
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
 
