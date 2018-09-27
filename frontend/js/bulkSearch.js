@@ -371,8 +371,14 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
 
     const colSize = 20;
     const rowSize = 27;
+    const heatmapHeight = highChartsHeatMapConfigObj.chart.marginTop +
+        highChartsHeatMapConfigObj.chart.marginBottom +
+        rowSize*proteins.length;
+    const heatmapWidth = highChartsHeatMapConfigObj.chart.marginRight +
+        highChartsHeatMapConfigObj.chart.marginLeft +
+        experiments.length*colSize;
     $('#heatmap').attr(
-        {'style':`height:${115+rowSize*proteins.length}px; width:${100+colSize*experiments.length}px`}
+        {'style':`height:${heatmapHeight}px; width:${heatmapWidth}px`}
     );
 
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);

@@ -80,7 +80,9 @@ highChartsHeatMapConfigObj = {
         title: undefined,
         type: 'heatmap',
         marginTop: 40,
-        marginBottom: 80,
+        marginBottom: 40,
+        marginRight: 20,
+        marginLeft: 20,
         plotBorderWidth: 1,
         backgroundColor: '#fbfbfb'
     },
