@@ -6,6 +6,25 @@ block postStyles
 block content
     .space
     h1 Global View
+    .settings
+        .ui.selection.dropdown#coloring-dropdown
+            i.dropdown.icon
+            input(type="hidden" name="coloring" value="0").value
+            .text
+            .menu
+                .item(data-value="0") Color by Protein
+                .item(data-value="1") Color by Experiment
+        .ui.selection.fluid.multiple.dropdown#experiments-dropdown
+            input(type="hidden" name="experiments").value
+            .text
+            .menu
+            i.dropdown.icon
+        .ui.selection.fluid.multiple.dropdown#proteins-dropdown
+            input(type="hidden" name="proteins").value
+            .text
+            .menu
+            i.dropdown.icon
+    
     .ui.vertically.divided.grid
         .two.column.row
             .column
