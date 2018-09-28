@@ -37,8 +37,8 @@ StorageManager.splitUpProteinIntoExperiments = (protein) => {
 
 /**
  * takes a list of proteins, hands them to the StorageManager.splitUpProteinIntoExperiments function
- * @param  { {uniprotId: string, (experiment:string| experiments:{experiment})}[] } proteins - list of proteins
- * @return { {uniprotId: string, experiment}[] } the protein(s) split up to be only arrays of protein/experiment pairs
+ * @param  { {uniprotId: string, (experiment: string| experiments: {experiment})}[] } proteins - list of proteins
+ * @return { {uniprotId: string, experiment: string}[] } the protein(s) split up to be only arrays of protein/experiment pairs
  */
 StorageManager.splitUpProteins = (proteins) => {
     let tmp = [];
