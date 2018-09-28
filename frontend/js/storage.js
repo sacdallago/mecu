@@ -232,8 +232,8 @@ StorageManager.getMinTemp = function() {
             }
 
             for(let j = 0; j<proteins[i].experiment.length; j++) {
-                if(proteins[i].experiment[j].constructor !== Number) {
-                    console.log(proteins[i].experiment[j].constructor !== Number);
+                if(proteins[i].experiment[j] === null || proteins[i].experiment[j].constructor !== Number) {
+                    console.log('null value found or not a number ');
                     ok = false;
                     console.error('Local storage had faulty values... (L2)', proteins[i].experiment);
                     break;
