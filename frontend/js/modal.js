@@ -55,7 +55,33 @@ ModalService.listenForDecision = (identifier, arrayOfActions, handler) => {
     );
 }
 
+
+// -----------------------------------------------------------------------------------------
 // custom usages
+// -----------------------------------------------------------------------------------------
+ModalService.openModalAndDoAction = (
+    action1,
+    action2,
+    action3
+) => {
+    ModalService.listenForDecision(
+        modalIdentifier,
+        ['custom-modal-event-no', 'custom-modal-event-yes', 'custom-modal-event-add'],
+        (event) => {
+            switch(event.type) {
+                case 'custom-modal-event-no':
+                    action1();
+                    break;
+                case 'custom-modal-event-yes':
+                    action2();
+                    break;
+                case 'custom-modal-event-add':
+                    action3();
+                    break;
+            }
+        }
+    );
+}
 ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons = (identifier) => {
     return ModalService.create(
         identifier,
@@ -71,7 +97,7 @@ ModalService.createButtonsNoYesAdd = () => {
     return [
         {
             id: 'modal-deny-button',
-            text: 'No',
+            text: 'Cancel',
             action: 'no'
         },
         {

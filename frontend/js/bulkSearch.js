@@ -326,34 +326,24 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : '');
 
-                    ModalService.listenForDecision(
-                        modalIdentifier,
-                        ['custom-modal-event-no', 'custom-modal-event-yes', 'custom-modal-event-add'],
-                        (event) => {
-                            switch(event.type) {
-                                case 'custom-modal-event-no':
-                                    console.log('doing nothing...');
-                                    break;
-                                case 'custom-modal-event-yes':
-                                    console.log('overwriting...');
-                                    StorageManager.clear();
-                                    StorageManager.toggle(
-                                        tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
-                                        () => {}
-                                    );
-                                    drawProteinXExperimentHeatmap(experiments, proteins, data);
-                                    enableShowButton();
-                                    break;
-                                case 'custom-modal-event-add':
-                                    console.log('adding...');
-                                    StorageManager.add(
-                                        tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
-                                        () => {}
-                                    );
-                                    drawProteinXExperimentHeatmap(experiments, proteins, data);
-                                    enableShowButton();
-                                    break;
-                            }
+                    ModalService.openModalAndDoAction(
+                        () => {},
+                        () => {
+                            StorageManager.clear();
+                            StorageManager.toggle(
+                                tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                () => {}
+                            );
+                            drawProteinXExperimentHeatmap(experiments, proteins, data);
+                            enableShowButton();
+                        },
+                        () => {
+                            StorageManager.add(
+                                tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                () => {}
+                            );
+                            drawProteinXExperimentHeatmap(experiments, proteins, data);
+                            enableShowButton();
                         }
                     );
 
