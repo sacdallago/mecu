@@ -53,8 +53,7 @@
 .curves-grid .grid {
     padding: 10px;
 }
-.curves-grid .grid .selected-curve-dot {
-    visibility: hidden;
+.selected-curve-dot {
     width: 20px;
     background: green;
     height: 20px;

@@ -4,6 +4,7 @@ block postStyles
         link(rel='stylesheet', href='/public/css/complex.css')
 
 block content
+    .modal#add-protein-modal
     .complex-header
         .complex-name
         .experiment-number#experiment-number
@@ -22,6 +23,10 @@ block content
     
     .curves-grid#curves-grid
         h3.title Contained Proteins
+        .select-all-button
+            a.ui.button#select-all-button
+                i.check.icon
+                span Select All
         .grid
     
 block settings
@@ -34,5 +39,6 @@ block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/js/complex.js")
     script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/modal.js")
+    script(type="text/javascript", src="/public/js/complex.js")

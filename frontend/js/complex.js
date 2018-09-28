@@ -1,73 +1,51 @@
 let localStorageDeleted = StorageManager.getProteins().length === 0;
 const dropDownSelector = '#experiment-number .dropdown';
 
+const modalIdentifier = '#add-protein-modal';
+const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+const selectAllButtonSelector = '#select-all-button';
+
 // grid proteins from the complex
 const proteinCurvesGridIdentifier = '#curves-grid .grid';
+const gridItemIdentifier = '.grid-item';
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
-    itemSelector: '.grid-item',
+    itemSelector: gridItemIdentifier,
     layoutMode: 'packery',
     packery: {
         gutter: 10
     }
 });
-proteinCurvesGrid.on('click', '.grid-item', function(){
+proteinCurvesGrid.on('click', gridItemIdentifier, function(){
     const data = $(this).data('grid-item-contents');
-    let dot = $(this).children('.selected-curve-dot');
     console.log('data', data.obj.uniprotId, data.experiment.experiment);
-    const hasBeenAdded = saveExperimentToLocalStorage(data.obj.uniprotId, data.experiment.experiment);
-    if(hasBeenAdded) dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
-});
 
-
-$(document).ready(() => {
-    const currentUri = URI(window.location.href);
-    const query = currentUri.search(true);
-    console.log('query', query);
-    if(query.id && query.experiment) {
-        let loading = true;
-
-        const complexData = ComplexService.getComplexById(query.id);
-        const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(query.id);
-        const temperatureReadsToProteins = (complex) =>
-            TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                    complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment })
-                )
-            );
-
-        complexData
-            .then(complex => {
-                console.log('complex', complex);
-                return complex;
-            })
-            .then(complex =>
-                Promise.all([
-                    drawComplexMetadata(complex, query.experiment),
-                    temperatureReadsToProteins(complex)
-                ])
-            )
-            .then(([done, proteinCurves]) => {
-                console.log('proteinCurves', proteinCurves);
-                drawCombinedProteinCurves(proteinCurves);
-                drawCurvesItems(proteinCurves);
-                return done;
-            })
-            .then(() => experimentsWhichHaveComplex)
-            .then(exps => drawOtherExperimentsSelect(exps, query.id, query.experiment))
-            .then(done => {
-                $(dropDownSelector).dropdown({
-                    match: 'both',
-                    fullTextSearch: true,
-                    glyphWidth: 3.0,
-                    placeholder: 'default'
-                });
-                loading = false;
-                console.log('done', done);
-            })
-            .catch(error => {
-                loading = false;
-                console.error('loading error', error);
-            });
+    if(!localStorageDeleted) {
+        ModalService.openModalAndDoAction(
+            () => {},
+            () => {
+                StorageManager.clear();
+                gridItemToggleDotAll(false);
+                StorageManager.toggle(
+                    {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
+                    () => gridItemToggleDot(this)
+                );
+                localStorageDeleted = true;
+            },
+            () => {
+                StorageManager.toggle(
+                    {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
+                    () => gridItemToggleDot(this)
+                );
+                localStorageDeleted = true;
+            }
+        );
+    } else {
+        StorageManager.toggle(
+            {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
+            () => gridItemToggleDot(this)
+        );
     }
+
 });
 
 const drawComplexMetadata = (complex, experimentId) => {
@@ -267,8 +245,10 @@ const drawCombinedProteinCurves = (proteins) => {
 }
 
 
-const drawCurvesItems = (proteins) => {
+const drawCurvesItems = (proteins, experimentId) => {
     return new Promise((resolve, reject) => {
+
+        const alreadyInStorage = StorageManager.getProteins();
 
         const toAppend = (obj, exp) => {
             return [
@@ -283,33 +263,123 @@ const drawCurvesItems = (proteins) => {
                     })
                     .text(obj.uniprotId),
                 $('<div />')
-                    .addClass('selected-curve-dot')
+                    .addClass(
+                        'dot-div'+
+                        (
+                            alreadyInStorage.find(p =>
+                                p.uniprotId === obj.uniprotId &&
+                                p.experiment.find(e => e === obj.experiments[0].experiment)
+                            ) ? ' selected-curve-dot' : ''
+                        )
+                    )
             ];
         };
 
         HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteins, toAppend);
 
+        // add functionality to select all button
+        document.querySelector(selectAllButtonSelector).addEventListener(
+            'click',
+            () => {
+                ModalService.openModalAndDoAction(
+                    () => {},
+                    () => {
+                        StorageManager.clear();
+                        StorageManager.add(
+                            proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
+                            (c,a) => {
+                                document.querySelector(selectAllButtonSelector).classList.add('green');
+                                document.querySelector(selectAllButtonSelector).classList.add('disabled');
+                                gridItemToggleDotAll(true);
+                            }
+                        );
+                    },
+                    () => {
+                        StorageManager.add(
+                            proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
+                            () => {
+                                document.querySelector(selectAllButtonSelector).classList.add('green');
+                                document.querySelector(selectAllButtonSelector).classList.add('disabled');
+                                gridItemToggleDotAll(true);
+                            }
+                        );
+                    }
+                )
+            }
+        );
+
         resolve(true);
     })
 }
 
-
-const saveExperimentToLocalStorage = (protein, experiment) => {
-    let added = true;
-    // if the localStorage hasn't been deleted yet and there are some proteins in it
-    if(!localStorageDeleted && StorageManager.get().length > 0) {
-        added = confirm("There are Proteins still in the local storage. Do you want to overwrite them?");
-        if(added) {
-            StorageManager.clear();
-            console.log('store cleared');
-            localStorageDeleted = true;
-            console.log('adding', {uniprotId: protein, experiment: experiment});
-            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
-        }
-    // else just add the protein/experiment pair
+const gridItemToggleDot = (gridItem, show) => {
+    let dot = $(gridItem).children('.dot-div');
+    if(show === true) {
+        dot.addClass('selected-curve-dot');
+    } else if(show === false) {
+        dot.removeClass('selected-curve-dot');
     } else {
-        console.log('adding', {uniprotId: protein, experiment: experiment});
-        StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
+        dot.toggleClass('selected-curve-dot')
     }
-    return added;
 }
+const gridItemToggleDotAll = (show) => {
+    if(show === true) {
+        document.querySelectorAll(gridItemIdentifier).forEach(item => gridItemToggleDot(item, true))
+    } else if(show === false) {
+        document.querySelectorAll(gridItemIdentifier).forEach(item => gridItemToggleDot(item, false))
+    } else {
+        document.querySelectorAll(gridItemIdentifier).forEach(item => gridItemToggleDot(item))
+    }
+}
+
+
+$(document).ready(() => {
+    const currentUri = URI(window.location.href);
+    const query = currentUri.search(true);
+    console.log('query', query);
+    if(query.id && query.experiment) {
+        let loading = true;
+
+        const complexData = ComplexService.getComplexById(query.id);
+        const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(query.id);
+        const temperatureReadsToProteins = (complex) =>
+            TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                    complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment })
+                )
+            );
+
+        complexData
+            .then(complex => {
+                console.log('complex', complex);
+                return complex;
+            })
+            .then(complex =>
+                Promise.all([
+                    drawComplexMetadata(complex, query.experiment),
+                    temperatureReadsToProteins(complex)
+                ])
+            )
+            .then(([done, proteinCurves]) => {
+                console.log('proteinCurves', proteinCurves);
+                drawCombinedProteinCurves(proteinCurves);
+                drawCurvesItems(proteinCurves, query.experiment);
+                return done;
+            })
+            .then(() => experimentsWhichHaveComplex)
+            .then(exps => drawOtherExperimentsSelect(exps, query.id, query.experiment))
+            .then(done => {
+                $(dropDownSelector).dropdown({
+                    match: 'both',
+                    fullTextSearch: true,
+                    glyphWidth: 3.0,
+                    placeholder: 'default'
+                });
+                loading = false;
+                console.log('done', done);
+            })
+            .catch(error => {
+                loading = false;
+                console.error('loading error', error);
+            });
+    }
+});
