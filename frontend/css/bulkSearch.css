@@ -1,7 +1,25 @@
+
 .maxWidth {
     width: 100%
 }
 
+.step {
+    margin-bottom: 3px !important;
+}
+
+.ui.table td {
+    padding: 5px !important;
+}
+.table .name {
+    max-width: 400px;
+}
+.table .uploader {
+    min-width: 118px;
+}
+
+.ui.input.search {
+    border: silver 1px solid;
+}
 .textarea {
     height: 6em;
     border-radius: 3px;
@@ -15,15 +33,17 @@
 .heatmap-container {
     display: flex;
     flex-direction: column;
+    padding-bottom: 20px;
 }
-
+.heatmap-container > *{
+    margin: 5 0 5 0px;
+}
 .heatmap-container .legend {
     display: flex;
-    width: max-content;
-    visibility: hidden;
+    justify-content: space-between;
+    flex-wrap: wrap;
     border: 0.5px solid silver;
     background-color: rgba(226, 226, 226, 0.48);
-    margin: 5px;
 }
 .heatmap-container .legend .l-item{
     display:flex;

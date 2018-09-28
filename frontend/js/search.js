@@ -58,7 +58,7 @@ grid.on('click', '.grid-item', function(){
  * @return {[type]}   [description]
  */
 searchInput.keydown(function(e) {
-    delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
+    HelperFunctions.delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
 });
 
 /**

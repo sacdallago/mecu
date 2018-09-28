@@ -109,6 +109,23 @@ ProteinService.getProteinInteractions = (uniprotId, expId) => {
             return [];
         });
 }
+ProteinService.getProteinExperimentCombinations = (proteinExperimentArr, expId) => {
+    return fetch(
+            `/api//protein/experimentcombinations`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify(proteinExperimentArr)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ProteinService.getProteinInteractions: ', error, proteinExperimentArr);
+            return [];
+        });
+}
 
 ComplexService = {};
 ComplexService.getComplexById = (id) => {
