@@ -128,13 +128,6 @@ function populateGlobalsGraphs(){
             };
             Highcharts.chart('curves-chart', highChartsCurvesConfigObject);
 
-            // click binding for the fullscreen
-            $('.highcharts-series, .highcharts-background').bind('mousedown', function () {
-                console.log('click');
-                $('.curves-graph-container').toggleClass('modal');
-                $('.chart').highcharts().reflow();
-            });
-
             // plot distances
             globalGraph = new MecuGraph({element: "#nodesGraph"});
             globalGraph.add(data);
