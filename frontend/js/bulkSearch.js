@@ -383,6 +383,19 @@ const populateProteinSearch = () => {
     $('textarea.protein-list').val(text);
 }
 
+$('textarea.inline.prompt.maxWidth.textarea')
+    .keyup(function(){
+        let matches = $(this).val().match(uniprotAccessionRegex);
+
+        selectedProteins = new Set(matches);
+        matchCount.text(selectedProteins.size);
+
+        HelperFunctions.delay(
+            () => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)),
+            DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME
+        );
+    });
+
 $(document)
     .ready(() => Promise.resolve()
         .then(() => {
@@ -399,16 +412,3 @@ $(document)
         .then(result => drawPaginationComponent(1, result.count))
         .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
     );
-
-$('textarea.inline.prompt.maxWidth.textarea')
-    .keyup(function(){
-        let matches = $(this).val().match(uniprotAccessionRegex);
-
-        selectedProteins = new Set(matches);
-        matchCount.text(selectedProteins.size);
-
-        HelperFunctions.delay(
-            () => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)),
-            DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME
-        );
-    });
