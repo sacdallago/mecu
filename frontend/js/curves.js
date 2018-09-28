@@ -41,7 +41,7 @@ function loadProteins() {
     proteinCurvesGrid.empty();
 
     // load stored proteins
-    let proteins = StorageManager.get();
+    let proteins = StorageManager.getProteins();
     if(proteins.length === 0) {
         return;
     }
@@ -93,7 +93,7 @@ function loadProteins() {
 let globalGraph;
 
 function populateGlobalsGraphs(){
-    let proteins = StorageManager.splitUpProteins(StorageManager.get());
+    let proteins = StorageManager.splitUpProteins(StorageManager.getProteins());
     if(proteins.length === 0) {
         $('#curves-chart').empty();
         $('#nodesGraph').empty();

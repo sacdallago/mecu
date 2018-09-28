@@ -8,7 +8,7 @@ const ITEM_PER_PAGE_COUNT = 10;
 
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
-let localStorageDeleted = StorageManager.get().length === 0;
+let localStorageDeleted = StorageManager.getProteins().length === 0;
 let experimentsQuery = {
     search: undefined,
     limit: ITEM_PER_PAGE_COUNT,
@@ -326,34 +326,24 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : '');
 
-                    ModalService.listenForDecision(
-                        modalIdentifier,
-                        ['custom-modal-event-no', 'custom-modal-event-yes', 'custom-modal-event-add'],
-                        (event) => {
-                            switch(event.type) {
-                                case 'custom-modal-event-no':
-                                    console.log('doing nothing...');
-                                    break;
-                                case 'custom-modal-event-yes':
-                                    console.log('overwriting...');
-                                    StorageManager.clear();
-                                    StorageManager.toggle(
-                                        tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
-                                        () => {}
-                                    );
-                                    drawProteinXExperimentHeatmap(experiments, proteins, data);
-                                    enableShowButton();
-                                    break;
-                                case 'custom-modal-event-add':
-                                    console.log('adding...');
-                                    StorageManager.add(
-                                        tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
-                                        () => {}
-                                    );
-                                    drawProteinXExperimentHeatmap(experiments, proteins, data);
-                                    enableShowButton();
-                                    break;
-                            }
+                    ModalService.openModalAndDoAction(
+                        () => {},
+                        () => {
+                            StorageManager.clear();
+                            StorageManager.toggle(
+                                tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                () => {}
+                            );
+                            drawProteinXExperimentHeatmap(experiments, proteins, data);
+                            enableShowButton();
+                        },
+                        () => {
+                            StorageManager.add(
+                                tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                () => {}
+                            );
+                            drawProteinXExperimentHeatmap(experiments, proteins, data);
+                            enableShowButton();
                         }
                     );
 
@@ -393,23 +383,6 @@ const populateProteinSearch = () => {
     $('textarea.protein-list').val(text);
 }
 
-$(document)
-    .ready(() => Promise.resolve()
-        .then(() => {
-            // populate selectedProteins and selectedExperiments with the data from localStorage
-            const storageData = StorageManager.get('proteins');
-
-            storageData.forEach(proteinWithExperimentsList => {
-                selectedProteins.add(proteinWithExperimentsList.uniprotId);
-                proteinWithExperimentsList.experiment.forEach(experiment => selectedExperiments.add(experiment));
-            });
-        })
-        .then(() => populateProteinSearch())
-        .then(() => pullPaginatedExperiments(experimentsQuery))
-        .then(result => drawPaginationComponent(1, result.count))
-        .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
-    );
-
 $('textarea.inline.prompt.maxWidth.textarea')
     .keyup(function(){
         let matches = $(this).val().match(uniprotAccessionRegex);
@@ -422,3 +395,20 @@ $('textarea.inline.prompt.maxWidth.textarea')
             DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME
         );
     });
+
+$(document)
+    .ready(() => Promise.resolve()
+        .then(() => {
+            // populate selectedProteins and selectedExperiments with the data from localStorage
+            const storageData = StorageManager.getProteins();
+
+            storageData.forEach(proteinWithExperimentsList => {
+                selectedProteins.add(proteinWithExperimentsList.uniprotId);
+                proteinWithExperimentsList.experiment.forEach(experiment => selectedExperiments.add(experiment));
+            });
+        })
+        .then(() => populateProteinSearch())
+        .then(() => pullPaginatedExperiments(experimentsQuery))
+        .then(result => drawPaginationComponent(1, result.count))
+        .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
+    );

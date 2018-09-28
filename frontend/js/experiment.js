@@ -4,25 +4,6 @@ const saveExperimentButtonContainerIdentifier = '#save-experiment-button-contain
 const experimentsStatisticsContainerIdentifier = '#experiment-statistics';
 const errorContainerIdentifier = '#error-container';
 
-$(document).ready(() => {
-    const currentUri = URI(window.location.href);
-    const query = currentUri.search(true);
-    if(query.id) {
-
-        $('#experiment-id').text(query.id);
-
-        ExperimentService.getExperiment(query.id)
-            .then(experiment => {
-                console.log('data', experiment);
-                if(experiment.error) {
-                    drawError(experiment.error);
-                } else {
-                    drawExperiment(experiment);
-                }
-            });
-    }
-});
-
 const drawError = (error) => {
     $(experimentContainerIdentifier).css({'display':'none'});
     $(metaDataContaierIdentifier).css({'display':'none'});
@@ -111,3 +92,22 @@ const drawSaveButton = () => {
             .catch(e => console.error('error updating the experiment', e));
     });
 }
+
+$(document).ready(() => {
+    const currentUri = URI(window.location.href);
+    const query = currentUri.search(true);
+    if(query.id) {
+
+        $('#experiment-id').text(query.id);
+
+        ExperimentService.getExperiment(query.id)
+            .then(experiment => {
+                console.log('data', experiment);
+                if(experiment.error) {
+                    drawError(experiment.error);
+                } else {
+                    drawExperiment(experiment);
+                }
+            });
+    }
+});
