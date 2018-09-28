@@ -113,7 +113,7 @@ function populateGlobalsGraphs(coloringType){
             data.forEach(protein => {
                 protein.experiments.forEach(experiment => {
                     series.push({
-                        name: protein.uniprotId+' '+experiment.experiment,
+                        name: protein.uniprotId+' - '+experiment.experiment,
                         data: experiment.reads.map(r => [r.t, r.r]),
                         color: coloringType === 0 ?
                             HelperFunctions.stringToColor(protein.uniprotId):
