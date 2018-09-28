@@ -10,6 +10,7 @@ module.exports = function(context) {
         .post('/experiment', securityController.loggedIn, securityController.allowedPostRequests, experimentsController.uploadExperiment)
         .get('/experiments', experimentsController.getExperiments)
         .get('/experiments/proteins/:id', experimentsController.getProteinsInExperiment)
-        .get('/experiments/containing/:uniprotId', experimentsController.getExperimentsWhichHaveProtein)
+        .get('/experiments/containing/complex/:complexId', experimentsController.getExperimentsWhichHaveComplex)
+        .get('/experiments/containing/protein/:uniprotId', experimentsController.getExperimentsWhichHaveProtein)
         ;
 };

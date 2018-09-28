@@ -1,3 +1,6 @@
+let experimentsToDraw = [];
+let proteinsToDraw = [];
+
 const proteinCurvesGridIdentifier = '.isoGrid';
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
     itemSelector: '.grid-item',
@@ -30,8 +33,8 @@ proteinCurvesGrid.on('click', '.grid-item', function(){
                 }
             }
 
+            populateGlobalsGraphs(getColoringValue());
             loadProteins();
-            populateGlobalsGraphs();
         }
     );
 });
@@ -41,7 +44,7 @@ function loadProteins() {
     proteinCurvesGrid.empty();
 
     // load stored proteins
-    let proteins = StorageManager.get();
+    let proteins = StorageManager.getProteins();
     if(proteins.length === 0) {
         return;
     }
@@ -92,9 +95,12 @@ function loadProteins() {
 
 let globalGraph;
 
-function populateGlobalsGraphs(){
-    let proteins = StorageManager.splitUpProteins(StorageManager.get());
-    if(proteins.length === 0) {
+function populateGlobalsGraphs(coloringType){
+
+    let proteins = StorageManager.splitUpProteins(StorageManager.getProteins());
+    proteins = proteins.filter(p => experimentsToDraw.indexOf(p.experiment) > -1 && proteinsToDraw.indexOf(p.uniprotId) > -1);
+
+    if(proteins.length === 0 || experimentsToDraw.length === 0 || proteinsToDraw.length === 0) {
         $('#curves-chart').empty();
         $('#nodesGraph').empty();
         return;
@@ -109,7 +115,9 @@ function populateGlobalsGraphs(){
                     series.push({
                         name: protein.uniprotId+' '+experiment.experiment,
                         data: experiment.reads.map(r => [r.t, r.r]),
-                        color: HelperFunctions.stringToColor(protein.uniprotId+"-E"+experiment.experiment),
+                        color: coloringType === 0 ?
+                            HelperFunctions.stringToColor(protein.uniprotId):
+                            HelperFunctions.stringToColor(experiment.experiment*12+''),
                         marker: {symbol: 'circle'}
                     })
                 })
@@ -122,52 +130,109 @@ function populateGlobalsGraphs(){
             highChartsCurvesConfigObject['series'] = series;
             highChartsCurvesConfigObject['tooltip'] = {
                 // valueSuffix: '',
-                split: true,
+                // split: true,
                 distance: 30,
-                padding: 5
+                padding: 5,
+                formatter: function() {
+                    return `<b>${this.x}</b> C°<br /><b>${this.y}</b> %`;
+                }
+                // if you want to show the whole line(vertical) in one tooltip
+                // formatter: function() {
+                //     var s = [];
+                //
+                //     $.each(this.points, function(i, point) {
+                //         s.push('<span style="color:#D31B22;font-weight:bold;">'+ point.series.name +' : '+
+                //             point.y +'<span>');
+                //     });
+                //
+                //     return s.join(' and ');
+                // },
+                // shared: true
             };
             Highcharts.chart('curves-chart', highChartsCurvesConfigObject);
 
-            // click binding for the fullscreen
-            $('.highcharts-series, .highcharts-background').bind('mousedown', function () {
-                console.log('click');
-                $('.curves-graph-container').toggleClass('modal');
-                $('.chart').highcharts().reflow();
-            });
-
             // plot distances
-            globalGraph = new MecuGraph({element: "#nodesGraph"});
-            globalGraph.add(data);
+            // globalGraph = new MecuGraph({element: "#nodesGraph"});
+            // globalGraph.add(data);
         })
         .catch(error => {
             console.error(error);
         });
 }
 
-populateGlobalsGraphs();
+const getColoringValue = () => {
+    return parseInt(document.querySelector('#coloring-dropdown .value').value);
+}
+const getExperimentsValue = () => {
+    return parseInt(document.querySelector('#experiments-dropdown .value').value);
+}
+const drawExperimentsSelect = (experiments) => {
+    const menu = document.querySelector('#experiments-dropdown .menu');
+    experiments.forEach(exp => {
+        let newExp = document.createElement('div');
+        newExp.classList.add('item');
+        newExp.setAttribute('data-value', exp);
+        newExp.innerText = 'Experiment '+exp;
+        menu.appendChild(newExp);
+    });
+}
+const drawProteinsSelect = (proteins) => {
+    const menu = document.querySelector('#proteins-dropdown .menu');
+    proteins.forEach(p => {
+        let newProt = document.createElement('div');
+        newProt.classList.add('item');
+        newProt.setAttribute('data-value', p);
+        newProt.innerText = p;
+        menu.appendChild(newProt);
+    });
+}
 
-loadProteins();
+$('#coloring-dropdown').dropdown({
+    onChange: () => {
+        populateGlobalsGraphs(getColoringValue());
+    }
+});
+$('#experiments-dropdown').dropdown({
+    clearable: false,
+    onChange: (e) => {
+        if(e.length === 0) {
+            $('#curves-chart').empty();
+            $('#nodesGraph').empty();
+            return;
+        };
+        experimentsToDraw = e.split(',').map(e => parseInt(e));
+        populateGlobalsGraphs(getColoringValue());
+    }
+});
+$('#proteins-dropdown').dropdown({
+    clearable: false,
+    onChange: (e) => {
+        if(e.length === 0) {
+            $('#curves-chart').empty();
+            $('#nodesGraph').empty();
+            return;
+        };
+        proteinsToDraw = e.split(',');
+        populateGlobalsGraphs(getColoringValue());
+    }
+});
 
 // Change Distance Metrics logic
 $('.ui.button.manhattan').on('click', function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.manhattan);
-});
-
+}).popup({position: 'bottom left'});
 $('.ui.button.euclidian').on('click', function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.euclidian);
-});
-
+}).popup({position: 'bottom left'});
 $('.ui.button.supremum').on('click', function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.supremum);
-});
-
-
+}).popup({position: 'bottom left'});
 $('.ui.dropdown.button.minkowski').dropdown({
     action: function(e) {
         const rank = $('#rank').val();
@@ -178,4 +243,23 @@ $('.ui.dropdown.button.minkowski').dropdown({
         }
 
     }
+}).popup({position: 'bottom left'});
+
+// on page drawing finished, start requests
+$(document).ready(() => {
+    Promise.resolve()
+        .then(() => {
+            // populate experiments dropdown
+            const inStorage = StorageManager.getProteins();
+            const experimentsSet = new Set();
+            const proteinsSet = new Set();
+            inStorage.forEach(p => {
+                proteinsSet.add(p.uniprotId);
+                p.experiment.forEach(e => experimentsSet.add(e));
+            });
+            drawExperimentsSelect(Array.from(experimentsSet));
+            drawProteinsSelect(Array.from(proteinsSet));
+        })
+        .then(() => populateGlobalsGraphs(getColoringValue(), []))
+        .then(() => loadProteins());
 });

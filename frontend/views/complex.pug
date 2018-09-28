@@ -4,7 +4,17 @@ block postStyles
         link(rel='stylesheet', href='/public/css/complex.css')
 
 block content
-    h3.complex-name#complex-name
+    .modal#add-protein-modal
+    .complex-header
+        .complex-name
+        .experiment-number#experiment-number
+            .dropdown.dropdown-search
+                input(type='hidden' name='experiments' value='default').text-input
+                .text
+                    .value Select
+                .dropdown-icon
+                    i.dropdown.icon
+                .menu
         
     .data-container#data-container
         .column-left
@@ -13,17 +23,22 @@ block content
     
     .curves-grid#curves-grid
         h3.title Contained Proteins
+        .select-all-button
+            a.ui.button#select-all-button
+                i.check.icon
+                span Select All
         .grid
     
 block settings
     .divider
-    a(href='/search').item Search
+    a(href='/search').item Find Proteins in Experiments
     a(href='/experiments').item Search Experiments
-    a(href='/curves').item Selected Curves
+    a(href='/curves').item Analyze
 
 block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/js/complex.js")
     script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/modal.js")
+    script(type="text/javascript", src="/public/js/complex.js")

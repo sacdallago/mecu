@@ -121,17 +121,25 @@ HelperFunctions.dateTimeStringPrettify = (dateTime) => {
 HelperFunctions.stringToColor = (string) => {
     // these 2 functions can eventually be outsourced into own utils(?) file
     let getHashCode = function(str) {
-        var hash = 0;
+        let hash = 0;
         if (str.length == 0) return hash;
-        for (var i = 0; i < str.length; i++) {
+        for (let i = 0; i < str.length; i++) {
             hash = str.charCodeAt(i) + ((hash << 5) - hash);
             hash = hash & hash; // Convert to 32bit integer
         }
         return hash;
     };
     let intToHSL = function(inputInt) {
-        var shortened = inputInt % 360;
+        let shortened = inputInt % 360;
         return "hsl(" + shortened + ",100%,40%)";
     };
     return getHashCode(string).intToHSL();
 }
+
+HelperFunctions.delay = (function(){
+    var timer = 0;
+    return function(callback, ms){
+        clearTimeout(timer);
+        timer = setTimeout(callback, ms);
+    };
+})();

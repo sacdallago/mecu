@@ -67,10 +67,18 @@ ExperimentService.updateExperiment = (id, experiment) => {
         });
 }
 ExperimentService.experimentsWhichHaveProtein = (uniprotId) => {
-    return fetch(`/api/experiments/containing/${uniprotId}`)
+    return fetch(`/api/experiments/containing/protein/${uniprotId}`)
         .then(resp => resp.json())
         .catch(error => {
             console.error('Request error for ExperimentService.experimentsWhichHaveProtein: ', error, uniprotId);
+            return [];
+        });
+}
+ExperimentService.experimentsWhichHaveComplex = (complexId) => {
+    return fetch(`/api/experiments/containing/complex/${complexId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ExperimentService.experimentsWhichHaveComplex: ', error, complexId);
             return [];
         });
 }
@@ -98,6 +106,23 @@ ProteinService.getProteinInteractions = (uniprotId, expId) => {
         .then(resp => resp.json())
         .catch(error => {
             console.error('Request error for ProteinService.getProteinInteractions: ', error, uniprotId);
+            return [];
+        });
+}
+ProteinService.getProteinExperimentCombinations = (proteinExperimentArr, expId) => {
+    return fetch(
+            `/api//protein/experimentcombinations`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify(proteinExperimentArr)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ProteinService.getProteinInteractions: ', error, proteinExperimentArr);
             return [];
         });
 }

@@ -109,7 +109,7 @@ module.exports = function(context) {
 
         getExperimentsWhichHaveProtein: function(uniprotId, uploader) {
             const query = `
-                SELECT "uniprotId", "experimentId"
+                SELECT "experimentId", name
                 FROM protein_experiments pe, experiments e
                 WHERE
                     pe."uniprotId" = :uniprotId and
@@ -127,6 +127,31 @@ module.exports = function(context) {
                     {type: sequelize.QueryTypes.SELECT}
                 )
                 .then(r => r.length > 0 ? r[0] : []);
+        },
+
+        getExperimentsWhichHaveComplex: (complexId, uploader) => {
+            const query = `
+                SELECT DISTINCT e.id, e.name
+                FROM
+                    experiments e,
+                    protein_experiments pe,
+                    (SELECT "uniprotId" FROM protein_complexes pc WHERE pc."complexId" = :complexId) proteins
+                WHERE
+                    pe."uniprotId" = proteins."uniprotId" AND
+                    pe."experimentId" = e.id AND
+                    (e.private = false or e.uploader = :uploader);
+            `;
+            return context.dbConnection.query(
+                    query,
+                    {
+                        replacements: {
+                            complexId,
+                            uploader
+                        }
+                    },
+                    {type: sequelize.QueryTypes.SELECT}
+                )
+                .then(result => result[0]);
         }
     };
 };

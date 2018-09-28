@@ -1,4 +1,4 @@
-let localStorageDeleted = StorageManager.get().length === 0;
+let localStorageDeleted = StorageManager.getProteins().length === 0;
 const dropDownSelector = '#experiment-number .dropdown';
 
 // grid for experiments which use this protein as well
@@ -52,81 +52,6 @@ interactionsGrid.on('click', '.grid-item', function(){
 });
 
 
-// on page drawing finished, start requests
-$(document).ready(() => {
-    let loading = true;
-    const currentUri = URI(window.location.href);
-    const query = currentUri.search(true);
-    console.log('query', query);
-    if(query.protein && query.experiment) {
-
-        Promise.all([
-
-            // data for protein curve and meta data
-            ProteinService.getSpecificProtein(query.protein, query.experiment)
-                .then(proteinData => {
-                    console.log('proteinCurveData', proteinData);
-                    if(Object.keys(proteinData).length > 0) {
-                        return drawProtein(proteinData);
-                    } else {
-                        return Promise.resolve(true);
-                    }
-                }),
-
-            // list of experiments which have this protein
-            ExperimentService.experimentsWhichHaveProtein(query.protein)
-                .then(exps => {
-                    console.log('exps', exps);
-                    return Promise.all([
-                        // list of experiments, which ahve this protein, but not the actual experiment
-                        drawOtherExperiments(exps, query.protein, query.experiment),
-                        TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                                exps.map(exp =>
-                                    ({
-                                        uniprotId: query.protein,
-                                        experiment: exp
-                                    })
-                                )
-                            )
-                            .then(reads => {
-                                console.log('reads', reads);
-                                // protein curves of other experiments
-                                return drawExperimentsWhichHaveProtein(reads, query.experiment);
-                            })
-                    ]);
-                }),
-
-            // list of complexes which have this protein
-            ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
-                .then(complexes => {
-                    console.log('complexes', complexes);
-                    return drawRelatedComplexes(complexes, query.experiment);
-                }),
-
-            // list of protein interactions, which have this protein
-            Promise.all([
-                    ProteinService.getProteinInteractions(query.protein, query.experiment),
-                    ExperimentService.allProteinsContainedInExperiment(query.experiment)
-                ])
-                .then(([proteinInteractions, proteinsContainedInExperiment]) => {
-                    console.log('proteinInteractions', proteinInteractions);
-                    console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
-                    return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, query.experiment);
-                })
-        ])
-        .then(done => {
-            loading = false;
-            $(dropDownSelector).dropdown('restore defaults');
-            console.log('done', done);
-        })
-        .catch(error => {
-            loading = false;
-            console.error('loading error', error);
-        });
-
-    }
-})
-
 /**
  * [drawProteinData description]
  * @param  {experiment: number, uniprotId: string, reads: {r:number, t:number}[] } data [description]
@@ -170,8 +95,6 @@ const writeProteinMetaData = ({
         lysate, e_createdAt, e_updatedAt, uploader
     }) => {
     return new Promise((resolve, reject) => {
-        $('#protein-name').text(uniprotId);
-
         $('#protein-data .uniprot-id .value')
         .attr({'target':'_blank', 'href':`https://www.uniprot.org/uniprot/${uniprotId}`})
             .text(uniprotId);
@@ -191,8 +114,9 @@ const writeProteinMetaData = ({
     });
 }
 
-const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
+const drawOtherExperimentsSelect = (experiments, uniprotId, actualExperiment) => {
     return new Promise((resolve, reject) => {
+
         const dropDownContainer = $(dropDownSelector).addClass(['ui', 'search', 'dropdown']);
         dropDownContainer.dropdown({});
         $('#experiment-number .dropdown .search').css({'padding': '11 20px'})
@@ -200,19 +124,19 @@ const drawOtherExperiments = (experiments, uniprotId, actualExperiment) => {
         const menuContainer = $('#experiment-number .dropdown .menu');
         const otherExperiments = [];
         experiments.forEach(experiment => {
-            if(experiment != actualExperiment) {
+            if(experiment.experimentId != actualExperiment) {
                 otherExperiments.push(
                     $('<a />')
                         .addClass('item')
-                        .attr({'data-value':experiment, 'href':`/protein?protein=${uniprotId}&experiment=${experiment}`})
-                        .text('Experiment '+experiment)
+                        .attr({'data-value':experiment.name, 'href':`/protein?protein=${uniprotId}&experiment=${experiment.experimentId}`})
+                        .text(experiment.name)
                 )
             } else {
                 otherExperiments.push(
                     $('<a />')
                         .addClass('item')
                         .attr({'data-value':'default'})
-                        .text('Experiment '+experiment)
+                        .text(experiment.name)
                 )
             }
         });
@@ -339,7 +263,7 @@ const drawRelatedComplexes = (complexes, actualExperiment) => {
 const saveExperimentToLocalStorage = (protein, experiment) => {
     let added = true;
     // if the localStorage hasn't been deleted yet and there are some proteins in it
-    if(!localStorageDeleted && StorageManager.get().length > 0) {
+    if(!localStorageDeleted && StorageManager.getProteins().length > 0) {
         added = confirm("There are Proteins still in the local storage. Do you want to overwrite them?");
         if(added) {
             StorageManager.clear();
@@ -392,7 +316,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
         });
 
         const toAppend = (obj) => {
-            return [
+            const ret = [
                 $('<p />')
                     .addClass('grid-item-text')
                     .css({
@@ -402,11 +326,24 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
                         'line-height': '35px',
                         'font-size': '1.2rem'
                     })
-                    .text(obj.uniprotId),
+                    .text(obj.uniprotId)
+            ];
+
+            if(obj.present === 1) {
+                ret.push(
+                    $('<div />')
+                        .addClass(['cube-text-middle', 'grid-item-text'])
+                        .text('No data available')
+                )
+            }
+
+            ret.push(
                 $('<div />')
                     .addClass(['correlation', 'grid-item-text'])
                     .text(obj.correlation)
-            ];
+                );
+
+            return ret;
         };
 
         HelperFunctions.drawItemsAllExperimentsInOneItem(interactionsGridIdentifier, proteinExperimentObject, toAppend);
@@ -414,3 +351,89 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
         resolve(true);
     });
 }
+
+
+// on page drawing finished, start requests
+$(document).ready(() => {
+    let loading = true;
+    const currentUri = URI(window.location.href);
+    const query = currentUri.search(true);
+    console.log('query', query);
+    if(query.protein && query.experiment) {
+
+        // data for protein curve and meta data
+        const proteinCurveAndMetaData = ProteinService.getSpecificProtein(query.protein, query.experiment)
+            .then(proteinData => {
+                console.log('proteinCurveData', proteinData);
+                if(Object.keys(proteinData).length > 0) {
+                    return drawProtein(proteinData);
+                } else {
+                    return Promise.resolve(true);
+                }
+            });
+
+            // list of experiments which have this protein
+        const otherExperimentsAndSelect = ExperimentService.experimentsWhichHaveProtein(query.protein)
+            .then(exps => {
+                console.log('exps', exps);
+                return Promise.all([
+                    // list of experiments, which ahve this protein, but not the actual experiment
+                    drawOtherExperimentsSelect(exps, query.protein, query.experiment),
+                    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                            exps.map(exp =>
+                                ({
+                                    uniprotId: query.protein,
+                                    experiment: exp.experimentId
+                                })
+                            )
+                        )
+                        .then(reads => {
+                            console.log('reads', reads);
+                            // protein curves of other experiments
+                            return drawExperimentsWhichHaveProtein(reads, query.experiment);
+                        })
+                ]);
+            });
+
+            // list of complexes which have this protein
+        const complexes = ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
+            .then(complexes => {
+                console.log('complexes', complexes);
+                return drawRelatedComplexes(complexes, query.experiment);
+            });
+
+            // list of protein interactions, which have this protein
+        const ppi = Promise.all([
+                ProteinService.getProteinInteractions(query.protein, query.experiment),
+                ExperimentService.allProteinsContainedInExperiment(query.experiment)
+            ])
+            .then(([proteinInteractions, proteinsContainedInExperiment]) => {
+                console.log('proteinInteractions', proteinInteractions);
+                console.log('proteinsContainedInExperiment', proteinsContainedInExperiment);
+                return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, query.experiment);
+            });
+
+        proteinCurveAndMetaData
+            .then(() => console.log('proteinCurveAndMetaData'))
+            .then(() => otherExperimentsAndSelect)
+            .then(() => console.log('otherExperimentsAndSelect'))
+            .then(() => complexes)
+            .then(() => console.log('complexes'))
+            .then(() => ppi)
+            .then(() => console.log('ppi'))
+            .then(() => {
+                loading = false;
+                $(dropDownSelector).dropdown({
+                    match: 'both',
+                    fullTextSearch: true,
+                    glyphWidth: 3.0
+                });
+                console.log('done');
+            })
+            .catch(error => {
+                loading = false;
+                console.error('loading error', error);
+            });
+
+    }
+})

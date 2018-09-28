@@ -74,7 +74,7 @@ module.exports = function(context) {
         },
 
         getProteinInteractions: function(request, response) {
-            
+
             proteinXproteinsDao.getProteinInteraction(request.params.uniprotId)
                 .then(result => {
                     let setOfProteins = new Set();
@@ -116,6 +116,20 @@ module.exports = function(context) {
                     console.error('getProteinInteractions', error);
                     return response.status(500).send({});
                 });
+        },
+
+        getProteinExperimentCombinations: function(request, response) {
+            let protExpArray = request.body;
+            if(protExpArray.constructor == Object) {
+                protExpArray = [];
+            }
+
+            proteinsDao.findProteinExperimentCombinations(protExpArray, extractUserGoogleId(request))
+                .then(r => response.status(200).send(r))
+                .catch(err => {
+                    console.error('getProteinExperimentCombinations', err);
+                    response.send([]);
+                })
         }
     }
 }

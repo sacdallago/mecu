@@ -1,10 +1,14 @@
+const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
+const modalIdentifier = '#add-protein-modal';
+const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+const showButtonIdentifier = '#show-button';
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
-const ITEM_PER_PAGE_COUNT = 3;
+const ITEM_PER_PAGE_COUNT = 10;
 
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
-let localStorageDeleted = StorageManager.get().length === 0;
+let localStorageDeleted = StorageManager.getProteins().length === 0;
 let experimentsQuery = {
     search: undefined,
     limit: ITEM_PER_PAGE_COUNT,
@@ -46,13 +50,11 @@ const drawPaginationComponent = (actualPage, totalPages) => {
  * @return { {uniprotId: string, experiments:{experiment: number, reads: {t: number, r: number}[] }[] }[] } list of proteins with the according experiments
  */
 const fetchMeltingCurves = function(experiments, proteins){
-    const tableBodyIdentifier = '#result-table tbody';
-    const tableHeadIdentifier = '#result-table thead tr th:not(:first-child)';
 
     // always empty table before new request
-    $(tableBodyIdentifier).empty();
-    $(tableHeadIdentifier).remove();
     if(experiments.length < 1 || proteins.length < 1){
+        $('#heatmap').empty();
+        $('#heatmap').text('Here you will see a which experiment has which protein.');
         return;
     }
 
@@ -64,9 +66,9 @@ const fetchMeltingCurves = function(experiments, proteins){
         proteins.forEach(p => arr.push({uniprotId: p, experiment: e}))
     )
 
-    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(arr)
+    ProteinService.getProteinExperimentCombinations(arr)
         .then(data => {
-            console.log('data', data);
+            console.log('getProteinExperimentCombinations', data);
             return data;
         })
         .then(data => drawProteinXExperimentHeatmap(experiments, proteins, data));
@@ -105,10 +107,13 @@ const drawExperimentsTable = (data, checkboxIdentifier) => {
             )
         );
         row.append(td.clone().text(exp.id));
-        row.append(td.clone().text(exp.name));
-        row.append(td.clone().text(exp.metaData.description));
+        row.append(td.clone().addClass('name').text(exp.name));
+        row.append(td.clone().addClass('description').text(
+            exp.metaData.description && exp.metaData.description.length > 200 ?
+            exp.metaData.description.slice(0,200)+'...' :
+            exp.metaData.description));
         row.append(
-            td.clone().append(
+            td.clone().addClass('uploader').append(
                 link.clone()
                     .attr({'href':'https://plus.google.com/'+exp.uploader})
                     .text('Google Plus Profile')
@@ -161,8 +166,8 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
         let tableProt = tableData.find(td => td.name === d.uniprotId);
 
         d.experiments.forEach(e => {
-            let idx = experiments.indexOf(e.experiment);
-            StorageManager.has({uniprotId: d.uniprotId, experiment: e.experiment},
+            let idx = experiments.indexOf(e);
+            StorageManager.has({uniprotId: d.uniprotId, experiment: e},
                 (c,h,n) => {
                     if(h == 1) {
                         tableProt.values[idx] = 2; // 2 means: in localStorage
@@ -233,7 +238,7 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     }));
     // console.log('contained/selected/total', contained, selected, total);
 
-    let colorAxis = {}
+    let colorAxis = {};
     // none contained (selected not interesting)
     if(contained == 0) {
         // console.log('none contained (selected not interesting)')
@@ -302,24 +307,46 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
         data: s
     }));
     highChartsHeatMapConfigObj.tooltip = {
+        useHTML: true,
         formatter: function () {
             if (this.point.value >= 1) {
-                return `Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> has Protein
-                <b>${this.series.yAxis.categories[this.point.y]}</b> in it <b>`;
+                return `<div class="custom-chart-tooltip">Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> has Protein
+                <b>${this.series.yAxis.categories[this.point.y]}</b> in it <b></div>`;
             } else {
-                return `Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> does <b>NOT</b> have
-                <b>${this.series.yAxis.categories[this.point.y]}</b> Protein in it <b>`;
+                return `<div class="custom-chart-tooltip">Experiment <b>${this.series.xAxis.categories[this.point.x]}</b> does <b>NOT</b> have
+                <b>${this.series.yAxis.categories[this.point.y]}</b> Protein in it <b></div>`;
             }
         }
     };
+
     highChartsHeatMapConfigObj.plotOptions = {
         series: {
             events: {
                 click: function(e) {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : '');
-                    saveExperimentToLocalStorage(tmpList, experiments[e.point.x]);
-                    drawProteinXExperimentHeatmap(experiments, proteins, data);
+
+                    ModalService.openModalAndDoAction(
+                        () => {},
+                        () => {
+                            StorageManager.clear();
+                            StorageManager.toggle(
+                                tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                () => {}
+                            );
+                            drawProteinXExperimentHeatmap(experiments, proteins, data);
+                            enableShowButton();
+                        },
+                        () => {
+                            StorageManager.add(
+                                tmpList.map(p => ({uniprotId: p, experiment: experiments[e.point.x]})),
+                                () => {}
+                            );
+                            drawProteinXExperimentHeatmap(experiments, proteins, data);
+                            enableShowButton();
+                        }
+                    );
+
                 }
             },
             heatmap: {
@@ -334,41 +361,27 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
 
     const colSize = 20;
     const rowSize = 27;
+    const heatmapHeight = highChartsHeatMapConfigObj.chart.marginTop +
+        highChartsHeatMapConfigObj.chart.marginBottom +
+        rowSize*proteins.length;
+    const heatmapWidth = highChartsHeatMapConfigObj.chart.marginRight +
+        highChartsHeatMapConfigObj.chart.marginLeft +
+        experiments.length*colSize;
     $('#heatmap').attr(
-        {'style':`height:${115+rowSize*proteins.length}px; width:${100+colSize*experiments.length}px`}
+        {'style':`height:${heatmapHeight}px; width:${heatmapWidth}px`}
     );
-
-    $('.heatmap-container .legend').css('visibility', 'visible');
 
     Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
 }
 
-const saveExperimentToLocalStorage = (proteinList, experiment) => {
-    // if the localStorage hasn't been deleted yet and there are some proteins in it
-    if(!localStorageDeleted && StorageManager.get().length > 0) {
-        if(confirm("There are Proteins still in the local storage. Do you want to overwrite them?")) {
-            StorageManager.clear();
-            console.log('store cleared');
-            localStorageDeleted = true;
-            proteinList.forEach(protein => {
-                // console.log('adding', {uniprotId: protein, experiment: experiment});
-                StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
-            });
-        }
-    // else just add the protein/experiment pair
-    } else {
-        proteinList.forEach(protein => {
-            // console.log('adding', {uniprotId: protein, experiment: experiment});
-            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
-        });
-    }
+const enableShowButton = () => {
+    $(showButtonIdentifier).removeClass('disabled').addClass('green');
 }
 
-
-$(document)
-    .ready(() => pullPaginatedExperiments(experimentsQuery)
-        .then(result => drawPaginationComponent(1, result.count))
-    );
+const populateProteinSearch = () => {
+    const text = Array.from(selectedProteins).reduce((acc,c) => acc+=(c+' '), '');
+    $('textarea.protein-list').val(text);
+}
 
 $('textarea.inline.prompt.maxWidth.textarea')
     .keyup(function(){
@@ -377,5 +390,25 @@ $('textarea.inline.prompt.maxWidth.textarea')
         selectedProteins = new Set(matches);
         matchCount.text(selectedProteins.size);
 
-        fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
+        HelperFunctions.delay(
+            () => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)),
+            DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME
+        );
     });
+
+$(document)
+    .ready(() => Promise.resolve()
+        .then(() => {
+            // populate selectedProteins and selectedExperiments with the data from localStorage
+            const storageData = StorageManager.getProteins();
+
+            storageData.forEach(proteinWithExperimentsList => {
+                selectedProteins.add(proteinWithExperimentsList.uniprotId);
+                proteinWithExperimentsList.experiment.forEach(experiment => selectedExperiments.add(experiment));
+            });
+        })
+        .then(() => populateProteinSearch())
+        .then(() => pullPaginatedExperiments(experimentsQuery))
+        .then(result => drawPaginationComponent(1, result.count))
+        .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
+    );

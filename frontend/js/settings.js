@@ -4,6 +4,11 @@
 $('.dropdown').dropdown();
 
 highChartsCurvesConfigObject = {
+    chart: {
+        title: undefined,
+        backgroundColor: '#fbfbfb'
+    },
+
     title: {
         text: ''
     },
@@ -75,7 +80,9 @@ highChartsHeatMapConfigObj = {
         title: undefined,
         type: 'heatmap',
         marginTop: 40,
-        marginBottom: 80,
+        marginBottom: 40,
+        marginRight: 20,
+        marginLeft: 60,
         plotBorderWidth: 1,
         backgroundColor: '#fbfbfb'
     },
@@ -89,12 +96,3 @@ highChartsHeatMapConfigObj = {
     }
 
 };
-
-
-delay = (function(){
-    var timer = 0;
-    return function(callback, ms){
-        clearTimeout(timer);
-        timer = setTimeout(callback, ms);
-    };
-})();
