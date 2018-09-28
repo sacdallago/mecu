@@ -66,9 +66,9 @@ const fetchMeltingCurves = function(experiments, proteins){
         proteins.forEach(p => arr.push({uniprotId: p, experiment: e}))
     )
 
-    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(arr)
+    ProteinService.getProteinExperimentCombinations(arr)
         .then(data => {
-            console.log('temperatureReadsToProteinsAndExperimentPairs', data);
+            console.log('getProteinExperimentCombinations', data);
             return data;
         })
         .then(data => drawProteinXExperimentHeatmap(experiments, proteins, data));
@@ -166,8 +166,8 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
         let tableProt = tableData.find(td => td.name === d.uniprotId);
 
         d.experiments.forEach(e => {
-            let idx = experiments.indexOf(e.experiment);
-            StorageManager.has({uniprotId: d.uniprotId, experiment: e.experiment},
+            let idx = experiments.indexOf(e);
+            StorageManager.has({uniprotId: d.uniprotId, experiment: e},
                 (c,h,n) => {
                     if(h == 1) {
                         tableProt.values[idx] = 2; // 2 means: in localStorage
