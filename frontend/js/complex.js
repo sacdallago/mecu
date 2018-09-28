@@ -1,4 +1,4 @@
-let localStorageDeleted = StorageManager.get().length === 0;
+let localStorageDeleted = StorageManager.getProteins().length === 0;
 const dropDownSelector = '#experiment-number .dropdown';
 
 // grid proteins from the complex

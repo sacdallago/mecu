@@ -183,7 +183,7 @@ StorageManager.has = function(proteins, callback) {
     return current;
 };
 
-StorageManager.get = function() {
+StorageManager.getProteins = function() {
     let proteinsObj = store.get('proteins') || {};
     return Object.keys(proteinsObj).map(i => ({uniprotId:i, experiment: proteinsObj[i]})) || [];
 };
@@ -211,7 +211,7 @@ StorageManager.getMinTemp = function() {
 
 // check structure of 'proteins' in local storage
 (function (s) {
-    let proteins = s.get();
+    let proteins = s.getProteins();
     let ok = true;
     if(proteins.constructor !== Array){
         ok = false;

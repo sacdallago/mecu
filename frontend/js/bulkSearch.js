@@ -8,7 +8,7 @@ const ITEM_PER_PAGE_COUNT = 10;
 
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
-let localStorageDeleted = StorageManager.get().length === 0;
+let localStorageDeleted = StorageManager.getProteins().length === 0;
 let experimentsQuery = {
     search: undefined,
     limit: ITEM_PER_PAGE_COUNT,
@@ -397,7 +397,7 @@ $(document)
     .ready(() => Promise.resolve()
         .then(() => {
             // populate selectedProteins and selectedExperiments with the data from localStorage
-            const storageData = StorageManager.get('proteins');
+            const storageData = StorageManager.getProteins();
 
             storageData.forEach(proteinWithExperimentsList => {
                 selectedProteins.add(proteinWithExperimentsList.uniprotId);

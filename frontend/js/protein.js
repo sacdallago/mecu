@@ -1,4 +1,4 @@
-let localStorageDeleted = StorageManager.get().length === 0;
+let localStorageDeleted = StorageManager.getProteins().length === 0;
 const dropDownSelector = '#experiment-number .dropdown';
 
 // grid for experiments which use this protein as well
@@ -348,7 +348,7 @@ const drawRelatedComplexes = (complexes, actualExperiment) => {
 const saveExperimentToLocalStorage = (protein, experiment) => {
     let added = true;
     // if the localStorage hasn't been deleted yet and there are some proteins in it
-    if(!localStorageDeleted && StorageManager.get().length > 0) {
+    if(!localStorageDeleted && StorageManager.getProteins().length > 0) {
         added = confirm("There are Proteins still in the local storage. Do you want to overwrite them?");
         if(added) {
             StorageManager.clear();
