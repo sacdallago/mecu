@@ -153,21 +153,17 @@ $('.ui.button.manhattan').on('click', function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.manhattan);
-});
-
+}).popup({position: 'bottom left'});
 $('.ui.button.euclidian').on('click', function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.euclidian);
-});
-
+}).popup({position: 'bottom left'});
 $('.ui.button.supremum').on('click', function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.supremum);
-});
-
-
+}).popup({position: 'bottom left'});
 $('.ui.dropdown.button.minkowski').dropdown({
     action: function(e) {
         const rank = $('#rank').val();
@@ -178,4 +174,5 @@ $('.ui.dropdown.button.minkowski').dropdown({
         }
 
     }
+}).popup({position: 'bottom left'});
 });
