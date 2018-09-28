@@ -86,7 +86,7 @@ ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons = (identifie
     return ModalService.create(
         identifier,
         'Proteins already in memory',
-        'There are alreay proteins saved. Do you want to overwrite them or add them?',
+        `There are alreay proteins saved. Do you want to overwrite them('Yes') or add them('Add')?`,
         ModalService.createButtonsNoYesAdd(),
         {
             closable: true
