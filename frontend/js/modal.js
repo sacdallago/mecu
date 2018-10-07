@@ -102,7 +102,7 @@ ModalService.createButtonsNoYesAdd = () => {
         },
         {
             id: 'modal-approve-button',
-            text: 'Yes',
+            text: 'Overwrite',
             action: 'yes'
 
         },
