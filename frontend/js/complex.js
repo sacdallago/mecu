@@ -116,8 +116,8 @@ const drawComplexMetadata = (complex, experimentId) => {
 
         dataContainer.append([
             itemContainer.clone().append([
-                text.clone().text('Experiment'),
-                value.clone().text(experimentId)
+                text.clone().text('Name'),
+                value.clone().text(complex.name)
             ]),
             itemContainer.clone().append([
                 text.clone().text('Purification Method'),
