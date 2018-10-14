@@ -5,6 +5,9 @@ HelperFunctions = {};
  * @param  {[type]} gridIdentifier [description]
  * @param  { {uniprotId: string, experiments: {experiment: number, reads: {}[]} } } data           [description]
  * @return {[type]}                [description]
+ *
+ * necessary for data:
+ * {uniprotId, experiments:[{experiment}]}
  */
 HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridItemAppendexesFun) => {
     const gridIdentifier = $(gridIdentifierString);
@@ -19,7 +22,7 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
 
             const gridItem = $('<div />')
                 .addClass('grid-item')
-                .attr({'id': [itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('').toLowerCase()});
+                .attr({'id': [itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('-').toLowerCase()});
             gridItem.append(gridItemAppendexesFun(obj, expRead));
 
             gridItem.data('grid-item-contents', {
@@ -38,7 +41,7 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
 
         obj.experiments.forEach((expRead, index, a) => {
             let curve = new MecuLine({
-                element: "#"+[itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('').toLowerCase(),
+                element: "#"+[itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('-').toLowerCase(),
                 width:"200",
                 height:"200",
                 limit: 5,
@@ -47,10 +50,12 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
                 minRatio: 0.1
             });
 
-            curve.add({
-                uniprotId: obj.uniprotId,
-                experiments: [expRead]
-            });
+            if(expRead. reads) {
+                curve.add({
+                    uniprotId: obj.uniprotId,
+                    experiments: [expRead]
+                });
+            }
 
             curves.push(curve);
         });
@@ -62,6 +67,9 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
  * @param  {[type]} gridIdentifier [description]
  * @param  { {uniprotId: string, experiments: {experiment: number, reads: {}[]} } } data           [description]
  * @return {[type]}                [description]
+ *
+ * necessary for data:
+ * {id, experiments}
  */
 HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, gridItemAppendexesFun) => {
     const gridIdentifier = $(gridIdentifierString);
@@ -75,7 +83,7 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
 
         const gridItem = $('<div />')
             .addClass('grid-item')
-            .attr({'id': [itemIdentifierPrefix, index, obj.id].join('').toLowerCase()});
+            .attr({'id': [itemIdentifierPrefix, index, obj.id].join('-').toLowerCase()});
         gridItem.append(gridItemAppendexesFun(obj));
 
         gridItem.data('grid-item-contents', {
@@ -91,7 +99,7 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
     data.forEach((obj,index,a) => {
 
         let curve = new MecuLine({
-            element: "#"+[itemIdentifierPrefix, index, obj.id].join('').toLowerCase(),
+            element: "#"+[itemIdentifierPrefix, index, obj.id].join('-').toLowerCase(),
             width:"200",
             height:"200",
             limit: 5,
@@ -101,10 +109,12 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
         });
 
         obj.experiments.forEach(expRead => {
-            curve.add({
-                uniprotId: obj.id,
-                experiments: [expRead]
-            });
+            if(expRead.reads) {
+                curve.add({
+                    uniprotId: obj.id,
+                    experiments: [expRead]
+                });
+            }
 
             curves.push(curve);
         });
