@@ -144,6 +144,14 @@ ComplexService.getAllComplexesWhichContainProtein = (uniprotId, experimentId) =>
             return [];
         });
 }
+ComplexService.getAverageDistancesToOtherExperiments = (complexId) => {
+    return fetch(`/api/complex/distancetootherexperiments/${complexId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ComplexService.getAverageDistancesToOtherExperiments: ', error, complexId);
+            return [];
+        });
+}
 
 ExternalService = {};
 ExternalService.getUniprotIdsFromText = (text) => {

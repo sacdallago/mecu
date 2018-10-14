@@ -11,7 +11,7 @@ module.exports = (context) => {
                     id
                 }
             })
-            .then(complexArray => complexArray.length >= 1 ? complexArray[0] : {});
+            .then(([result, metadata]) => result || {});
         },
 
         getComplexWhichHasProtein: (uniprotId) => {
@@ -25,7 +25,20 @@ module.exports = (context) => {
                     {replacements: {uniprotId: uniprotId}},
                     {type: sequelize.QueryTypes.SELECT}
                 )
-                .then(result => result[0]);
+                .then(([result, metadata]) => result);
+        },
+
+        getAverageComplexDistancePerExperiment: (complexId) => {
+            const query = `select * from average_complex_distance_per_experiment where "complexId" = :complexId order by avg;`;
+            return context.dbConnection.query(
+                    query,
+                    {replacements: {complexId: complexId}},
+                    {
+                        type: sequelize.QueryTypes.SELECT,
+                        plain: true
+                    }
+                )
+                .then(([result, metadata]) => result);
         }
     };
 };

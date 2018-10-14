@@ -99,3 +99,11 @@
 .experiment-number .dropdown .menu .item:hover {
     background-color: lightgrey;
 }
+
+.tooltip-content .t-line {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100px;
+
+}

@@ -48,7 +48,7 @@ proteinCurvesGrid.on('click', gridItemIdentifier, function(){
 
 });
 
-const drawComplexMetadata = (complex, experimentId) => {
+const drawComplexMetadata = (complex, avgDistances, experimentId) => {
     return new Promise((resolve, reject) => {
 
         const dataContainer = $('#data-container .column-right');
@@ -113,12 +113,29 @@ const drawComplexMetadata = (complex, experimentId) => {
         const swissprotOrganismList = list.clone().addClass('swissprot-organism-list');
         complex.swissprotOrganism.forEach(p => swissprotOrganismList.append(listItem.clone().text(p)));
 
+        let avgDistanceRanking = '';
+        let tooltip = `<div class="tooltip-content">`;
+        avgDistances.forEach((v,i) => {
+            if(v.experiment === parseInt(experimentId)) {
+                avgDistanceRanking = i+1;
+                tooltip+= `<div class="t-line"><div class="t-left"><b>${v.experiment}</b></div><div class="t-right"><b>${v.avg.toFixed(2)}</b></div></div>`;
+            } else {
+                tooltip+= `<div class="t-line"><div class="t-left">${v.experiment}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
+            };
+
+        });
+        tooltip+=`</div>`;
+
 
         dataContainer.append([
             itemContainer.clone().append([
                 text.clone().text('Name'),
                 value.clone().text(complex.name)
             ]),
+            itemContainer.clone().append([
+                text.clone().text('Ranking'),
+                value.clone().text(avgDistanceRanking)
+            ]).attr({'id':'ranking-tooltip', 'data-html':tooltip}),
             itemContainer.clone().append([
                 text.clone().text('Purification Method'),
                 value.clone().text(complex.purificationMethod)
@@ -164,6 +181,8 @@ const drawComplexMetadata = (complex, experimentId) => {
                 value.clone().append(complex.funCatDescription)
             ]),
         ]);
+
+        $('#ranking-tooltip').popup({position: 'bottom right'});
 
         // dataContainer.append(
         //     $('<div />').text(`TODO LEFT OUT:
@@ -347,15 +366,20 @@ $(document).ready(() => {
                     complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment })
                 )
             );
+        const averageDistanceToOtherExperimentsComplex = ComplexService.getAverageDistancesToOtherExperiments(query.id);
 
-        complexData
-            .then(complex => {
+        Promise.all([
+                complexData,
+                averageDistanceToOtherExperimentsComplex
+            ])
+            .then(([complex, avgDist]) => {
                 console.log('complex', complex);
-                return complex;
+                console.log('avgDist', avgDist);
+                return [complex, avgDist];
             })
-            .then(complex =>
+            .then(([complex, avgDist]) =>
                 Promise.all([
-                    drawComplexMetadata(complex, query.experiment),
+                    drawComplexMetadata(complex, avgDist, query.experiment),
                     temperatureReadsToProteins(complex)
                 ])
             )

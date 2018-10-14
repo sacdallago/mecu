@@ -71,6 +71,19 @@ module.exports = function(context) {
                     console.error('hasProtein', error);
                     return response.status(500).send([]);
                 });
+        },
+
+        getAverageComplexDistancePerExperiment: function(request, response) {
+            const start = new Date();
+            complexesDao.getAverageComplexDistancePerExperiment(request.params.id)
+                .then(result => {
+                    console.log('DURATION getAverageComplexDistancePerExperiment', (Date.now()-start)/1000);
+                    response.status(200).send(result);
+                })
+                .catch(error => {
+                    console.error('getAverageComplexDistancePerExperiment', error);
+                    return response.status(500).send([]);
+                });
         }
     }
 }
