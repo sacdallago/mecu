@@ -77,7 +77,6 @@ module.exports = function(context) {
             const start = new Date();
             complexesDao.getAverageComplexDistancePerExperiment(request.params.id, extractUserGoogleId(request))
                 .then(result => {
-                    console.log('result', result);
                     console.log('DURATION getAverageComplexDistancePerExperiment', (Date.now()-start)/1000);
                     response.status(200).send(result);
                 })
