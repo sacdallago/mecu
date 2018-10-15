@@ -116,14 +116,15 @@ const drawComplexMetadata = (complex, avgDistances, experimentId) => {
         const swissprotOrganismList = list.clone().addClass('swissprot-organism-list');
         complex.swissprotOrganism.forEach(p => swissprotOrganismList.append(listItem.clone().text(p)));
 
-        let avgDistanceRanking = '';
+        // complex data ranking
+        let avgDistanceRanking = 'not yet calculated';
         let tooltip = `<div class="tooltip-content"><div class="t-line"><div class="t-left">Exp.</div><div class="t-right">Distance</div></div>`;
         avgDistances.forEach((v,i) => {
             if(v.experiment === parseInt(experimentId)) {
                 avgDistanceRanking = i+1;
-                tooltip+= `<div class="t-line"><div class="t-left"><b>${v.experiment}</b></div><div class="t-right"><b>${v.avg.toFixed(2)}</b></div></div>`;
+                tooltip+= `<div class="t-line"><div class="t-left"><b>${v.name.slice(0,35)}</b></div><div class="t-right"><b>${v.avg.toFixed(2)}</b></div></div>`;
             } else {
-                tooltip+= `<div class="t-line"><div class="t-left">${v.experiment}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
+                tooltip+= `<div class="t-line"><div class="t-left">${v.name.slice(0,35)}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
             };
 
         });
