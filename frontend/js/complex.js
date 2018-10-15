@@ -19,31 +19,34 @@ proteinCurvesGrid.on('click', gridItemIdentifier, function(){
     const data = $(this).data('grid-item-contents');
     console.log('data', data.obj.id, data.obj.experiments[0].experiment);
 
-    if(!localStorageDeleted) {
-        ModalService.openModalAndDoAction(
-            () => {},
-            () => {
-                StorageManager.clear();
-                gridItemToggleDotAll(false);
-                StorageManager.toggle(
-                    {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
-                    () => gridItemToggleDot(this)
-                );
-                localStorageDeleted = true;
-            },
-            () => {
-                StorageManager.toggle(
-                    {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
-                    () => gridItemToggleDot(this)
-                );
-                localStorageDeleted = true;
-            }
-        );
-    } else {
-        StorageManager.toggle(
-            {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
-            () => gridItemToggleDot(this)
-        );
+    // disable selection of proteins without curves
+    if(data.obj.present > 1) {
+        if(!localStorageDeleted) {
+            ModalService.openModalAndDoAction(
+                () => {},
+                () => {
+                    StorageManager.clear();
+                    gridItemToggleDotAll(false);
+                    StorageManager.toggle(
+                        {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
+                        () => gridItemToggleDot(this)
+                    );
+                    localStorageDeleted = true;
+                },
+                () => {
+                    StorageManager.toggle(
+                        {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
+                        () => gridItemToggleDot(this)
+                    );
+                    localStorageDeleted = true;
+                }
+            );
+        } else {
+            StorageManager.toggle(
+                {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
+                () => gridItemToggleDot(this)
+            );
+        }
     }
 
 });
