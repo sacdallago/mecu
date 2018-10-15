@@ -1,5 +1,6 @@
 let localStorageDeleted = StorageManager.getProteins().length === 0;
 const dropDownSelector = '#experiment-number .dropdown';
+const AMOUNT_OF_PPI_TO_DRAW = 20;
 
 // grid for experiments which use this protein as well
 const expWithProteinGridIdentifier = '#experiments-container .grid';
@@ -346,7 +347,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
             return ret;
         };
 
-        HelperFunctions.drawItemsAllExperimentsInOneItem(interactionsGridIdentifier, proteinExperimentObject, toAppend);
+        HelperFunctions.drawItemsAllExperimentsInOneItem(interactionsGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
 
         resolve(true);
     });

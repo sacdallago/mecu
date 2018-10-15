@@ -1,5 +1,6 @@
 let experimentsToDraw = [];
 let proteinsToDraw = [];
+const AMOUNT_OF_PPI_TO_DRAW = 20;
 
 const proteinCurvesGridIdentifier = '.isoGrid';
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
@@ -89,7 +90,7 @@ function loadProteins() {
                 ];
             };
 
-            HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend);
+            HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
         });
 };
 
