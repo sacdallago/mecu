@@ -28,11 +28,23 @@ module.exports = (context) => {
                 .then(([result, metadata]) => result);
         },
 
-        getAverageComplexDistancePerExperiment: (complexId) => {
-            const query = `select * from average_complex_distance_per_experiment where "complexId" = :complexId order by avg;`;
+        getAverageComplexDistancePerExperiment: (complexId, uploader) => {
+            const query = `
+            select experiment, name, ac.avg
+            from average_complex_distance_per_experiment ac, experiments e
+            where ac."complexId" = :complexId and
+                  e.id = ac.experiment and
+                  (e.private = false or e.uploader = :uploader)
+            order by ac.avg;
+            `;
             return context.dbConnection.query(
                     query,
-                    {replacements: {complexId: complexId}},
+                    {
+                        replacements: {
+                            complexId: complexId,
+                            uploader: uploader
+                        }
+                    },
                     {
                         type: sequelize.QueryTypes.SELECT,
                         plain: true
