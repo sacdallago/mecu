@@ -315,7 +315,7 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
                 ret.push(
                     $('<div />')
                         .addClass(['cube-text-middle', 'grid-item-text'])
-                        .text('No data available')
+                        .text('No data for this experiment')
                 )
             }
             ret.push(

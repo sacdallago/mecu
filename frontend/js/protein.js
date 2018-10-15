@@ -333,7 +333,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
                 ret.push(
                     $('<div />')
                         .addClass(['cube-text-middle', 'grid-item-text'])
-                        .text('No data available')
+                        .text('No data for this experiment')
                 )
             }
 
