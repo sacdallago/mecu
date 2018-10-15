@@ -27,7 +27,7 @@ module.exports = function(context) {
                         replacements: {
                             uniprotId,
                             experimentId: experiment,
-                            requester
+                            uploader: requester
                         }
                     },
                     {type: sequelize.QueryTypes.SELECT}

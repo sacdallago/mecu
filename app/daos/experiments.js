@@ -121,7 +121,7 @@ module.exports = function(context) {
                     {
                         replacements: {
                             uniprotId,
-                            requester
+                            uploader: requester
                         }
                     },
                     {type: sequelize.QueryTypes.SELECT}
@@ -146,7 +146,7 @@ module.exports = function(context) {
                     {
                         replacements: {
                             complexId,
-                            requester
+                            uploader: requester
                         }
                     },
                     {type: sequelize.QueryTypes.SELECT}

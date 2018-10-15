@@ -156,7 +156,7 @@ module.exports = function(context) {
                     FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
                     WHERE
                         e.id = e_tr."experimentId" AND
-                        (e.private = :isPrivate or e.uploader = :uploader) AND
+                        (e.private = :isPrivate or e.uploader = ':uploader') AND
                         e_tr."temperatureReadId" = tr.id AND
                         p_tr."uniprotId" = p."uniprotId" AND
                         p_tr."temperatureReadId" = tr.id AND
