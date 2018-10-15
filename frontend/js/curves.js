@@ -15,6 +15,7 @@ proteinCurvesGrid.on('click', '.grid-item', function(){
     let self = this;
     const content = $(this).data('grid-item-contents');
     console.log('item contents', content);
+    if(!data) return;
     return StorageManager.toggle(
         [{
             uniprotId: content.obj.uniprotId,
