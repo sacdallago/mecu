@@ -1,4 +1,7 @@
 let localStorageDeleted = StorageManager.getProteins().length === 0;
+const modalIdentifier = '#add-protein-modal';
+const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+const selectAllPPIButtonSelector = '#select-all-ppi-button';
 const dropDownSelector = '#experiment-number .dropdown';
 const AMOUNT_OF_PPI_TO_DRAW = 20;
 
@@ -15,9 +18,52 @@ expWithProteinGrid.on('click', '.grid-item', function(){
     const data = $(this).data('grid-item-contents');
     let dot = $(this).children('.selected-curve-dot');
     console.log('data', data.obj.uniprotId, data.experiment.experiment);
-    const hasBeenAdded = saveExperimentToLocalStorage(data.obj.uniprotId, data.experiment.experiment);
-    if(hasBeenAdded) dot.css({'visibility': dot.css('visibility') === 'hidden' ? 'visible' : 'hidden'});
+    if(!localStorageDeleted) {
+        ModalService.openModalAndDoAction(
+            () => {},
+            () => {
+                StorageManager.clear();
+                gridItemToggleDotAll(false);
+                StorageManager.toggle(
+                    {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
+                    () => gridItemToggleDot(this)
+                );
+                localStorageDeleted = true;
+            },
+            () => {
+                StorageManager.toggle(
+                    {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
+                    () => gridItemToggleDot(this)
+                );
+                localStorageDeleted = true;
+            }
+        );
+    } else {
+        StorageManager.toggle(
+            {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
+            () => gridItemToggleDot(this)
+        );
+    }
 });
+const gridItemToggleDot = (gridItem, show) => {
+    let dot = $(gridItem).children('.dot-div');
+    if(show === true) {
+        dot.addClass('selected-curve-dot');
+    } else if(show === false) {
+        dot.removeClass('selected-curve-dot');
+    } else {
+        dot.toggleClass('selected-curve-dot')
+    }
+}
+const gridItemToggleDotAll = (show) => {
+    if(show === true) {
+        document.querySelectorAll(expWithProteinGridIdentifier).forEach(item => gridItemToggleDot(item, true))
+    } else if(show === false) {
+        document.querySelectorAll(expWithProteinGridIdentifier).forEach(item => gridItemToggleDot(item, false))
+    } else {
+        document.querySelectorAll(expWithProteinGridIdentifier).forEach(item => gridItemToggleDot(item))
+    }
+}
 
 // grid for complexes
 const complexesWithProteinGridIdentifier = '#related-complexes-container .grid';
@@ -47,7 +93,7 @@ const interactionsGrid = $(interactionsGridIdentifier).isotope({
 interactionsGrid.on('click', '.grid-item', function(){
     const data = $(this).data('grid-item-contents');
     console.log('data', data);
-    if(data.obj.experiments.length > 0) {
+    if(data && data.obj.experiments.length > 0) {
         document.location.href = `/protein?protein=${data.obj.uniprotId}&experiment=${data.obj.experimentId}`;
     }
 });
@@ -165,6 +211,8 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
             });
         });
 
+        const alreadyInStorage = StorageManager.getProteins();
+
         const toAppend = (obj, exp) => {
             return [
                 $('<p />')
@@ -184,7 +232,15 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                         `Experiment ${exp.experiment}`
                     ),
                 $('<div />')
-                    .addClass('selected-curve-dot')
+                    .addClass(
+                        'dot-div'+
+                        (
+                            alreadyInStorage.find(p =>
+                                p.uniprotId === obj.uniprotId &&
+                                p.experiment.find(e => e === obj.experiments[0].experiment)
+                            ) ? ' selected-curve-dot' : ''
+                        )
+                    )
             ];
         };
 
@@ -261,26 +317,6 @@ const drawRelatedComplexes = (complexes, actualExperiment) => {
     });
 }
 
-const saveExperimentToLocalStorage = (protein, experiment) => {
-    let added = true;
-    // if the localStorage hasn't been deleted yet and there are some proteins in it
-    if(!localStorageDeleted && StorageManager.getProteins().length > 0) {
-        added = confirm("There are Proteins still in the local storage. Do you want to overwrite them?");
-        if(added) {
-            StorageManager.clear();
-            console.log('store cleared');
-            localStorageDeleted = true;
-            console.log('adding', {uniprotId: protein, experiment: experiment});
-            StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
-        }
-    // else just add the protein/experiment pair
-    } else {
-        console.log('adding', {uniprotId: protein, experiment: experiment});
-        StorageManager.toggle({uniprotId: protein, experiment: experiment}, () => {});
-    }
-    return added;
-}
-
 const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment, experimentId) => {
     return new Promise((resolve,reject) => {
         interactionsGrid.empty();
@@ -348,6 +384,43 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
         };
 
         HelperFunctions.drawItemsAllExperimentsInOneItem(interactionsGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
+
+
+        // add functionality to select all button
+        const toAdd = proteinInteractions.map(int => {
+                if(int.interactor2 && int.interactor2.experiments) {
+                    return ({uniprotId: int.interactor2.uniprotId, experiment: parseInt(experimentId)});
+                }
+            }).filter(x => !!x);
+        document.querySelector(selectAllPPIButtonSelector).addEventListener(
+            'click',
+            () => {
+                ModalService.openModalAndDoAction(
+                    () => {},
+                    () => {
+                        StorageManager.clear();
+                        StorageManager.add(
+                            toAdd,
+                            (c,a) => {
+                                document.querySelector(selectAllPPIButtonSelector).classList.add('green');
+                                document.querySelector(selectAllPPIButtonSelector).classList.add('disabled');
+                                // gridItemToggleDotAll(true);
+                            }
+                        );
+                    },
+                    () => {
+                        StorageManager.add(
+                            toAdd,
+                            () => {
+                                document.querySelector(selectAllPPIButtonSelector).classList.add('green');
+                                document.querySelector(selectAllPPIButtonSelector).classList.add('disabled');
+                                // gridItemToggleDotAll(true);
+                            }
+                        );
+                    }
+                )
+            }
+        );
 
         resolve(true);
     });
