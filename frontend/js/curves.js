@@ -175,6 +175,23 @@ const drawExperimentsSelect = (experiments) => {
         newExp.innerText = 'Experiment '+exp;
         menu.appendChild(newExp);
     });
+
+    document.querySelector('#experiments-dropdown .value').setAttribute('value', experiments.join(','));
+
+    experimentsToDraw = experiments;
+
+    $('#experiments-dropdown').dropdown({
+        clearable: false,
+        onChange: (e) => {
+            if(e.length === 0) {
+                $('#curves-chart').empty();
+                $('#nodesGraph').empty();
+                return;
+            };
+            experimentsToDraw = e.split(',').map(e => parseInt(e));
+            populateGlobalsGraphs(getColoringValue());
+        }
+    });
 }
 const drawProteinsSelect = (proteins) => {
     const menu = document.querySelector('#proteins-dropdown .menu');
@@ -185,34 +202,27 @@ const drawProteinsSelect = (proteins) => {
         newProt.innerText = p;
         menu.appendChild(newProt);
     });
+
+    document.querySelector('#proteins-dropdown .value').setAttribute('value', proteins.join(','));
+
+    proteinsToDraw = proteins;
+
+    $('#proteins-dropdown').dropdown({
+        clearable: false,
+        onChange: (e) => {
+            if(e.length === 0) {
+                $('#curves-chart').empty();
+                $('#nodesGraph').empty();
+                return;
+            };
+            proteinsToDraw = e.split(',');
+            populateGlobalsGraphs(getColoringValue());
+        }
+    });
 }
 
 $('#coloring-dropdown').dropdown({
     onChange: () => {
-        populateGlobalsGraphs(getColoringValue());
-    }
-});
-$('#experiments-dropdown').dropdown({
-    clearable: false,
-    onChange: (e) => {
-        if(e.length === 0) {
-            $('#curves-chart').empty();
-            $('#nodesGraph').empty();
-            return;
-        };
-        experimentsToDraw = e.split(',').map(e => parseInt(e));
-        populateGlobalsGraphs(getColoringValue());
-    }
-});
-$('#proteins-dropdown').dropdown({
-    clearable: false,
-    onChange: (e) => {
-        if(e.length === 0) {
-            $('#curves-chart').empty();
-            $('#nodesGraph').empty();
-            return;
-        };
-        proteinsToDraw = e.split(',');
         populateGlobalsGraphs(getColoringValue());
     }
 });
