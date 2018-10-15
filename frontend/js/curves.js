@@ -136,7 +136,7 @@ function populateGlobalsGraphs(coloringType){
                 distance: 30,
                 padding: 5,
                 formatter: function() {
-                    return `<b>${this.x}</b> C°<br /><b>${this.y}</b> %`;
+                    return `<b>${this.x}</b> C°<br /><b>${(this.y*100).toFixed(2)}</b> %`;
                 }
                 // if you want to show the whole line(vertical) in one tooltip
                 // formatter: function() {
