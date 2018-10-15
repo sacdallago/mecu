@@ -11,26 +11,26 @@ module.exports = function(context) {
             return experimentsModel.create(item, options);
         },
 
-        getExperiments: function(options = {}, uploader){
+        getExperiments: function(options = {}, requester){
             return experimentsModel.findAll({
                 attributes: ['id', 'name', 'metaData', 'uploader'],
                 where: {
                     [sequelize.Op.or]: [
                         {private: false},
-                        {uploader: uploader}
+                        {uploader: requester}
                     ]
                 }
             });
         },
 
-        findExperiment: function(id, uploader) {
+        findExperiment: function(id, requester) {
             return experimentsModel.findAll({
                     attributes: ['id', 'name', 'metaData', 'uploader', 'private', 'createdAt', 'updatedAt'],
                     where: {
                         id: id,
                         [sequelize.Op.or]: [
                             {private: false},
-                            {uploader: uploader}
+                            {uploader: requester}
                         ]
                     }
                 })
@@ -49,14 +49,14 @@ module.exports = function(context) {
             );
         },
 
-        getExperimentsPaged: function(options, uploader) {
+        getExperimentsPaged: function(options, requester) {
             // add search if necessary
             return Promise.all([
                     experimentsModel.count({
                         where: {
                             [sequelize.Op.or]: [
                                 {private: false},
-                                {uploader: uploader}
+                                {uploader: requester}
                             ]
                         }
                     }),
@@ -65,7 +65,7 @@ module.exports = function(context) {
                         where: {
                             [sequelize.Op.or]: [
                                 {private: false},
-                                {uploader: uploader}
+                                {uploader: requester}
                             ]
                         },
                         limit: options.limit,
@@ -78,7 +78,7 @@ module.exports = function(context) {
                 .then(([count, result]) => ({count, data:result}));
         },
 
-        getRawData: function(id, uploader){
+        getRawData: function(id, requester){
             if(id !== undefined) {
                 return experimentsModel.findById(
                     id,
@@ -87,7 +87,7 @@ module.exports = function(context) {
                         where: {
                             [sequelize.Op.or]: [
                                 {private: false},
-                                {uploader: uploader}
+                                {uploader: requester}
                             ]
                         }
                     }
@@ -99,7 +99,7 @@ module.exports = function(context) {
                         where: {
                             [sequelize.Op.or]: [
                                 {private: false},
-                                {uploader: uploader}
+                                {uploader: requester}
                             ]
                         }
                     }
@@ -107,7 +107,7 @@ module.exports = function(context) {
             }
         },
 
-        getExperimentsWhichHaveProtein: function(uniprotId, uploader) {
+        getExperimentsWhichHaveProtein: function(uniprotId, requester) {
             const query = `
                 SELECT "experimentId", name
                 FROM protein_experiments pe, experiments e
@@ -121,7 +121,7 @@ module.exports = function(context) {
                     {
                         replacements: {
                             uniprotId,
-                            uploader
+                            requester
                         }
                     },
                     {type: sequelize.QueryTypes.SELECT}
@@ -129,7 +129,7 @@ module.exports = function(context) {
                 .then(r => r.length > 0 ? r[0] : []);
         },
 
-        getExperimentsWhichHaveComplex: (complexId, uploader) => {
+        getExperimentsWhichHaveComplex: (complexId, requester) => {
             const query = `
                 SELECT DISTINCT e.id, e.name
                 FROM
@@ -146,7 +146,7 @@ module.exports = function(context) {
                     {
                         replacements: {
                             complexId,
-                            uploader
+                            requester
                         }
                     },
                     {type: sequelize.QueryTypes.SELECT}

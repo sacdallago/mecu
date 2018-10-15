@@ -16,9 +16,9 @@ module.exports = function(context) {
             return temperatureReadsModel.bulkCreate(items, options);
         },
 
-        findByUniprotIdAndExperiment: function(uniprotId, experimentId, uploader) {
+        findByUniprotIdAndExperiment: function(uniprotId, experimentId, requester) {
             const replacements = {
-                uploader: uploader,
+                uploader: requester,
                 private: false
             };
             let whereClause = `
@@ -48,13 +48,13 @@ module.exports = function(context) {
                 .then(r => r.length > 0 ? r[0] : []);
         },
 
-        findAndAggregateTempsBySimilarUniprotId: function(query, uploader) {
+        findAndAggregateTempsBySimilarUniprotId: function(query, requester) {
             let replacements = {
                 search: query.search+'%',
                 offset: query.offset,
                 limit: query.limit,
                 isPrivate: false,
-                uploader: uploader
+                uploader: requester
             };
             let whereClause = '';
             if(query.search.constructor === Array) {
@@ -128,12 +128,12 @@ module.exports = function(context) {
                 });
         },
 
-        findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs, uploader) {
+        findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs, requester) {
             if(uniprodIdExpIdPairs.length === 0) {
                 return Promise.resolve([]);
             }
             const replacements = {
-                uploader: uploader,
+                uploader: requester,
                 isPrivate: false
             };
             let whereClause = '(';
@@ -185,7 +185,7 @@ module.exports = function(context) {
 
         },
 
-        getSingleProteinXExperiment: function(proteinName, experimentId, uploader) {
+        getSingleProteinXExperiment: function(proteinName, experimentId, requester) {
             const query = `
                 SELECT tr.experiment, tr."uniprotId", json_agg(json_build_object('t', tr.temperature, 'r', tr.ratio)) as reads
                 FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
@@ -207,7 +207,7 @@ module.exports = function(context) {
                          proteinName: proteinName,
                          experimentId: experimentId,
                          isPrivate: false,
-                         uploader: uploader
+                         uploader: requester
                      }
                  },
                  {type: sequelize.QueryTypes.SELECT}

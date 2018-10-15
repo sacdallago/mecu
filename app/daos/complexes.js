@@ -28,7 +28,7 @@ module.exports = (context) => {
                 .then(([result, metadata]) => result);
         },
 
-        getAverageComplexDistancePerExperiment: (complexId, uploader) => {
+        getAverageComplexDistancePerExperiment: (complexId, requester) => {
             const query = `
             select experiment, name, ac.avg
             from average_complex_distance_per_experiment ac, experiments e
@@ -42,7 +42,7 @@ module.exports = (context) => {
                     {
                         replacements: {
                             complexId: complexId,
-                            uploader: uploader
+                            uploader: requester
                         }
                     },
                     {

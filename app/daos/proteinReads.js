@@ -10,7 +10,7 @@ module.exports = function(context) {
             return proteinReadsModel.bulkCreate(items, options);
         },
 
-        findProteinExperiment: function(uniprotId, experiment, uploader) {
+        findProteinExperiment: function(uniprotId, experiment, requester) {
             const query = `
             SELECT pr."uniprotId", pr.experiment, pr.peptides, pr.psms, pr."createdAt", pr."updatedAt"
             FROM "proteinReads" pr, "experiment_proteinReads" e_pr, experiments e
@@ -27,7 +27,7 @@ module.exports = function(context) {
                         replacements: {
                             uniprotId,
                             experimentId: experiment,
-                            uploader
+                            requester
                         }
                     },
                     {type: sequelize.QueryTypes.SELECT}

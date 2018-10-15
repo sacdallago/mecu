@@ -60,13 +60,13 @@ module.exports = function(context) {
                 });
         },
 
-        findProteinExperimentCombinations: function(proteinExperimentPairs, uploader) {
+        findProteinExperimentCombinations: function(proteinExperimentPairs, requester) {
 
             if(proteinExperimentPairs.length === 0) {
                 return Promise.resolve([]);
             }
             const replacements = {
-                uploader: uploader,
+                uploader: requester,
                 isPrivate: false
             };
             let whereClause = '';
