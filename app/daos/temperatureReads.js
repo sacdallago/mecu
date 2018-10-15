@@ -181,7 +181,11 @@ module.exports = function(context) {
                     console.log(`DURATION findAndAggregateTempsByIdAndExperiment  ${(Date.now()-start)/1000} ms`);
                     return r;
                 })
-                .then(r => r.length > 0 ? r[0] : []);
+                .then(r => r.length > 0 ? r[0] : [])
+                .catch(error => {
+                    console.error('findAndAggregateTempsByIdAndExperiment', uniprodIdExpIdPairs, requester);
+                    return [];
+                });
 
         },
 

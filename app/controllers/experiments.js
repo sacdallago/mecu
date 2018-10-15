@@ -342,7 +342,7 @@ module.exports = function(context) {
                     response.status(200).send(result);
                 })
                 .catch(error => {
-                    console.error('hasProtein', error);
+                    console.error('getExperimentsWhichHaveComplex', error);
                     return response.status(500).send([]);
                 });
         }
