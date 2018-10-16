@@ -9,13 +9,19 @@ HelperFunctions = {};
  * necessary for data:
  * {uniprotId, experiments:[{experiment}]}
  */
-HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridItemAppendexesFun) => {
+HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridItemAppendexesFun, maxCubesToDraw) => {
     const gridIdentifier = $(gridIdentifierString);
     gridIdentifier.empty();
 
     const itemIdentifierPrefix = 'GRIDITEM'+HelperFunctions.generateRandomString();
     const curves = [];
     const items = [];
+
+    let cubesNotDrawn = 0;
+    if(maxCubesToDraw) {
+        cubesNotDrawn = data.length -(maxCubesToDraw-1);
+        data = data.slice(0,maxCubesToDraw-1);
+    }
 
     data.forEach(obj => {
         obj.experiments.forEach((expRead, index, a) => {
@@ -35,6 +41,19 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
         });
     });
 
+    if(maxCubesToDraw) {
+        const gridItem = $('<div />')
+            .addClass('grid-item')
+            .attr({'id':'more-cubes-cube'})
+            .append([
+                $('<div />')
+                    .addClass('center-text')
+                    .css({'position':'absolute', 'top':'44%', 'left':'58px', 'font-size':'13pt'})
+                    .text(`${cubesNotDrawn} more...`)
+            ]);
+        items.push(gridItem[0]);
+    }
+
     gridIdentifier.isotope('insert', items);
 
     data.forEach(obj => {
@@ -50,7 +69,7 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
                 minRatio: 0.1
             });
 
-            if(expRead. reads) {
+            if(expRead.reads) {
                 curve.add({
                     uniprotId: obj.uniprotId,
                     experiments: [expRead]
@@ -60,6 +79,18 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
             curves.push(curve);
         });
     });
+
+    if(maxCubesToDraw) {
+        let curve = new MecuLine({
+            element: '#more-cubes-cube',
+            width:"200",
+            height:"200",
+            limit: 5,
+            minTemp: 41,
+            maxTemp: 64,
+            minRatio: 0.1
+        });
+    }
 };
 
 /**
@@ -71,13 +102,19 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
  * necessary for data:
  * {id, experiments}
  */
-HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, gridItemAppendexesFun) => {
+HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, gridItemAppendexesFun, maxCubesToDraw) => {
     const gridIdentifier = $(gridIdentifierString);
     gridIdentifier.empty();
 
     const itemIdentifierPrefix = 'GRIDITEM'+HelperFunctions.generateRandomString();
     const curves = [];
     const items = [];
+
+    let cubesNotDrawn = 0;
+    if(maxCubesToDraw) {
+        cubesNotDrawn = data.length -(maxCubesToDraw-1);
+        data = data.slice(0,maxCubesToDraw-1);
+    }
 
     data.forEach((obj,index,a) => {
 
@@ -93,6 +130,19 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
 
         items.push(gridItem[0]);
     });
+
+    if(maxCubesToDraw) {
+        const gridItem = $('<div />')
+            .addClass('grid-item')
+            .attr({'id':'more-cubes-cube'})
+            .append([
+                $('<div />')
+                    .addClass('center-text')
+                    .css({'position':'absolute', 'top':'44%', 'left':'58px', 'font-size':'13pt'})
+                    .text(`${cubesNotDrawn} more...`)
+            ]);
+        items.push(gridItem[0]);
+    }
 
     gridIdentifier.isotope('insert', items);
 

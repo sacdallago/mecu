@@ -1,5 +1,6 @@
 let experimentsToDraw = [];
 let proteinsToDraw = [];
+const AMOUNT_OF_PPI_TO_DRAW = 20;
 
 const proteinCurvesGridIdentifier = '.isoGrid';
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
@@ -14,6 +15,7 @@ proteinCurvesGrid.on('click', '.grid-item', function(){
     let self = this;
     const content = $(this).data('grid-item-contents');
     console.log('item contents', content);
+    if(!data) return;
     return StorageManager.toggle(
         [{
             uniprotId: content.obj.uniprotId,
@@ -89,7 +91,7 @@ function loadProteins() {
                 ];
             };
 
-            HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend);
+            HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
         });
 };
 
@@ -134,7 +136,7 @@ function populateGlobalsGraphs(coloringType){
                 distance: 30,
                 padding: 5,
                 formatter: function() {
-                    return `<b>${this.x}</b> C°<br /><b>${this.y}</b> %`;
+                    return `<b>${this.x}</b> C°<br /><b>${(this.y*100).toFixed(2)}</b> %`;
                 }
                 // if you want to show the whole line(vertical) in one tooltip
                 // formatter: function() {
