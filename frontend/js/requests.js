@@ -152,6 +152,23 @@ ComplexService.getAverageDistancesToOtherExperiments = (complexId) => {
             return [];
         });
 }
+ComplexService.findComplex = (query) => {
+    return fetch(
+            `/api/complex/find`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify(query)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ComplexService.findComplex: ', query);
+            return [];
+        });
+}
 
 ExternalService = {};
 ExternalService.getUniprotIdsFromText = (text) => {

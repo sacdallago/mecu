@@ -15,7 +15,7 @@ const queryParams = (query) => {
         sortBy: query.sortBy || 'id',
         order: query.order ? (isNaN(parseInt(query.order)) ? 1 : parseInt(query.order)) : 1
     };
-    return ret;
+    return Object.assign(ret, query);
 }
 
 module.exports = function(context) {
