@@ -10,6 +10,12 @@
     min-width: 300px;
     max-height: 700px;
 }
+.data-container .column-left .default-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
 
 .data-container .column-right .column-right {
     padding: 10 20 10 20px;
@@ -105,6 +111,12 @@
     flex-direction: row;
     justify-content: space-between;
     width: 300px;
+}
+.tooltip-content .t-left {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 30px;
 }
 
 .curves-grid .cube-text-middle {

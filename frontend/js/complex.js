@@ -116,30 +116,15 @@ const drawComplexMetadata = (complex, avgDistances, experimentId) => {
         const swissprotOrganismList = list.clone().addClass('swissprot-organism-list');
         complex.swissprotOrganism.forEach(p => swissprotOrganismList.append(listItem.clone().text(p)));
 
-        // complex data ranking
-        let avgDistanceRanking = 'not yet calculated';
-        let tooltip = `<div class="tooltip-content"><div class="t-line"><div class="t-left">Exp.</div><div class="t-right">Distance</div></div>`;
-        avgDistances.forEach((v,i) => {
-            if(v.experiment === parseInt(experimentId)) {
-                avgDistanceRanking = i+1;
-                tooltip+= `<div class="t-line"><div class="t-left"><b>${v.name.slice(0,35)}</b></div><div class="t-right"><b>${v.avg.toFixed(2)}</b></div></div>`;
-            } else {
-                tooltip+= `<div class="t-line"><div class="t-left">${v.name.slice(0,35)}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
-            };
-
-        });
-        tooltip+=`</div>`;
-
-
         dataContainer.append([
             itemContainer.clone().append([
                 text.clone().text('Name'),
                 value.clone().text(complex.name)
             ]),
-            itemContainer.clone().append([
+            itemContainer.clone().attr({'id':'ranking-field'}).append([
                 text.clone().text('Ranking'),
-                value.clone().text(avgDistanceRanking)
-            ]).attr({'id':'ranking-tooltip', 'data-html':tooltip}),
+                value.clone()
+            ]),
             itemContainer.clone().append([
                 text.clone().text('Purification Method'),
                 value.clone().text(complex.purificationMethod)
@@ -186,8 +171,6 @@ const drawComplexMetadata = (complex, avgDistances, experimentId) => {
             ]),
         ]);
 
-        $('#ranking-tooltip').popup({position: 'bottom right'});
-
         // dataContainer.append(
         //     $('<div />').text(`TODO LEFT OUT:
         //         goId GO:0006260,GO:0006281,GO:0005634\n
@@ -201,6 +184,30 @@ const drawComplexMetadata = (complex, avgDistances, experimentId) => {
         // );
         resolve(true);
     });
+}
+
+const drawRanking = (avgDistances, tempReadsLength, experimentId) => {
+    // complex data ranking
+    let avgDistanceRanking = tempReadsLength < 2 ? 'not enough data to calculate' : 'not yet calculated';
+    let tooltip = `<div class="tooltip-content"><div class="t-line"><div class="t-left">Experiment</div><div class="t-right">Distance</div></div>`;
+    avgDistances.forEach((v,i) => {
+        if(v.experiment === parseInt(experimentId)) {
+            avgDistanceRanking = i+1;
+            tooltip+= `<div class="t-line" style="font-weight:bold;"><div class="t-left">${v.name}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
+        } else {
+            tooltip+= `<div class="t-line"><div class="t-left">${v.name}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
+        };
+
+    });
+    tooltip+=`</div>`;
+
+    console.log($('#ranking-field'));
+    console.log($('#ranking-field .value'));
+
+    $('#ranking-field').attr({'id':'ranking-tooltip', 'data-html':tooltip});
+    $('#ranking-tooltip .value').text(avgDistanceRanking);
+
+    $('#ranking-tooltip').popup({position: 'bottom right'});
 }
 
 const drawOtherExperimentsSelect = (experiments, complexId, actualExperiment) => {
@@ -396,41 +403,51 @@ $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     console.log('query', query);
-    if(query.id && query.experiment) {
+    if(query.id) {
         let loading = true;
 
         const complexData = ComplexService.getComplexById(query.id);
         const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(query.id);
-        const temperatureReadsToProteins = (complex) =>
-            TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                    complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment })
-                )
-            );
         const averageDistanceToOtherExperimentsComplex = ComplexService.getAverageDistancesToOtherExperiments(query.id);
 
-        Promise.all([
-                complexData,
-                averageDistanceToOtherExperimentsComplex
-            ])
+        experimentsWhichHaveComplex
+            .then(exps => {
+                console.log('experiments which have complex', exps);
+                drawOtherExperimentsSelect(exps, query.id, query.experiment);
+                return exps;
+            })
+            .then((experiments) => Promise.all([
+                    complexData,
+                    averageDistanceToOtherExperimentsComplex
+                ])
+            )
             .then(([complex, avgDist]) => {
                 console.log('complex', complex);
                 console.log('avgDist', avgDist);
                 return [complex, avgDist];
             })
-            .then(([complex, avgDist]) =>
-                Promise.all([
-                    drawComplexMetadata(complex, avgDist, query.experiment),
-                    Promise.all([temperatureReadsToProteins(complex), Promise.resolve(complex.proteins)])
-                ])
-            )
-            .then(([done, proteinData]) => {
-                console.log('proteinCurves', proteinData);
-                drawCombinedProteinCurves(proteinData[0]);
-                drawCurvesItems(proteinData[0], proteinData[1], query.experiment);
-                return done;
+            .then(([complex, avgDist]) => {
+                drawComplexMetadata(complex, avgDist, query.experiment);
+                return Promise.all([
+                    averageDistanceToOtherExperimentsComplex,
+                    complex
+                ]);
             })
-            .then(() => experimentsWhichHaveComplex)
-            .then(exps => drawOtherExperimentsSelect(exps, query.id, query.experiment))
+            .then(([avgDist, complex]) => {
+                if(query.experiment) {
+                    return TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                            complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment }))
+                        )
+                        .then(proteinData => {
+                            console.log('proteinCurves', proteinData);
+                            drawRanking(avgDist, proteinData.length, query.experiment);
+                            drawCombinedProteinCurves(proteinData);
+                            drawCurvesItems(proteinData, complex.proteins, query.experiment);
+                        });
+                } else {
+                    return Promise.resolve();
+                }
+            })
             .then(done => {
                 $(dropDownSelector).dropdown({
                     match: 'both',
