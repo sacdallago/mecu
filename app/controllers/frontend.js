@@ -47,6 +47,10 @@ module.exports = function(context) {
             return response.render('protein', {title: 'Protein'});
         },
 
+        complexes: function(request, response) {
+            return response.render('complexes', {title: 'Find Complex'});
+        },
+
         complex: function(request, response) {
             return response.render('complex', {title: 'Complex'});
         },
