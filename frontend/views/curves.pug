@@ -7,6 +7,7 @@ block content
     .space
     h1 Global View
     .settings
+        .text-coloring Select how the curves should be colored:
         .ui.selection.dropdown#coloring-dropdown
             i.dropdown.icon
             input(type="hidden" name="coloring" value="0").value
@@ -14,11 +15,13 @@ block content
             .menu
                 .item(data-value="0") Color by Protein
                 .item(data-value="1") Color by Experiment
+        .text-experiments Select which experiments to draw:
         .ui.selection.fluid.multiple.dropdown#experiments-dropdown
             input(type="hidden" name="experiments").value
             .text
             .menu
             i.dropdown.icon
+        .text-proteins Select which proteins to draw:
         .ui.selection.fluid.multiple.dropdown#proteins-dropdown
             input(type="hidden" name="proteins").value
             .text
@@ -30,6 +33,8 @@ block content
             .column
                 .curves-graph-container
                     #curves-chart.chart
+                    .space
+                    .ui.button#fullscreen-button View in new page
             .column
                 #nodesGraph
                 .space

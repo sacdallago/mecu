@@ -84,6 +84,12 @@ module.exports = function(context) {
                         error: error
                     });
                 });
+        },
+
+        storageProteinsFullscreen: function(request, response) {
+            return response.render('storage-proteins-fullscreen', {
+                title: 'Proteins Fullscreen'
+            });
         }
     }
 };

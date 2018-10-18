@@ -1,6 +1,5 @@
 highChartsCurvesConfigObject = {
     chart: {
-        title: undefined,
         backgroundColor: '#fbfbfb'
     },
 
@@ -8,12 +7,19 @@ highChartsCurvesConfigObject = {
         text: ''
     },
 
+    xAxis: {
+        title: {
+            text: ''
+        },
+        startOnTick: true,
+        tickInterval: 1,
+        min: 37,
+        max: 64
+    },
     yAxis: {
         title: {
             text: ''
         }
-        //     min: 0,
-        //     max: 1.1
     },
     legend: {
         layout: 'vertical',
@@ -30,16 +36,6 @@ highChartsCurvesConfigObject = {
                 duration: 1000
             }
         }
-    },
-
-    xAxis: {
-        title: {
-            text: ''
-        },
-        startOnTick: true,
-        tickInterval: 1,
-        min: 37,
-        max: 64
     },
 
     responsive: {

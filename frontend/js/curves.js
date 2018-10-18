@@ -126,9 +126,17 @@ function populateGlobalsGraphs(coloringType){
             });
 
             // configuring and plotting highcharts
-            highChartsCurvesConfigObject['title.text'] = 'TPCA melting curve';
-            highChartsCurvesConfigObject['yAxis.title.text'] = '% alive';
-            highChartsCurvesConfigObject['xAxis.title.text'] = 'Temperature';
+            highChartsCurvesConfigObject['title'] = {
+                text: 'TPCA melting curve'
+            };
+            highChartsCurvesConfigObject['xAxis']['title'] = {
+                enabled: true,
+                text: 'Temperature'
+            };
+            highChartsCurvesConfigObject['yAxis']['title'] = {
+                enabled: true,
+                text: '% alive'
+            };
             highChartsCurvesConfigObject['series'] = series;
             highChartsCurvesConfigObject['tooltip'] = {
                 // valueSuffix: '',
@@ -136,7 +144,7 @@ function populateGlobalsGraphs(coloringType){
                 distance: 30,
                 padding: 5,
                 formatter: function() {
-                    return `<b>${this.x}</b> C°<br /><b>${(this.y*100).toFixed(2)}</b> %`;
+                    return `<b>${this.series.name}</b><br><b>${this.x}</b> C°<br /><b>${(this.y*100).toFixed(2)}</b> %`;
                 }
                 // if you want to show the whole line(vertical) in one tooltip
                 // formatter: function() {
@@ -185,11 +193,6 @@ const drawExperimentsSelect = (experiments) => {
     $('#experiments-dropdown').dropdown({
         clearable: false,
         onChange: (e) => {
-            if(e.length === 0) {
-                $('#curves-chart').empty();
-                $('#nodesGraph').empty();
-                return;
-            };
             experimentsToDraw = e.split(',').map(e => parseInt(e));
             populateGlobalsGraphs(getColoringValue());
         }
@@ -212,11 +215,6 @@ const drawProteinsSelect = (proteins) => {
     $('#proteins-dropdown').dropdown({
         clearable: false,
         onChange: (e) => {
-            if(e.length === 0) {
-                $('#curves-chart').empty();
-                $('#nodesGraph').empty();
-                return;
-            };
             proteinsToDraw = e.split(',');
             populateGlobalsGraphs(getColoringValue());
         }
@@ -256,6 +254,17 @@ $('.ui.dropdown.button.minkowski').dropdown({
 
     }
 }).popup({position: 'bottom left'});
+
+$('#fullscreen-button').on('click', function() {
+    // set storage settings for fullscreen
+    StorageManager.setFullScreenProteinsSettings(
+        proteinsToDraw,
+        experimentsToDraw,
+        parseInt(document.querySelector('#coloring-dropdown .value').value)
+    );
+
+    window.open(`/storage-proteins-fullscreen`, '_blank');
+});
 
 // on page drawing finished, start requests
 $(document).ready(() => {
