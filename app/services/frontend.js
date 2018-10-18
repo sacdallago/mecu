@@ -12,5 +12,7 @@ module.exports = function(context) {
         .get('/complexes', frontendController.complexes)
         .get('/complex', frontendController.complex)
         .get('/experiments', frontendController.experiments)
-        .get('/experiment', frontendController.experiment);
+        .get('/experiment', frontendController.experiment)
+        .get('/storage-proteins-fullscreen', frontendController.storageProteinsFullscreen)
+        ;
 }
