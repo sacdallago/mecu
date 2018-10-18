@@ -126,9 +126,17 @@ function populateGlobalsGraphs(coloringType){
             });
 
             // configuring and plotting highcharts
-            highChartsCurvesConfigObject['title.text'] = 'TPCA melting curve';
-            highChartsCurvesConfigObject['yAxis.title.text'] = '% alive';
-            highChartsCurvesConfigObject['xAxis.title.text'] = 'Temperature';
+            highChartsCurvesConfigObject['title'] = {
+                text: 'TPCA melting curve'
+            };
+            highChartsCurvesConfigObject['xAxis']['title'] = {
+                enabled: true,
+                text: 'Temperature'
+            };
+            highChartsCurvesConfigObject['yAxis']['title'] = {
+                enabled: true,
+                text: '% alive'
+            };
             highChartsCurvesConfigObject['series'] = series;
             highChartsCurvesConfigObject['tooltip'] = {
                 // valueSuffix: '',
