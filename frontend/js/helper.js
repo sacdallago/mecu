@@ -193,7 +193,7 @@ HelperFunctions.stringToColor = (string) => {
         let shortened = inputInt % 360;
         return "hsl(" + shortened + ",100%,40%)";
     };
-    return getHashCode(string).intToHSL();
+    return intToHSL(getHashCode(string));
 }
 
 HelperFunctions.delay = (function(){
