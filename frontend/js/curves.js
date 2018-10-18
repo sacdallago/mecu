@@ -193,11 +193,6 @@ const drawExperimentsSelect = (experiments) => {
     $('#experiments-dropdown').dropdown({
         clearable: false,
         onChange: (e) => {
-            if(e.length === 0) {
-                $('#curves-chart').empty();
-                $('#nodesGraph').empty();
-                return;
-            };
             experimentsToDraw = e.split(',').map(e => parseInt(e));
             populateGlobalsGraphs(getColoringValue());
         }
@@ -220,11 +215,6 @@ const drawProteinsSelect = (proteins) => {
     $('#proteins-dropdown').dropdown({
         clearable: false,
         onChange: (e) => {
-            if(e.length === 0) {
-                $('#curves-chart').empty();
-                $('#nodesGraph').empty();
-                return;
-            };
             proteinsToDraw = e.split(',');
             populateGlobalsGraphs(getColoringValue());
         }
