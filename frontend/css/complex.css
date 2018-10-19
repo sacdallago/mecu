@@ -118,6 +118,11 @@
     text-overflow: ellipsis;
     padding-right: 30px;
 }
+.ranking-info-text{
+    padding-top: 20px;
+    font-size: 14px;
+    font-style: italic;;
+}
 
 .curves-grid .cube-text-middle {
     position: absolute;

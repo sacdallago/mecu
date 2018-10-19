@@ -199,7 +199,7 @@ const drawRanking = (avgDistances, tempReadsLength, experimentId) => {
         };
 
     });
-    tooltip+=`</div>`;
+    tooltip+=`</div><div class="ranking-info-text">Distance of all the proteins within a complex for each experiment.</div>`;
 
     console.log($('#ranking-field'));
     console.log($('#ranking-field .value'));
