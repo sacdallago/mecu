@@ -54,7 +54,7 @@ proteinCurvesGrid.on('click', gridItemIdentifier, function(){
 const drawComplexMetadata = (complex, avgDistances, experimentId) => {
     return new Promise((resolve, reject) => {
 
-        const dataContainer = $('#data-container .column-right');
+        const dataContainer = $('.column-right');
 
         const itemContainer = $('<div />').addClass('item-container');
         const text = $('<div />').addClass('text');
@@ -200,9 +200,6 @@ const drawRanking = (avgDistances, tempReadsLength, experimentId) => {
 
     });
     tooltip+=`</div><div class="ranking-info-text">Distance of all the proteins within a complex for each experiment.</div>`;
-
-    console.log($('#ranking-field'));
-    console.log($('#ranking-field .value'));
 
     $('#ranking-field').attr({'id':'ranking-tooltip', 'data-html':tooltip});
     $('#ranking-tooltip .value').text(avgDistanceRanking);
