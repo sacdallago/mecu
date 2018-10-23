@@ -85,7 +85,6 @@ module.exports = function(context) {
                   (e.private = false or e.uploader = :uploader)
             order by interactor1, interactor2
             ;`;
-            console.log('query', query);
 
             return context.dbConnection.query(
                     query,
