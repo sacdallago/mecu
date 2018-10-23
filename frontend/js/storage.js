@@ -209,6 +209,21 @@ StorageManager.getMinTemp = function() {
     return (t != "NaN" ? t : undefined);
 };
 
+StorageManager.setFullScreenProteinsSettings = (proteins, experiments, coloring) => {
+    return store.set(
+            'fullscreenSettings',
+            {
+                proteins: proteins,
+                experiments: experiments,
+                coloring: coloring
+            }
+        );
+}
+StorageManager.getFullScreenProteinsSet = () => {
+    const ret = {proteins: [], experiments: [], coloring: 0};
+    return store.get('fullscreenSettings') || ret;
+}
+
 // check structure of 'proteins' in local storage
 (function (s) {
     let proteins = s.getProteins();

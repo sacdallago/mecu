@@ -126,6 +126,23 @@ ProteinService.getProteinExperimentCombinations = (proteinExperimentArr, expId) 
             return [];
         });
 }
+ProteinService.getProteinXProteinDistances = (proteinList, experimentList) => {
+    return fetch(
+            `/api/protein/proteinxproteindistances`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify({proteinList: proteinList, experimentList: experimentList})
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ProteinService.getProteinXProteinDistances: ', error, proteinList, experimentList);
+            return [];
+        });
+}
 
 ComplexService = {};
 ComplexService.getComplexById = (id) => {
@@ -141,6 +158,31 @@ ComplexService.getAllComplexesWhichContainProtein = (uniprotId, experimentId) =>
         .then(resp => resp.json())
         .catch(error => {
             console.error('Request error for ComplexService.getAllComplexesWhichContainProtein: ', error, uniprotId);
+            return [];
+        });
+}
+ComplexService.getAverageDistancesToOtherExperiments = (complexId) => {
+    return fetch(`/api/complex/distancetootherexperiments/${complexId}`)
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ComplexService.getAverageDistancesToOtherExperiments: ', error, complexId);
+            return [];
+        });
+}
+ComplexService.findComplex = (query) => {
+    return fetch(
+            `/api/complex/find`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify(query)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ComplexService.findComplex: ', query);
             return [];
         });
 }

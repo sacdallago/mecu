@@ -5,8 +5,9 @@ block postStyles
 
 block content
     .space
-    h1 Global View
+    h3 Global View
     .settings
+        .text-coloring Select how the curves should be colored:
         .ui.selection.dropdown#coloring-dropdown
             i.dropdown.icon
             input(type="hidden" name="coloring" value="0").value
@@ -14,11 +15,13 @@ block content
             .menu
                 .item(data-value="0") Color by Protein
                 .item(data-value="1") Color by Experiment
+        .text-experiments Select which experiments to draw:
         .ui.selection.fluid.multiple.dropdown#experiments-dropdown
             input(type="hidden" name="experiments").value
             .text
             .menu
             i.dropdown.icon
+        .text-proteins Select which proteins to draw:
         .ui.selection.fluid.multiple.dropdown#proteins-dropdown
             input(type="hidden" name="proteins").value
             .text
@@ -30,6 +33,8 @@ block content
             .column
                 .curves-graph-container
                     #curves-chart.chart
+                    .space
+                    .ui.button#fullscreen-button View in new page
             .column
                 #nodesGraph
                 .space
@@ -44,7 +49,24 @@ block content
                         .item
                             .ui.attached.button.submit Save
 
-    h1 Selected Proteins
+    h3 Protein X Protein distances and correlations
+    .legend
+        .distance
+            .color-distance
+            .text-distance Distance of 2 proteins (euclidian)
+        .correlation
+            .color-correlation
+            .text-correlation Correlation of 2 proteins (data from Hippie)
+    .table-container
+        table.ui.definition.collapsing.celled.table
+            thead#ppi-thead
+            
+            tbody#ppi-tbody
+    
+    .space
+    .ui.button.disabled#fullscreen-button View in new page
+
+    h3 Select/Deselect Proteins
     .grid-container
         .text Click to remove
         .isoGrid
@@ -53,6 +75,7 @@ block content
 block settings
     .divider
     a(href='/search').item Find Proteins in Experiments
+    a(href='/complexes').item Find Complex
     a(href='/experiments').item Search Experiments
 
 block scripts
@@ -60,5 +83,7 @@ block scripts
     script(type="text/javascript", src="/public/modules/disi/build/disi.js")
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
+    script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
     script(type="text/javascript", src="/public/js/curves.js")
     script(type="text/javascript", src="/public/js/helper.js")

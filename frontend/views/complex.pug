@@ -19,6 +19,8 @@ block content
     .data-container#data-container
         .column-left
             #curvesGraph
+                .default-text
+                    .text No experiment selected for this complex
         .column-right
     
     .curves-grid#curves-grid
@@ -32,6 +34,7 @@ block content
 block settings
     .divider
     a(href='/search').item Find Proteins in Experiments
+    a(href='/complexes').item Find Complex
     a(href='/experiments').item Search Experiments
     a(href='/curves').item Analyze
 
@@ -39,6 +42,8 @@ block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
+    script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
     script(type="text/javascript", src="/public/js/helper.js")
     script(type="text/javascript", src="/public/js/modal.js")
     script(type="text/javascript", src="/public/js/complex.js")

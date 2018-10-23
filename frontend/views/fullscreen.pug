@@ -1,0 +1,55 @@
+html
+    head
+        title= "MeCu - " + title
+        block preStyles
+            link(rel='stylesheet', href='/public/css/fullscreen.css')
+
+        block postStyles
+        meta(charset="utf-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+        //- Classic meta
+        meta(name="title", content="CellMap")
+        meta(name="description", content="Protein localization and protein-protein interaction visualizer.")
+        meta(name="keywords", content="cell,map,protein,interactions,PPI,localization")
+        meta(name="author", content="Christian Dallago")
+        meta(name="copyright", content="Christian Dallago 2016")
+        meta(http-equiv="Reply-to", content="code@dallago.us")
+        meta(http-equiv="content-language", content="en")
+        meta(http-equiv="Content-Type", content="text/html; iso-8859-1")
+        meta(name="ROBOTS", content="INDEX,FOLLOW")
+        meta(name="creation_Date", content="06/27/2016")
+        meta(name="revisit-after", content="7 days")
+
+        meta(name="fragment", content="!")
+
+        //- Open Graph Meta Tags
+        meta(property="og:type", content="website")
+        meta(property="og:title", content="CellMap")
+        meta(property="og:description", content="Protein localization and protein-protein interaction visualizer.")
+        meta(property="og:site_name", content="CellMap")
+        meta(property="og:url", content="http://cell.dallago.us/")
+        meta(property="og:locale", content="en_US")
+
+        //- Twitter Card Meta Tags
+        meta(name="twitter:card", content="summary")
+        meta(name="twitter:title", content="CellMap")
+        meta(name="twitter:description", content="Protein localization and protein-protein interaction visualizer.")
+
+
+    body
+        block content
+
+        //- libraries, loaded from node_modules
+        script(type="text/javascript", src="/public/modules/jquery/dist/jquery.min.js")
+        script(type="text/javascript", src='/public/modules/store/dist/store.legacy.min.js')
+        
+        //- custom scripts
+        script(type="text/javascript", src="/public/js/storage.js")
+        script(type="text/javascript", src="/public/js/requests.js")
+        script(type="text/javascript", src="/public/js/fullscreen.js")
+
+        if scripts
+            each s in scripts
+                script(type="text/javascript", src=s)
+        block scripts

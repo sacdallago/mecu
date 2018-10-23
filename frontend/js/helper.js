@@ -5,8 +5,11 @@ HelperFunctions = {};
  * @param  {[type]} gridIdentifier [description]
  * @param  { {uniprotId: string, experiments: {experiment: number, reads: {}[]} } } data           [description]
  * @return {[type]}                [description]
+ *
+ * necessary for data:
+ * {uniprotId, experiments:[{experiment}]}
  */
-HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridItemAppendexesFun) => {
+HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridItemAppendexesFun, maxCubesToDraw) => {
     const gridIdentifier = $(gridIdentifierString);
     gridIdentifier.empty();
 
@@ -14,12 +17,18 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
     const curves = [];
     const items = [];
 
+    let cubesNotDrawn = 0;
+    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+        cubesNotDrawn = data.length -(maxCubesToDraw-1);
+        data = data.slice(0,maxCubesToDraw-1);
+    }
+
     data.forEach(obj => {
         obj.experiments.forEach((expRead, index, a) => {
 
             const gridItem = $('<div />')
                 .addClass('grid-item')
-                .attr({'id': [itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('').toLowerCase()});
+                .attr({'id': [itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('-').toLowerCase()});
             gridItem.append(gridItemAppendexesFun(obj, expRead));
 
             gridItem.data('grid-item-contents', {
@@ -32,13 +41,26 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
         });
     });
 
+    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+        const gridItem = $('<div />')
+            .addClass('grid-item')
+            .attr({'id':'more-cubes-cube'})
+            .append([
+                $('<div />')
+                    .addClass('center-text')
+                    .css({'position':'absolute', 'top':'44%', 'left':'58px', 'font-size':'13pt'})
+                    .text(`${cubesNotDrawn} more...`)
+            ]);
+        items.push(gridItem[0]);
+    }
+
     gridIdentifier.isotope('insert', items);
 
     data.forEach(obj => {
 
         obj.experiments.forEach((expRead, index, a) => {
             let curve = new MecuLine({
-                element: "#"+[itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('').toLowerCase(),
+                element: "#"+[itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join('-').toLowerCase(),
                 width:"200",
                 height:"200",
                 limit: 5,
@@ -47,14 +69,28 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
                 minRatio: 0.1
             });
 
-            curve.add({
-                uniprotId: obj.uniprotId,
-                experiments: [expRead]
-            });
+            if(expRead.reads) {
+                curve.add({
+                    uniprotId: obj.uniprotId,
+                    experiments: [expRead]
+                });
+            }
 
             curves.push(curve);
         });
     });
+
+    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+        let curve = new MecuLine({
+            element: '#more-cubes-cube',
+            width:"200",
+            height:"200",
+            limit: 5,
+            minTemp: 41,
+            maxTemp: 64,
+            minRatio: 0.1
+        });
+    }
 };
 
 /**
@@ -62,8 +98,11 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
  * @param  {[type]} gridIdentifier [description]
  * @param  { {uniprotId: string, experiments: {experiment: number, reads: {}[]} } } data           [description]
  * @return {[type]}                [description]
+ *
+ * necessary for data:
+ * {id, experiments}
  */
-HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, gridItemAppendexesFun) => {
+HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, gridItemAppendexesFun, maxCubesToDraw) => {
     const gridIdentifier = $(gridIdentifierString);
     gridIdentifier.empty();
 
@@ -71,11 +110,17 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
     const curves = [];
     const items = [];
 
+    let cubesNotDrawn = 0;
+    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+        cubesNotDrawn = data.length -(maxCubesToDraw-1);
+        data = data.slice(0,maxCubesToDraw-1);
+    }
+
     data.forEach((obj,index,a) => {
 
         const gridItem = $('<div />')
             .addClass('grid-item')
-            .attr({'id': [itemIdentifierPrefix, index, obj.id].join('').toLowerCase()});
+            .attr({'id': [itemIdentifierPrefix, index, obj.id].join('-').toLowerCase()});
         gridItem.append(gridItemAppendexesFun(obj));
 
         gridItem.data('grid-item-contents', {
@@ -86,12 +131,25 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
         items.push(gridItem[0]);
     });
 
+    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+        const gridItem = $('<div />')
+            .addClass('grid-item')
+            .attr({'id':'more-cubes-cube'})
+            .append([
+                $('<div />')
+                    .addClass('center-text')
+                    .css({'position':'absolute', 'top':'44%', 'left':'58px', 'font-size':'13pt'})
+                    .text(`${cubesNotDrawn} more...`)
+            ]);
+        items.push(gridItem[0]);
+    }
+
     gridIdentifier.isotope('insert', items);
 
     data.forEach((obj,index,a) => {
 
         let curve = new MecuLine({
-            element: "#"+[itemIdentifierPrefix, index, obj.id].join('').toLowerCase(),
+            element: "#"+[itemIdentifierPrefix, index, obj.id].join('-').toLowerCase(),
             width:"200",
             height:"200",
             limit: 5,
@@ -101,14 +159,28 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
         });
 
         obj.experiments.forEach(expRead => {
-            curve.add({
-                uniprotId: obj.id,
-                experiments: [expRead]
-            });
+            if(expRead.reads) {
+                curve.add({
+                    uniprotId: obj.id,
+                    experiments: [expRead]
+                });
+            }
 
             curves.push(curve);
         });
     });
+
+    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+        let curve = new MecuLine({
+            element: '#more-cubes-cube',
+            width:"200",
+            height:"200",
+            limit: 5,
+            minTemp: 41,
+            maxTemp: 64,
+            minRatio: 0.1
+        });
+    }
 }
 
 HelperFunctions.generateRandomString = () => Math.random().toString(36).substring(7);
@@ -133,7 +205,7 @@ HelperFunctions.stringToColor = (string) => {
         let shortened = inputInt % 360;
         return "hsl(" + shortened + ",100%,40%)";
     };
-    return getHashCode(string).intToHSL();
+    return intToHSL(getHashCode(string));
 }
 
 HelperFunctions.delay = (function(){

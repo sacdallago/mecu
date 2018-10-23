@@ -130,6 +130,22 @@ module.exports = function(context) {
                     console.error('getProteinExperimentCombinations', err);
                     response.send([]);
                 })
+        },
+
+        getProteinXProteinDistances: function(request, response) {
+            const proteinList = request.body.proteinList || [];
+            const experimentList = request.body.experimentList || [];
+
+            const start = new Date();
+            proteinXproteinsDao.getProteinXProteinDistances(proteinList, experimentList, extractUserGoogleId(request))
+                .then(r => {
+                    console.log('DURATION getProteinXProteinDistances', (Date.now()-start)/1000);
+                    response.status(200).send(r);
+                })
+                .catch(err => {
+                    console.error('getProteinXProteinDistances', err);
+                    response.send([]);
+                })
         }
     }
 }

@@ -1,6 +1,19 @@
 const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
 
 
+const UPPER_QUERY_LIMIT = 50;
+const queryParams = (query) => {
+    let ret = {
+        limit: query.limit ? (query.limit > UPPER_QUERY_LIMIT ? 10 : query.limit) : UPPER_QUERY_LIMIT,
+        offset: query.offset || 0,
+        sortBy: query.sortBy || 'id',
+        order:  query.order && (query.order === 'ASC' || query.order === 'DESC') ?
+                query.order : 'ASC',
+        search: query.search
+    };
+    return ret;
+}
+
 module.exports = function(context) {
 
     const complexesDao = context.component('daos').module('complexes');
@@ -13,6 +26,21 @@ module.exports = function(context) {
                 .then(result => response.status(200).send(result))
                 .catch(error => {
                     console.error('getById', error);
+                    return response.status(500).send({});
+                });
+        },
+
+        find: function(request, response) {
+            const start = new Date();
+            console.log('find complex .body', request.body);
+
+            complexesDao.findComplex(queryParams(request.body))
+                .then(result => {
+                    console.log('DURATION find', (Date.now()-start)/1000);
+                    response.status(200).send(result);
+                })
+                .catch(error => {
+                    console.error('find', error);
                     return response.status(500).send({});
                 });
         },
@@ -69,6 +97,19 @@ module.exports = function(context) {
                 })
                 .catch(error => {
                     console.error('hasProtein', error);
+                    return response.status(500).send([]);
+                });
+        },
+
+        getAverageComplexDistancePerExperiment: function(request, response) {
+            const start = new Date();
+            complexesDao.getAverageComplexDistancePerExperiment(request.params.id, extractUserGoogleId(request))
+                .then(result => {
+                    console.log('DURATION getAverageComplexDistancePerExperiment', (Date.now()-start)/1000);
+                    response.status(200).send(result);
+                })
+                .catch(error => {
+                    console.error('getAverageComplexDistancePerExperiment', error);
                     return response.status(500).send([]);
                 });
         }

@@ -17,38 +17,41 @@ const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
 });
 proteinCurvesGrid.on('click', gridItemIdentifier, function(){
     const data = $(this).data('grid-item-contents');
-    console.log('data', data.obj.uniprotId, data.experiment.experiment);
+    console.log('data', data.obj.id, data.obj.experiments[0].experiment);
 
-    if(!localStorageDeleted) {
-        ModalService.openModalAndDoAction(
-            () => {},
-            () => {
-                StorageManager.clear();
-                gridItemToggleDotAll(false);
-                StorageManager.toggle(
-                    {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
-                    () => gridItemToggleDot(this)
-                );
-                localStorageDeleted = true;
-            },
-            () => {
-                StorageManager.toggle(
-                    {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
-                    () => gridItemToggleDot(this)
-                );
-                localStorageDeleted = true;
-            }
-        );
-    } else {
-        StorageManager.toggle(
-            {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
-            () => gridItemToggleDot(this)
-        );
+    // disable selection of proteins without curves
+    if(data.obj.present > 1) {
+        if(!localStorageDeleted) {
+            ModalService.openModalAndDoAction(
+                () => {},
+                () => {
+                    StorageManager.clear();
+                    gridItemToggleDotAll(false);
+                    StorageManager.toggle(
+                        {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
+                        () => gridItemToggleDot(this)
+                    );
+                    localStorageDeleted = true;
+                },
+                () => {
+                    StorageManager.toggle(
+                        {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
+                        () => gridItemToggleDot(this)
+                    );
+                    localStorageDeleted = true;
+                }
+            );
+        } else {
+            StorageManager.toggle(
+                {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
+                () => gridItemToggleDot(this)
+            );
+        }
     }
 
 });
 
-const drawComplexMetadata = (complex, experimentId) => {
+const drawComplexMetadata = (complex, avgDistances, experimentId) => {
     return new Promise((resolve, reject) => {
 
         const dataContainer = $('#data-container .column-right');
@@ -113,11 +116,14 @@ const drawComplexMetadata = (complex, experimentId) => {
         const swissprotOrganismList = list.clone().addClass('swissprot-organism-list');
         complex.swissprotOrganism.forEach(p => swissprotOrganismList.append(listItem.clone().text(p)));
 
-
         dataContainer.append([
             itemContainer.clone().append([
-                text.clone().text('Experiment'),
-                value.clone().text(experimentId)
+                text.clone().text('Name'),
+                value.clone().text(complex.name)
+            ]),
+            itemContainer.clone().attr({'id':'ranking-field'}).append([
+                text.clone().text('Ranking'),
+                value.clone()
             ]),
             itemContainer.clone().append([
                 text.clone().text('Purification Method'),
@@ -178,6 +184,30 @@ const drawComplexMetadata = (complex, experimentId) => {
         // );
         resolve(true);
     });
+}
+
+const drawRanking = (avgDistances, tempReadsLength, experimentId) => {
+    // complex data ranking
+    let avgDistanceRanking = tempReadsLength < 2 ? 'not enough data to calculate' : 'not yet calculated';
+    let tooltip = `<div class="tooltip-content"><div class="t-line"><div class="t-left">Experiment</div><div class="t-right">Distance</div></div>`;
+    avgDistances.forEach((v,i) => {
+        if(v.experiment === parseInt(experimentId)) {
+            avgDistanceRanking = i+1;
+            tooltip+= `<div class="t-line" style="font-weight:bold;"><div class="t-left">${v.name}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
+        } else {
+            tooltip+= `<div class="t-line"><div class="t-left">${v.name}</div><div class="t-right">${v.avg.toFixed(2)}</div></div>`;
+        };
+
+    });
+    tooltip+=`</div><div class="ranking-info-text">Distance of all the proteins within a complex for each experiment.</div>`;
+
+    console.log($('#ranking-field'));
+    console.log($('#ranking-field .value'));
+
+    $('#ranking-field').attr({'id':'ranking-tooltip', 'data-html':tooltip});
+    $('#ranking-tooltip .value').text(avgDistanceRanking);
+
+    $('#ranking-tooltip').popup({position: 'bottom right'});
 }
 
 const drawOtherExperimentsSelect = (experiments, complexId, actualExperiment) => {
@@ -245,13 +275,37 @@ const drawCombinedProteinCurves = (proteins) => {
 }
 
 
-const drawCurvesItems = (proteins, experimentId) => {
+const drawCurvesItems = (proteins, allProteins, experimentId) => {
     return new Promise((resolve, reject) => {
+
+        const proteinsToDraw = [];
+        allProteins.forEach(protein => {
+            const obj = {
+                id: protein,
+                experiments:[],
+                present: 1
+            };
+            const tmpPrt = proteins.find(v => v.uniprotId === protein);
+            if(tmpPrt) {
+                obj.experiments.push({
+                    reads: tmpPrt.experiments[0].reads,
+                    experiment: tmpPrt.experiments[0].experiment,
+                    uniprotId: protein
+                });
+                obj.present++;
+            } else {
+                obj.experiments.push({
+                    experiment: parseInt(experimentId),
+                    uniprotId: protein
+                })
+            }
+            proteinsToDraw.push(obj);
+        })
 
         const alreadyInStorage = StorageManager.getProteins();
 
         const toAppend = (obj, exp) => {
-            return [
+            const ret = [
                 $('<p />')
                     .addClass('grid-item-text')
                     .css({
@@ -261,21 +315,33 @@ const drawCurvesItems = (proteins, experimentId) => {
                         'line-height': '35px',
                         'font-size': '1.2rem'
                     })
-                    .text(obj.uniprotId),
+                    .text(obj.id)
+                ];
+
+            if(obj.present === 1) {
+                ret.push(
+                    $('<div />')
+                        .addClass(['cube-text-middle', 'grid-item-text'])
+                        .text('No data for this experiment')
+                )
+            }
+            ret.push(
                 $('<div />')
                     .addClass(
                         'dot-div'+
                         (
                             alreadyInStorage.find(p =>
-                                p.uniprotId === obj.uniprotId &&
+                                p.uniprotId === obj.id &&
                                 p.experiment.find(e => e === obj.experiments[0].experiment)
                             ) ? ' selected-curve-dot' : ''
                         )
                     )
-            ];
+                );
+
+            return ret;
         };
 
-        HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteins, toAppend);
+        HelperFunctions.drawItemsAllExperimentsInOneItem(proteinCurvesGridIdentifier, proteinsToDraw, toAppend);
 
         // add functionality to select all button
         document.querySelector(selectAllButtonSelector).addEventListener(
@@ -337,36 +403,51 @@ $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     console.log('query', query);
-    if(query.id && query.experiment) {
+    if(query.id) {
         let loading = true;
 
         const complexData = ComplexService.getComplexById(query.id);
         const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(query.id);
-        const temperatureReadsToProteins = (complex) =>
-            TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                    complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment })
-                )
-            );
+        const averageDistanceToOtherExperimentsComplex = ComplexService.getAverageDistancesToOtherExperiments(query.id);
 
-        complexData
-            .then(complex => {
-                console.log('complex', complex);
-                return complex;
+        experimentsWhichHaveComplex
+            .then(exps => {
+                console.log('experiments which have complex', exps);
+                drawOtherExperimentsSelect(exps, query.id, query.experiment);
+                return exps;
             })
-            .then(complex =>
-                Promise.all([
-                    drawComplexMetadata(complex, query.experiment),
-                    temperatureReadsToProteins(complex)
+            .then((experiments) => Promise.all([
+                    complexData,
+                    averageDistanceToOtherExperimentsComplex
                 ])
             )
-            .then(([done, proteinCurves]) => {
-                console.log('proteinCurves', proteinCurves);
-                drawCombinedProteinCurves(proteinCurves);
-                drawCurvesItems(proteinCurves, query.experiment);
-                return done;
+            .then(([complex, avgDist]) => {
+                console.log('complex', complex);
+                console.log('avgDist', avgDist);
+                return [complex, avgDist];
             })
-            .then(() => experimentsWhichHaveComplex)
-            .then(exps => drawOtherExperimentsSelect(exps, query.id, query.experiment))
+            .then(([complex, avgDist]) => {
+                drawComplexMetadata(complex, avgDist, query.experiment);
+                return Promise.all([
+                    averageDistanceToOtherExperimentsComplex,
+                    complex
+                ]);
+            })
+            .then(([avgDist, complex]) => {
+                if(query.experiment) {
+                    return TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                            complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment }))
+                        )
+                        .then(proteinData => {
+                            console.log('proteinCurves', proteinData);
+                            drawRanking(avgDist, proteinData.length, query.experiment);
+                            drawCombinedProteinCurves(proteinData);
+                            drawCurvesItems(proteinData, complex.proteins, query.experiment);
+                        });
+                } else {
+                    return Promise.resolve();
+                }
+            })
             .then(done => {
                 $(dropDownSelector).dropdown({
                     match: 'both',

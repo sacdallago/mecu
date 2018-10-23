@@ -4,6 +4,7 @@ block postStyles
         link(rel='stylesheet', href='/public/css/protein.css')
 
 block content
+    .modal#add-protein-modal
     .protein-header
         .protein
         .experiment
@@ -80,12 +81,19 @@ block content
         .grid
             
     .related-proteins-container#related-proteins-container
-        h3 Related Proteins
+        h3 Protein Interactions
+        .header
+            .info Each cube shows the interaction of the protein of the page with the protein in the cube.
+            .select-all-button
+                a.ui.button#select-all-ppi-button
+                    i.check.icon
+                    span Select All
         .grid
 
 block settings
     .divider
     a(href='/search').item Find Proteins in Experiments
+    a(href='/complexes').item Find Complex
     a(href='/experiments').item Search Experiments
     a(href='/curves').item Analyze
 
@@ -93,5 +101,8 @@ block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/js/protein.js")
+    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
+    script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
     script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/modal.js")
+    script(type="text/javascript", src="/public/js/protein.js")

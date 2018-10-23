@@ -1,0 +1,15 @@
+extends fullscreen
+
+block postStyles
+    link(rel='stylesheet', href='/public/css/storage-proteins-fullscreen.css')
+
+block content
+    .graph#graph Loading...
+    
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
+    script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
+    script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/storage-proteins-fullscreen.js")
