@@ -1,6 +1,8 @@
 let experimentsToDraw = [];
 let proteinsToDraw = [];
 const AMOUNT_OF_PPI_TO_DRAW = 20;
+let ppiTableData = [];
+const MAX_ROW_COLS_PPI_TABLE = 12;
 
 const proteinCurvesGridIdentifier = '.isoGrid';
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
@@ -221,35 +223,48 @@ const drawProteinsSelect = (proteins) => {
     });
 }
 
-const drawPPITable = (data) => {
-
-    const MAX_ROW_COLS = 12;
+const drawPPITable = (relativeCorrelation) => {
 
     const thead = $('#ppi-thead');
+    thead.empty();
     const tbody = $('#ppi-tbody');
+    tbody.empty();
 
     const pPlusE = (obj, id) => obj[id]+'-'+obj[id+'_exp'];
 
     const proteinSet = {};
-    data.forEach(p => {
-
-        // if(p.distance !== 0) {
+    ppiTableData.forEach(p => {
+        if(!(proteinSet[pPlusE(p,'interactor1')] || []).find(o =>
+                o.interactor1 === p.interactor1 &&
+                o.interactor2 === p.interactor2 &&
+                o.interactor1_exp === p.interactor1_exp &&
+                o.interactor2_exp === p.interactor2_exp
+            )
+        ) {
             proteinSet[pPlusE(p,'interactor1')] ? proteinSet[pPlusE(p,'interactor1')].push(p) : proteinSet[pPlusE(p,'interactor1')] = [p];
+        }
+        if(!(proteinSet[pPlusE(p,'interactor2')] || []).find(o =>
+                o.interactor1 === p.interactor1 &&
+                o.interactor2 === p.interactor2 &&
+                o.interactor1_exp === p.interactor1_exp &&
+                o.interactor2_exp === p.interactor2_exp
+            )
+        ) {
             proteinSet[pPlusE(p,'interactor2')] ? proteinSet[pPlusE(p,'interactor2')].push(p) : proteinSet[pPlusE(p,'interactor2')] = [p];
-        // }
-
+        }
     });
-    console.log('proteinSet', proteinSet);
     let proteinArray = Object.keys(proteinSet)
+
+    // sort the table rows/columns by experiment
     proteinArray.sort((a,b) => {
         let tmp1 = a.split('-').map(t => t.trim());
         let tmp2 = b.split('-').map(t => t.trim());
-        return tmp1[1] < tmp2[1];
+        return parseInt(tmp1[1]) > parseInt(tmp2[1]);
     });
 
-    // only show MAX_ROW_COLS
-    if(proteinArray.length > MAX_ROW_COLS) {
-        proteinArray = proteinArray.slice(0,MAX_ROW_COLS);
+    // only show MAX_ROW_COLS_PPI_TABLE
+    if(proteinArray.length > MAX_ROW_COLS_PPI_TABLE) {
+        proteinArray = proteinArray.slice(0,MAX_ROW_COLS_PPI_TABLE);
     }
 
     // popuplate header
@@ -260,6 +275,19 @@ const drawPPITable = (data) => {
     );
     thead.append(trhead);
 
+    // find out what's min and max of all correlations to be shown
+    const minMaxCorr = {min: Number.MAX_SAFE_INTEGER, max: Number.MIN_SAFE_INTEGER};
+    if(relativeCorrelation) {
+        proteinArray.forEach(p1 =>
+            proteinArray.forEach(p2 => {
+                proteinSet[p1].forEach(pTmp => {
+                    if(pTmp.correlation !== null && pTmp.correlation < minMaxCorr.min) minMaxCorr.min = pTmp.correlation;
+                    if(pTmp.correlation !== null && pTmp.correlation > minMaxCorr.max) minMaxCorr.max = pTmp.correlation;
+                })
+            })
+        )
+    }
+
     proteinArray.forEach((p1,i) => {
         const row = $('<tr />').append($('<td />').text(p1));
         for(let empty = 0; empty < i; empty++) {
@@ -268,15 +296,11 @@ const drawPPITable = (data) => {
         proteinArray.slice(i,proteinArray.length).forEach(p2 => {
             const tdata = $('<td />');
             let d;
-            for(let k in proteinSet) {
-                if(k === p1) {
-                    d = proteinSet[k].find(obj => {
+                    d = proteinSet[p1].find(obj => {
 
                         return (pPlusE(obj,'interactor1') === p1 && pPlusE(obj,'interactor2') === p2) ||
                             (pPlusE(obj,'interactor1') === p2 && pPlusE(obj,'interactor2') === p1)
                     });
-                }
-            }
             if(d) {
                 tdata.append(
                     $('<div />')
@@ -285,11 +309,15 @@ const drawPPITable = (data) => {
                             $('<div />')
                                 .text(d.distance.toFixed(2))
                                 .addClass('distance-div')
-                                .attr({'style': `background-color: rgba(0,255,0,${d.distance})`}),
+                                .attr({'style': `background-color: rgba(0,255,0, ${1-d.distance})`}),
                             $('<div />')
                                 .addClass('correlation-div')
                                 .text(d.correlation ? d.correlation.toFixed(2) : '-')
-                                .attr({'style': `background-color: rgb(52, 152, 219, ${d.correlation})`}),
+                                .attr({'style': `background-color: rgb(52, 152, 219, ${
+                                    relativeCorrelation && d.correlation ?
+                                        (d.correlation - minMaxCorr.min) / (minMaxCorr.max - minMaxCorr.min):
+                                        d.correlation || 0
+                                    })`}),
                         ])
                         .attr({
                             'data-html':`(${d.interactor1} ${d.interactor1_exp}) <-> (${d.interactor2} ${d.interactor2_exp}):<br>
@@ -352,6 +380,19 @@ $('#fullscreen-button').on('click', function() {
 
     window.open(`/storage-proteins-fullscreen`, '_blank');
 });
+$('#relative-absolute-corr-button').on('click', function() {
+    switch($('#relative-absolute-corr-button').text()) {
+        case 'Relative correlation':
+            drawPPITable(true);
+            $('#relative-absolute-corr-button').text('Absolute Correlation');
+            break;
+        case 'Absolute Correlation':
+            drawPPITable(false);
+            $('#relative-absolute-corr-button').text('Relative correlation');
+            break;
+
+    }
+})
 
 // on page drawing finished, start requests
 $(document).ready(() => {
@@ -372,7 +413,8 @@ $(document).ready(() => {
     const ppiDistances = ProteinService.getProteinXProteinDistances(proteinList, experimentList)
         .then(result => {
             console.log('ppiDistances', result);
-            drawPPITable(result);
+            ppiTableData = result;
+            drawPPITable(true);
         })
 
     Promise.resolve()

@@ -34,7 +34,7 @@ block content
                 .curves-graph-container
                     #curves-chart.chart
                     .space
-                    .ui.button#fullscreen-button View in new page
+                    .ui.button#fullscreen-button View in fullscreen
             .column
                 #nodesGraph
                 .space
@@ -49,14 +49,14 @@ block content
                         .item
                             .ui.attached.button.submit Save
 
-    h3 Protein X Protein distances and correlations
+    h3 Distances and Correlations amongst proteins
     .legend
         .distance
             .color-distance
-            .text-distance Distance of 2 proteins (euclidian)
+            .text-distance Distance(euclidian) of 2 proteins (white: distant; green: close)
         .correlation
             .color-correlation
-            .text-correlation Correlation of 2 proteins (data from Hippie)
+            .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
     .table-container
         table.ui.definition.collapsing.celled.table
             thead#ppi-thead
@@ -64,7 +64,8 @@ block content
             tbody#ppi-tbody
     
     .space
-    .ui.button.disabled#fullscreen-button View in new page
+    .ui.button.disabled#fullscreen-button View in fullscreen
+    .ui.button#relative-absolute-corr-button Relative correlation
 
     h3 Select/Deselect Proteins
     .grid-container
