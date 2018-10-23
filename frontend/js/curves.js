@@ -231,6 +231,9 @@ const drawPPITable = (relativeCorrelation) => {
     tbody.empty();
 
     const pPlusE = (obj, id) => obj[id]+'-'+obj[id+'_exp'];
+    const extractE = (obj) => {
+        return obj.split('-')[1];
+    }
 
     const proteinSet = {};
     ppiTableData.forEach(p => {
@@ -271,7 +274,11 @@ const drawPPITable = (relativeCorrelation) => {
     const trhead = $('<tr />');
     trhead.append($('<th />'));
     trhead.append(
-        proteinArray.map(p => $('<th>').text(p))
+        proteinArray.map(p =>
+            $('<th>')
+                .attr({'style': `background-color: ${HelperFunctions.stringToColor(extractE(p)+'000')}`})
+                .text(p)
+            )
     );
     thead.append(trhead);
 
@@ -289,7 +296,7 @@ const drawPPITable = (relativeCorrelation) => {
     }
 
     proteinArray.forEach((p1,i) => {
-        const row = $('<tr />').append($('<td />').text(p1));
+        const row = $('<tr />').append($('<td />').attr({'style': `background-color: ${HelperFunctions.stringToColor(extractE(p1)+'000')}`}).text(p1));
         for(let empty = 0; empty < i; empty++) {
             row.append($('<td />'));
         }
