@@ -5,7 +5,7 @@ block postStyles
 
 block content
     .space
-    h1 Global View
+    h3 Global View
     .settings
         .text-coloring Select how the curves should be colored:
         .ui.selection.dropdown#coloring-dropdown
@@ -49,7 +49,24 @@ block content
                         .item
                             .ui.attached.button.submit Save
 
-    h1 Selected Proteins
+    h3 Protein X Protein distances and correlations
+    .legend
+        .distance
+            .color-distance
+            .text-distance Distance of 2 proteins (euclidian)
+        .correlation
+            .color-correlation
+            .text-correlation Correlation of 2 proteins (data from Hippie)
+    .table-container
+        table.ui.definition.collapsing.celled.table
+            thead#ppi-thead
+            
+            tbody#ppi-tbody
+    
+    .space
+    .ui.button.disabled#fullscreen-button View in new page
+
+    h3 Select/Deselect Proteins
     .grid-container
         .text Click to remove
         .isoGrid

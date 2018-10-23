@@ -221,6 +221,93 @@ const drawProteinsSelect = (proteins) => {
     });
 }
 
+const drawPPITable = (data) => {
+
+    const MAX_ROW_COLS = 12;
+
+    const thead = $('#ppi-thead');
+    const tbody = $('#ppi-tbody');
+
+    const pPlusE = (obj, id) => obj[id]+'-'+obj[id+'_exp'];
+
+    const proteinSet = {};
+    data.forEach(p => {
+
+        // if(p.distance !== 0) {
+            proteinSet[pPlusE(p,'interactor1')] ? proteinSet[pPlusE(p,'interactor1')].push(p) : proteinSet[pPlusE(p,'interactor1')] = [p];
+            proteinSet[pPlusE(p,'interactor2')] ? proteinSet[pPlusE(p,'interactor2')].push(p) : proteinSet[pPlusE(p,'interactor2')] = [p];
+        // }
+
+    });
+    console.log('proteinSet', proteinSet);
+    let proteinArray = Object.keys(proteinSet)
+    proteinArray.sort((a,b) => {
+        let tmp1 = a.split('-').map(t => t.trim());
+        let tmp2 = b.split('-').map(t => t.trim());
+        return tmp1[1] < tmp2[1];
+    });
+
+    // only show MAX_ROW_COLS
+    if(proteinArray.length > MAX_ROW_COLS) {
+        proteinArray = proteinArray.slice(0,MAX_ROW_COLS);
+    }
+
+    // popuplate header
+    const trhead = $('<tr />');
+    trhead.append($('<th />'));
+    trhead.append(
+        proteinArray.map(p => $('<th>').text(p))
+    );
+    thead.append(trhead);
+
+    proteinArray.forEach((p1,i) => {
+        const row = $('<tr />').append($('<td />').text(p1));
+        for(let empty = 0; empty < i; empty++) {
+            row.append($('<td />'));
+        }
+        proteinArray.slice(i,proteinArray.length).forEach(p2 => {
+            const tdata = $('<td />');
+            let d;
+            for(let k in proteinSet) {
+                if(k === p1) {
+                    d = proteinSet[k].find(obj => {
+
+                        return (pPlusE(obj,'interactor1') === p1 && pPlusE(obj,'interactor2') === p2) ||
+                            (pPlusE(obj,'interactor1') === p2 && pPlusE(obj,'interactor2') === p1)
+                    });
+                }
+            }
+            if(d) {
+                tdata.append(
+                    $('<div />')
+                        .addClass('table-data-content')
+                        .append([
+                            $('<div />')
+                                .text(d.distance.toFixed(2))
+                                .addClass('distance-div')
+                                .attr({'style': `background-color: rgba(0,255,0,${d.distance})`}),
+                            $('<div />')
+                                .addClass('correlation-div')
+                                .text(d.correlation ? d.correlation.toFixed(2) : '-')
+                                .attr({'style': `background-color: rgb(52, 152, 219, ${d.correlation})`}),
+                        ])
+                        .attr({
+                            'data-html':`(${d.interactor1} ${d.interactor1_exp}) <-> (${d.interactor2} ${d.interactor2_exp}):<br>
+                                Distance: ${d.distance.toFixed(5)}<br>
+                                Correlation: ${d.correlation ? d.correlation : 'no data'}`
+                        })
+                        .popup({position: 'bottom left'})
+                    );
+            }
+            row.append(tdata);
+        });
+
+        tbody.append(row);
+    })
+
+
+}
+
 $('#coloring-dropdown').dropdown({
     onChange: () => {
         populateGlobalsGraphs(getColoringValue());
@@ -268,19 +355,30 @@ $('#fullscreen-button').on('click', function() {
 
 // on page drawing finished, start requests
 $(document).ready(() => {
-    Promise.resolve()
-        .then(() => {
-            // populate experiments dropdown
-            const inStorage = StorageManager.getProteins();
-            const experimentsSet = new Set();
-            const proteinsSet = new Set();
-            inStorage.forEach(p => {
-                proteinsSet.add(p.uniprotId);
-                p.experiment.forEach(e => experimentsSet.add(e));
-            });
-            drawExperimentsSelect(Array.from(experimentsSet));
-            drawProteinsSelect(Array.from(proteinsSet));
+    // populate experiments dropdown
+    const inStorage = StorageManager.getProteins();
+    const experimentsSet = new Set();
+    const proteinsSet = new Set();
+    inStorage.forEach(p => {
+        proteinsSet.add(p.uniprotId);
+        p.experiment.forEach(e => experimentsSet.add(e));
+    });
+    const proteinList = Array.from(proteinsSet);
+    const experimentList = Array.from(experimentsSet);
+    drawExperimentsSelect(experimentList);
+    drawProteinsSelect(proteinList);
+
+
+    const ppiDistances = ProteinService.getProteinXProteinDistances(proteinList, experimentList)
+        .then(result => {
+            console.log('ppiDistances', result);
+            drawPPITable(result);
         })
+
+    Promise.resolve()
         .then(() => populateGlobalsGraphs(getColoringValue(), []))
-        .then(() => loadProteins());
+        .then(() => loadProteins())
+        .then(() => {
+            return
+        });
 });
