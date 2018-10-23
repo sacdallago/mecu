@@ -126,6 +126,23 @@ ProteinService.getProteinExperimentCombinations = (proteinExperimentArr, expId) 
             return [];
         });
 }
+ProteinService.getProteinXProteinDistances = (proteinList, experimentList) => {
+    return fetch(
+            `/api/protein/proteinxproteindistances`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+                body: JSON.stringify({proteinList: proteinList, experimentList: experimentList})
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error('Request error for ProteinService.getProteinXProteinDistances: ', error, proteinList, experimentList);
+            return [];
+        });
+}
 
 ComplexService = {};
 ComplexService.getComplexById = (id) => {
