@@ -274,7 +274,7 @@ $('.ui.dropdown.button.minkowski').dropdown({
     }
 }).popup({position: 'bottom left'});
 
-$('#fullscreen-button').on('click', function() {
+$('#fullscreen-button-chart').on('click', function() {
     // set storage settings for fullscreen
     StorageManager.setFullScreenProteinsSettings(
         proteinsToDraw,
@@ -296,7 +296,18 @@ $('#relative-absolute-corr-button').on('click', function() {
             break;
 
     }
-})
+});
+$('#fullscreen-button-ppi').on('click', function() {
+
+    // set storage settings for fullscreen
+    StorageManager.setFullscreenPPISettings(
+        proteinsToDraw,
+        experimentsToDraw,
+        $('#relative-absolute-corr-button').text() === 'Relative correlation'
+    );
+
+    window.open(`/ppi-fullscreen`, '_blank');
+});
 
 // on page drawing finished, start requests
 $(document).ready(() => {

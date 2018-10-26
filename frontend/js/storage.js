@@ -224,6 +224,14 @@ StorageManager.getFullScreenProteinsSettings = () => {
     return store.get('fullscreenProteinSettings') || ret;
 }
 
+StorageManager.setFullscreenPPISettings = (proteinList, experimentList, relativeCorrelation) => {
+    return store.set('fullscreenPPISettings', {data: {proteinList: proteinList, experimentList: experimentList}, relativeCorrelation: relativeCorrelation});
+}
+StorageManager.getFullScreenPPISettings = () => {
+    const ret = {data:{proteinList: [], experimentList: []}, relativeCorrelation: true};
+    return store.get('fullscreenPPISettings') || ret;
+}
+
 // check structure of 'proteins' in local storage
 (function (s) {
     let proteins = s.getProteins();

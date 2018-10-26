@@ -33,8 +33,10 @@ block content
             .column
                 .curves-graph-container
                     #curves-chart.chart
+                        .default-text
+                            .text No experiment selected for this complex.
                     .space
-                    .ui.button#fullscreen-button View in fullscreen
+                    .ui.button#fullscreen-button-chart View in fullscreen
             .column
                 #nodesGraph
                 .space
@@ -63,7 +65,7 @@ block content
                 th Loading...
             tbody#ppi-tbody
     .space
-    .ui.button.disabled#fullscreen-button View in fullscreen
+    .ui.button#fullscreen-button-ppi View in fullscreen
     .ui.button#relative-absolute-corr-button Relative correlation
 
     h3 Select/Deselect Proteins
