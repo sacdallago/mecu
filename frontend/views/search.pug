@@ -7,22 +7,29 @@ block postStyles
 block content
     .search-header
         .search
-            input(type="text", name="prot", placeholder="e.g. P12004" value="P12").field
+            input(type="text", name="prot", placeholder="e.g. P12004" value="").field
     .space
-    .selectors
+
+    .descriptive-info This page allows you to search for specific proteins with an UniProt identifier (eg. P12004) or the full name of a protein.
+        | In the menu (top right) you can also search for a specific list of proteins, complexes or experiments.
+        | Once you have selected some protein (indicated by a green dot), you can view all selected proteins and have them analyzed together on the 'Analyze' page.
+
     .space
+
     .grid-container
         .grid
+
     .space
+
     .pagination#pagination-component
 
 
 block settings
     .divider
-    a(href='/search').item Find Proteins in Experiments
-    a(href='/complexes').item Find Complex
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
     a(href='/experiments').item Search Experiments
-    a(href='/curves').item Analyze
+    a(href='/analyze-proteins').item Analyze
 
 block scripts
     - var delta = 50

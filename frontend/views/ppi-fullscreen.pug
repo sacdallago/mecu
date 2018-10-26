@@ -1,0 +1,26 @@
+extends fullscreen
+
+block postStyles
+    link(rel='stylesheet', href='/public/modules/semantic-ui-css/semantic.min.css')
+    link(rel='stylesheet', href='/public/css/ppi-fullscreen.css')
+
+block content
+    .legend
+        .distance
+            .color-distance
+            .text-distance Distance(euclidian) of 2 proteins (white: distant; green: close)
+        .correlation
+            .color-correlation
+            .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
+    .table-container
+        table.ui.definition.collapsing.celled.table
+            thead#ppi-thead
+                th Loading...
+            tbody#ppi-tbody
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/modules/semantic-ui-css/semantic.min.js")
+    script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/fullscreen-helper.js")
+    script(type="text/javascript", src="/public/js/ppi-fullscreen.js")

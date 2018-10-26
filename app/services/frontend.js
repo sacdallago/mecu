@@ -6,7 +6,7 @@ module.exports = function(context) {
         .get('/about', frontendController.about)
         .get('/upload', frontendController.uploadExperiment)
         .get('/downloads', frontendController.downloads)
-        .get('/curves', frontendController.curves)
+        .get('/analyze-proteins', frontendController.analyzeProteins)
         .get('/search', frontendController.bulkSearch)
         .get('/protein', frontendController.protein)
         .get('/complexes', frontendController.complexes)
@@ -14,5 +14,6 @@ module.exports = function(context) {
         .get('/experiments', frontendController.experiments)
         .get('/experiment', frontendController.experiment)
         .get('/storage-proteins-fullscreen', frontendController.storageProteinsFullscreen)
+        .get('/ppi-fullscreen', frontendController.ppiFullscreen)
         ;
 }

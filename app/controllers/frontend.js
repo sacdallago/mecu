@@ -37,9 +37,9 @@ module.exports = function(context) {
             });
         },
 
-        curves: function(request, response) {
-            return response.render('curves', {
-                title: 'My Selected curves'
+        analyzeProteins: function(request, response) {
+            return response.render('analyze-proteins', {
+                title: 'Analyze selected proteins'
             });
         },
 
@@ -89,6 +89,12 @@ module.exports = function(context) {
         storageProteinsFullscreen: function(request, response) {
             return response.render('storage-proteins-fullscreen', {
                 title: 'Proteins Fullscreen'
+            });
+        },
+
+        ppiFullscreen: function(request, response) {
+            return response.render('ppi-fullscreen', {
+                title: 'Distances and Correlations amongst proteins'
             });
         }
     }

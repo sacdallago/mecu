@@ -6,10 +6,11 @@ block postStyles
 
 block content
     .search-header
-        .complex-search-text Complex name:
+        .complex-search-text Enter a complex name or part of it:
         .search-complex-name
-            input(type="text", name="complex-name", placeholder="e.g. complex" value="").field#complex-search
-        .protein-list-search-text List contained proteins:
+            input(type="text", name="complex-name", placeholder="e.g. COP9" value="").field#complex-search
+        .separator or
+        .protein-list-search-text Enter a list of UniProt identifiers:
         .search-protein-list
             input(type="text", name="protein-list", placeholder="e.g. P12004 P40692" value="").field#protein-list-search
     
@@ -28,9 +29,9 @@ block content
 
 block settings
     .divider
-    a(href='/search').item Find Proteins in Experiments
+    a(href='/search').item Search list of proteins
     a(href='/experiments').item Search Experiments
-    a(href='/curves').item Analyze
+    a(href='/analyze-proteins').item Analyze
 
 block scripts
     - var delta = 50

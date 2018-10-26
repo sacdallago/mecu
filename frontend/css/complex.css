@@ -1,42 +1,64 @@
-.data-container {
-    display: flex;
-    flex-wrap: wrap;
-}
-.data-container > * {
-    width: 50%;
-    padding: 10px;
-}
-.data-container .column-left {
-    min-width: 300px;
-    max-height: 700px;
-}
-.data-container .column-left .default-text {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+/* if not supported, the divs will just be arranged as rows */
+@supports (display: grid) {
+    #spacedText {
+        display: grid;
+        grid-template-rows: 0.05fr 1fr 1fr auto;
+        grid-row-gap: 2em;
+        grid-template-areas:
+            "experiment-number"
+            "column-right"
+            "column-left"
+            "curves-grid"
+    }
+    @media (min-width:700px) {
+        #spacedText {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 0.1fr 1fr auto;
+            grid-row-gap: .5em;
+            grid-column-gap: 1.5em;
+            grid-template-areas:
+                "experiment-number experiment-number"
+                "column-left column-right"
+                "curves-grid curves-grid"
+        }
+    }
+    .experiment-number{
+        grid-area: experiment-number;
+    }
+    .column-left{
+        grid-area: column-left;
+    }
+    .column-right{
+        grid-area: column-right;
+    }
+    .curves-grid{
+        grid-area: curves-grid;
+    }
 }
 
-.data-container .column-right .column-right {
+
+
+.column-right .column-right {
     padding: 10 20 10 20px;
     border: 1px solid grey;
     background-color: #F5F5F5;
 }
 
-.data-container .column-right > * {
+.column-right > * {
     display: flex;
     align-items: flex-end;
     border-bottom: 0.5px solid silver;
     padding: 5px;
 }
-.data-container .column-right .text {
+.column-right .text {
     min-width: 150px;
 }
-.data-container .column-right .list {
+.column-right .list {
     display: flex;
     flex-wrap: wrap;
 }
-.data-container .column-right .list-item {
+.column-right .list-item {
     padding: 5px;
     margin: 2 1 2 1px;
 
@@ -44,15 +66,15 @@
     background-color: #E0E0E0;
     text-align: center;
 }
-.data-container .column-right .id-and-names-list-item {
+.column-right .id-and-names-list-item {
     display: flex;
 
     border-bottom: 0.5px dashed silver;
 }
-.data-container .column-right .id-and-names-id {
+.column-right .id-and-names-id {
     min-width: 80px;
 }
-.data-container .column-right .id-and-names-text {
+.column-right .id-and-names-text {
     word-wrap: break-word;
 }
 
@@ -74,22 +96,22 @@
     justify-content: space-between;
 }
 .experiment-number .dropdown {
-    width: 100%;
+    /* width: 100%; */
 
     display:flex;
     justify-content: space-between;
 }
 .experiment-number .dropdown-search {
-    border: 1px solid rgb(224, 225, 226);
+    border: 1px solid rgb(224, 225, 226, 0.8);
     border-radius: 3px;
-    background-color: rgb(224, 225, 226);
+    background-color: rgb(224, 225, 226, 0.8);
 }
 .experiment-number .dropdown .dropdown-icon {
     display: flex;
     justify-content: center;
 }
 .experiment-number .dropdown .text {
-    width: 100%;
+    /* width: 100%; */
     height: 40px;
     padding: 0 20px;
 
@@ -129,4 +151,17 @@
     top: 42%;
     left: 9px;
     font-size: 13pt;
+}
+
+#curvesGraph {
+    height: 550px;
+}
+#curvesGraph .highcharts-container{
+    height: 100%;
+}
+.default-text{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

@@ -17,7 +17,7 @@ ModalService.create = (htmlIdentifier, title, content, buttons, settings = {}) =
 
     modal.append([
         $('<div />').addClass('header').text(title),
-        $('<div />').addClass('content').text(content),
+        $('<div />').addClass('content').html(content),
         $('<div />').addClass('actions').append(buttonsArr)
     ]);
 
@@ -86,11 +86,12 @@ ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons = (identifie
     return ModalService.create(
         identifier,
         'Proteins already in memory',
-        `There are alreay proteins saved. Do you want to overwrite them('Yes') or add them('Add')?`,
+        `There are alreay proteins saved.<br><br>
+        <b>Cancel</b>: Do not add or remove any proteins<br>
+        <b>Overwrite</b>: Forget every previously selected protein and only remember the ones selected now.<br>
+        <b>Add</b>: Add these proteins to the already remembered proteins.`,
         ModalService.createButtonsNoYesAdd(),
-        {
-            closable: true
-        }
+        {closable: true}
     );
 }
 ModalService.createButtonsNoYesAdd = () => {

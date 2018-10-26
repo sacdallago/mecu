@@ -76,24 +76,6 @@ fs.writeFileSync(
           inter1.experiment = inter2.experiment;
 
 
-    -- Average per experiment could be an indicator of how good an experiment is.
-    DROP VIEW IF EXISTS average_ppi_distance_per_experiment;
-    CREATE MATERIALIZED VIEW average_ppi_distance_per_experiment AS
-    SELECT experiment, SUM(distance)/COUNT(*) as "average_distance"
-    FROM ppi_distances
-    GROUP BY experiment;
-    -- REFRESH MATERIALIZED VIEW average_ppi_distance_per_experiment;
-
-
-    -- Average of interaction across experiments could be an indicator of how likely an interaction is.
-    DROP VIEW IF EXISTS average_ppi_distance_per_ppi;
-    CREATE MATERIALIZED VIEW average_ppi_distance_per_ppi AS
-    SELECT interactor1, interactor2, SUM(distance)/COUNT(*) as "average_distance", array_agg(experiment) as "experiments"
-    FROM ppi_distances
-    GROUP BY interactor1, interactor2;
-    -- REFRESH MATERIALIZED VIEW average_ppi_distance_per_ppi;
-
-
     DROP VIEW IF EXISTS pairwaise_complex_interactions;
     CREATE OR REPLACE VIEW pairwaise_complex_interactions AS
     SELECT protein_proteins.interactor1, protein_proteins.interactor2, complex_protein_pairs."complexId"
@@ -116,21 +98,7 @@ fs.writeFileSync(
         ON ppi_distances.interactor1 = pairwaise_complex_interactions.interactor1 AND
            ppi_distances.interactor2 = pairwaise_complex_interactions.interactor2
     GROUP BY experiment, "complexId";
-
-
-    drop view if exists ppi_scores_distances_correlations;
-    create view ppi_scores_distances_correlations as
-    SELECT bins.bins, ppi_distances.experiment, corr(ppi_distances.distance, ppi_distances.correlation) AS corr
-    FROM ppi_distances, unnest(ARRAY[(0)::numeric, 0.25, 0.5, 0.75, 0.8, 0.9]) bins(bins)
-    WHERE (ppi_distances.distance > (bins.bins)::double precision)
-    GROUP BY bins.bins, ppi_distances.experiment;
-
-    drop view if exists ppi_scores_distances_covariance;
-    create view ppi_scores_distances_covariance as
-    SELECT bins.bins, ppi_distances.experiment, covar_samp(ppi_distances.distance, ppi_distances.correlation) AS corr
-    FROM ppi_distances, unnest(ARRAY[(0)::numeric, 0.25, 0.5, 0.75, 0.8, 0.9]) bins(bins)
-    WHERE (ppi_distances.distance > (bins.bins)::double precision)
-    GROUP BY bins.bins, ppi_distances.experiment;
+    --REFRESH MATERIALIZED VIEW average_complex_distance_per_experiment; -- 4h
     `,
     {flag: 'w'},
     function (err) {

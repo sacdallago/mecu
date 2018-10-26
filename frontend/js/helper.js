@@ -18,8 +18,9 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
     const items = [];
 
     let cubesNotDrawn = 0;
-    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
-        cubesNotDrawn = data.length -(maxCubesToDraw-1);
+    let originalLength = data.length;
+    if(maxCubesToDraw && originalLength - 1 > maxCubesToDraw) {
+        cubesNotDrawn = originalLength -(maxCubesToDraw-1);
         data = data.slice(0,maxCubesToDraw-1);
     }
 
@@ -41,7 +42,7 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
         });
     });
 
-    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+    if(maxCubesToDraw && originalLength - 1 > maxCubesToDraw) {
         const gridItem = $('<div />')
             .addClass('grid-item')
             .attr({'id':'more-cubes-cube'})
@@ -80,7 +81,7 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
         });
     });
 
-    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+    if(maxCubesToDraw && originalLength - 1 > maxCubesToDraw) {
         let curve = new MecuLine({
             element: '#more-cubes-cube',
             width:"200",
@@ -111,8 +112,9 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
     const items = [];
 
     let cubesNotDrawn = 0;
-    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
-        cubesNotDrawn = data.length -(maxCubesToDraw-1);
+    let originalLength = data.length;
+    if(maxCubesToDraw && originalLength - 1 > maxCubesToDraw) {
+        cubesNotDrawn = originalLength -(maxCubesToDraw-1);
         data = data.slice(0,maxCubesToDraw-1);
     }
 
@@ -131,7 +133,7 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
         items.push(gridItem[0]);
     });
 
-    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+    if(maxCubesToDraw && originalLength - 1 > maxCubesToDraw) {
         const gridItem = $('<div />')
             .addClass('grid-item')
             .attr({'id':'more-cubes-cube'})
@@ -169,8 +171,8 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
             curves.push(curve);
         });
     });
-
-    if(maxCubesToDraw && data.length - 1 > maxCubesToDraw) {
+    
+    if(maxCubesToDraw && originalLength - 1 > maxCubesToDraw) {
         let curve = new MecuLine({
             element: '#more-cubes-cube',
             width:"200",
