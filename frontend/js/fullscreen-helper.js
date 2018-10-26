@@ -1,6 +1,11 @@
 FullscreenHelper = {};
 
 FullscreenHelper.drawPPITable = (theadIdentifier, tbodyIdentifier, data, relativeCorrelation, MAX_ROW_COLS_PPI_TABLE) => {
+    const pPlusE = (obj, id) => obj[id]+'-'+obj[id+'_experiment'];
+    const extractE = (obj) => {
+        return obj.split('-')[1];
+    }
+
     const start = new Date();
 
     const thead = document.getElementById(theadIdentifier);
@@ -10,11 +15,6 @@ FullscreenHelper.drawPPITable = (theadIdentifier, tbodyIdentifier, data, relativ
     const tbody = document.getElementById(tbodyIdentifier);
     while (tbody.firstChild) {
         tbody.removeChild(tbody.firstChild)
-    }
-
-    const pPlusE = (obj, id) => obj[id]+'-'+obj[id+'_experiment'];
-    const extractE = (obj) => {
-        return obj.split('-')[1];
     }
 
     const proteinMap = new Map();
@@ -78,7 +78,6 @@ FullscreenHelper.drawPPITable = (theadIdentifier, tbodyIdentifier, data, relativ
             })
         })
     }
-    console.log('minMaxCorr', (new Date() - start)/1000, minMaxCorr);
 
     const process = (i) => {
 
@@ -117,15 +116,7 @@ FullscreenHelper.drawPPITable = (theadIdentifier, tbodyIdentifier, data, relativ
                 innerDiv.appendChild(leftInnerDiv);
                 innerDiv.appendChild(rightInnerDiv);
 
-                tdata.appendChild(
-                    innerDiv
-                    // .attr({
-                    //     'data-html':`(${d.interactor1} ${d.interactor1_exp}) <-> (${d.interactor2} ${d.interactor2_exp}):<br>
-                    //     Distance: ${d.distance.toFixed(5)}<br>
-                    //     Correlation: ${d.correlation ? d.correlation : 'no data'}`
-                    // })
-                    // .popup({position: 'bottom left'})
-                );
+                tdata.appendChild(innerDiv);
             }
             row.appendChild(tdata);
         };
