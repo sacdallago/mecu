@@ -19,7 +19,7 @@ const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
 proteinCurvesGrid.on('click', '.grid-item', function(){
     let self = this;
     const content = $(this).data('grid-item-contents');
-    if(!data) return;
+    if(!content) return;
     return StorageManager.toggle(
         [{
             uniprotId: content.obj.uniprotId,
