@@ -21,6 +21,7 @@
     outline: none;
 }
 
-.grid-container {
-    padding-left: 3.6%;
+
+.grid-container, .descriptive-info {
+    /* padding-left: 3.6%; */
 }
