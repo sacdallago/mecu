@@ -84,6 +84,9 @@
     overflow-y: auto;
 } */
 
+.table-container {
+    width: 100% !important;
+}
 .table-container td {
     padding: 4px 2px !important;
     vertical-align: top;

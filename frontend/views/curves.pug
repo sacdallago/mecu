@@ -58,11 +58,10 @@ block content
             .color-correlation
             .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
     .table-container
-        table.ui.definition.collapsing.celled.table
+        table.ui.definition.collapsing.celled.single.line.table
             thead#ppi-thead
-            
+                th Loading...
             tbody#ppi-tbody
-    
     .space
     .ui.button.disabled#fullscreen-button View in fullscreen
     .ui.button#relative-absolute-corr-button Relative correlation
@@ -86,5 +85,6 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
     script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
+    script(type="text/javascript", src="/public/js/fullscreen-helper.js")
     script(type="text/javascript", src="/public/js/curves.js")
     script(type="text/javascript", src="/public/js/helper.js")
