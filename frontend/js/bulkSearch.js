@@ -1,7 +1,7 @@
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
 const modalIdentifier = '#add-protein-modal';
 const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
-const showButtonIdentifier = '#show-button';
+const analyzeButtonIdentifier = '#analyze-button';
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const matchCount = $('.stats > span > strong');
 const ITEM_PER_PAGE_COUNT = 10;
@@ -375,7 +375,7 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
 }
 
 const enableShowButton = () => {
-    $(showButtonIdentifier).removeClass('disabled').addClass('green');
+    $(analyzeButtonIdentifier).removeClass('disabled').addClass('green');
 }
 
 const populateProteinSearch = () => {
@@ -406,6 +406,10 @@ $(document)
                 selectedProteins.add(proteinWithExperimentsList.uniprotId);
                 proteinWithExperimentsList.experiment.forEach(experiment => selectedExperiments.add(experiment));
             });
+
+            if(storageData.length > 0) {
+                enableShowButton();
+            }
         })
         .then(() => populateProteinSearch())
         .then(() => pullPaginatedExperiments(experimentsQuery))

@@ -1,4 +1,4 @@
-let localStorageDeleted = StorageManager.getProteins().length === 0;
+let showModal = !(StorageManager.getProteins().length === 0);
 const modalIdentifier = '#add-protein-modal';
 const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
 const selectAllPPIButtonSelector = '#select-all-ppi-button';
@@ -17,8 +17,8 @@ const expWithProteinGrid = $(expWithProteinGridIdentifier).isotope({
 expWithProteinGrid.on('click', '.grid-item', function(){
     const data = $(this).data('grid-item-contents');
     let dot = $(this).children('.selected-curve-dot');
-    console.log('data', data.obj.uniprotId, data.experiment.experiment);
-    if(!localStorageDeleted) {
+    
+    if(showModal) {
         ModalService.openModalAndDoAction(
             () => {},
             () => {
@@ -28,17 +28,18 @@ expWithProteinGrid.on('click', '.grid-item', function(){
                     {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
                     () => gridItemToggleDot(this)
                 );
-                localStorageDeleted = true;
+                showModal = true;
             },
             () => {
                 StorageManager.toggle(
                     {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
                     () => gridItemToggleDot(this)
                 );
-                localStorageDeleted = true;
+                showModal = true;
             }
         );
     } else {
+        showModal = true;
         StorageManager.toggle(
             {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
             () => gridItemToggleDot(this)

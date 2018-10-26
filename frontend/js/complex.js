@@ -1,4 +1,4 @@
-let localStorageDeleted = StorageManager.getProteins().length === 0;
+let showModal = !(StorageManager.getProteins().length === 0);
 const dropDownSelector = '#experiment-number .dropdown';
 
 const modalIdentifier = '#add-protein-modal';
@@ -17,11 +17,10 @@ const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
 });
 proteinCurvesGrid.on('click', gridItemIdentifier, function(){
     const data = $(this).data('grid-item-contents');
-    console.log('data', data.obj.id, data.obj.experiments[0].experiment);
 
     // disable selection of proteins without curves
     if(data.obj.present > 1) {
-        if(!localStorageDeleted) {
+        if(showModal && !gridItemHasDot(this)) {
             ModalService.openModalAndDoAction(
                 () => {},
                 () => {
@@ -31,17 +30,16 @@ proteinCurvesGrid.on('click', gridItemIdentifier, function(){
                         {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
                         () => gridItemToggleDot(this)
                     );
-                    localStorageDeleted = true;
                 },
                 () => {
                     StorageManager.toggle(
                         {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
                         () => gridItemToggleDot(this)
                     );
-                    localStorageDeleted = true;
                 }
             );
         } else {
+            showModal = true;
             StorageManager.toggle(
                 {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
                 () => gridItemToggleDot(this)
@@ -344,30 +342,42 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
         document.querySelector(selectAllButtonSelector).addEventListener(
             'click',
             () => {
-                ModalService.openModalAndDoAction(
-                    () => {},
-                    () => {
-                        StorageManager.clear();
-                        StorageManager.add(
-                            proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
-                            (c,a) => {
-                                document.querySelector(selectAllButtonSelector).classList.add('green');
-                                document.querySelector(selectAllButtonSelector).classList.add('disabled');
-                                gridItemToggleDotAll(true);
-                            }
-                        );
-                    },
-                    () => {
-                        StorageManager.add(
-                            proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
-                            () => {
-                                document.querySelector(selectAllButtonSelector).classList.add('green');
-                                document.querySelector(selectAllButtonSelector).classList.add('disabled');
-                                gridItemToggleDotAll(true);
-                            }
-                        );
-                    }
-                )
+                if(showModal) {
+                    ModalService.openModalAndDoAction(
+                        () => {},
+                        () => {
+                            StorageManager.clear();
+                            StorageManager.add(
+                                proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
+                                (c,a) => {
+                                    document.querySelector(selectAllButtonSelector).classList.add('green');
+                                    document.querySelector(selectAllButtonSelector).classList.add('disabled');
+                                    gridItemToggleDotAll(true);
+                                }
+                            );
+                        },
+                        () => {
+                            StorageManager.add(
+                                proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
+                                () => {
+                                    document.querySelector(selectAllButtonSelector).classList.add('green');
+                                    document.querySelector(selectAllButtonSelector).classList.add('disabled');
+                                    gridItemToggleDotAll(true);
+                                }
+                            );
+                        }
+                    )
+                } else {
+                    showModal = true;
+                    StorageManager.add(
+                        proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
+                        () => {
+                            document.querySelector(selectAllButtonSelector).classList.add('green');
+                            document.querySelector(selectAllButtonSelector).classList.add('disabled');
+                            gridItemToggleDotAll(true);
+                        }
+                    );
+                }
             }
         );
 
@@ -375,14 +385,21 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
     })
 }
 
+const gridItemHasDot = (gridItem) => {
+    return $(gridItem).children('.dot-div').hasClass('selected-curve-dot');
+}
+
 const gridItemToggleDot = (gridItem, show) => {
     let dot = $(gridItem).children('.dot-div');
     if(show === true) {
         dot.addClass('selected-curve-dot');
+        return true;
     } else if(show === false) {
         dot.removeClass('selected-curve-dot');
+        return false;
     } else {
-        dot.toggleClass('selected-curve-dot')
+        dot.toggleClass('selected-curve-dot');
+        return gridItemHasDot;
     }
 }
 const gridItemToggleDotAll = (show) => {

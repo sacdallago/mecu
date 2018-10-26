@@ -127,6 +127,8 @@ FullscreenHelper.drawPPITable = (theadIdentifier, tbodyIdentifier, data, relativ
         setTimeout(() => {
             if(i+1 < proteinArray.length) {
                 process(i+1);
+            } else {
+                console.log(`done drawing table (${i} lines)`, (new Date() - start)/1000);
             }
         }, 0);
 
@@ -136,5 +138,4 @@ FullscreenHelper.drawPPITable = (theadIdentifier, tbodyIdentifier, data, relativ
         setTimeout(() => {process(0);}, 10);
     }
 
-    console.log('done drawing table', (new Date() - start)/1000);
 }

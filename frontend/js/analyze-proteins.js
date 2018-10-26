@@ -41,6 +41,7 @@ proteinCurvesGrid.on('click', '.grid-item', function(){
 
             populateGlobalsGraphs(getColoringValue());
             loadProteins();
+            populateDropdowns();
         }
     );
 });
@@ -228,6 +229,23 @@ const drawPPITable = () => {
     FullscreenHelper.drawPPITable('ppi-thead', 'ppi-tbody', filteredData, ppiTableRelativeCorrelation, MAX_ROW_COLS_PPI_TABLE);
 }
 
+const populateDropdowns = () => {
+    // populate experiments/proteins dropdown
+    const inStorage = StorageManager.getProteins();
+    const experimentsSet = new Set();
+    const proteinsSet = new Set();
+    inStorage.forEach(p => {
+        proteinsSet.add(p.uniprotId);
+        p.experiment.forEach(e => experimentsSet.add(e));
+    });
+    const proteinList = Array.from(proteinsSet);
+    const experimentList = Array.from(experimentsSet);
+    drawProteinsSelect(proteinList);
+    drawExperimentsSelect(experimentList);
+
+    return {proteinList: proteinList, experimentList: experimentList};
+}
+
 
 $('#coloring-dropdown').dropdown({
     onChange: () => {
@@ -302,21 +320,9 @@ $('#fullscreen-button-ppi').on('click', function() {
 
 // on page drawing finished, start requests
 $(document).ready(() => {
-    // populate experiments dropdown
-    const inStorage = StorageManager.getProteins();
-    const experimentsSet = new Set();
-    const proteinsSet = new Set();
-    inStorage.forEach(p => {
-        proteinsSet.add(p.uniprotId);
-        p.experiment.forEach(e => experimentsSet.add(e));
-    });
-    const proteinList = Array.from(proteinsSet);
-    const experimentList = Array.from(experimentsSet);
-    drawExperimentsSelect(experimentList);
-    drawProteinsSelect(proteinList);
+    const data = populateDropdowns();
 
-
-    const ppiDistances = ProteinService.getProteinXProteinDistances(proteinList, experimentList)
+    const ppiDistances = ProteinService.getProteinXProteinDistances(data.proteinList, data.experimentList)
         .then(result => {
             console.log('ppiDistances', result);
             // IMPROVEMENT: only save the ones which should be drawn (limited by MAX_ROW_COLS_PPI_TABLE));
