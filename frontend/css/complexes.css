@@ -15,26 +15,27 @@ input{
 @supports (display: grid) {
     .search-header {
         display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(4, 1fr);
+        grid-template-rows: repeat(5, 1fr);
         grid-row-gap: .5em;
         grid-column-gap: 1.5em;
         grid-template-areas:
-        "complex-text"
-        "complex-search"
-        "protein-list-text"
-        "protein-list-search"
+            "complex-text"
+            "complex-search"
+            "separator"
+            "protein-list-text"
+            "protein-list-search"
     }
     @media (min-width:700px) {
         .search-header {
             display: grid;
+            grid-template-rows: 1fr 0.1fr 1fr;
             grid-template-columns: 1.5fr 4fr;
-            grid-template-rows: 1fr 1fr;
-            grid-row-gap: 1.5em;
+            grid-row-gap: 0.5em;
             grid-column-gap: 1.5em;
             grid-template-areas:
-            "complex-text complex-search complex-search complex-search complex-search"
-            "protein-list-text protein-list-search protein-list-search protein-list-search protein-list-search"
+                "complex-text complex-search"
+                "separator . "
+                "protein-list-text protein-list-search"
         }
     }
     .complex-search-text{
@@ -48,6 +49,9 @@ input{
     }
     .search-protein-list{
         grid-area: protein-list-search;
+    }
+    .separator {
+        grid-area: separator;
     }
 }
 
