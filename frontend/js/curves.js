@@ -1,8 +1,11 @@
 let experimentsToDraw = [];
 let proteinsToDraw = [];
-const AMOUNT_OF_PPI_TO_DRAW = 20;
+
 let ppiTableData = [];
 const MAX_ROW_COLS_PPI_TABLE = 11;
+let ppiTableRelativeCorrelation = true;
+
+const AMOUNT_OF_PPI_TO_DRAW = 20;
 
 const proteinCurvesGridIdentifier = '.isoGrid';
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
@@ -236,7 +239,7 @@ const drawPPITable = () => {
         return false;
     });
 
-    FullscreenHelper.drawPPITable('ppi-thead', 'ppi-tbody', filteredData, true, MAX_ROW_COLS_PPI_TABLE);
+    FullscreenHelper.drawPPITable('ppi-thead', 'ppi-tbody', filteredData, ppiTableRelativeCorrelation, MAX_ROW_COLS_PPI_TABLE);
 }
 
 
@@ -287,10 +290,12 @@ $('#fullscreen-button-chart').on('click', function() {
 $('#relative-absolute-corr-button').on('click', function() {
     switch($('#relative-absolute-corr-button').text()) {
         case 'Relative correlation':
+            ppiTableRelativeCorrelation = true;
             drawPPITable();
             $('#relative-absolute-corr-button').text('Absolute Correlation');
             break;
         case 'Absolute Correlation':
+            ppiTableRelativeCorrelation = false;
             drawPPITable();
             $('#relative-absolute-corr-button').text('Relative correlation');
             break;

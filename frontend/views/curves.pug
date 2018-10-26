@@ -4,8 +4,6 @@ block postStyles
     link(rel='stylesheet', href='/public/css/curves.css')
 
 block content
-    .space
-    h3 Global View
     .settings
         .text-coloring Select how the curves should be colored:
         .ui.selection.dropdown#coloring-dropdown
@@ -28,51 +26,51 @@ block content
             .menu
             i.dropdown.icon
     
-    .ui.vertically.divided.grid
-        .two.column.row
-            .column
-                .curves-graph-container
-                    #curves-chart.chart
-                        .default-text
-                            .text No experiment selected for this complex.
-                    .space
-                    .ui.button#fullscreen-button-chart View in fullscreen
-            .column
-                #nodesGraph
-                .space
-                .ui.button.manhattan(data-content="The distance between two points measured along axes at right angles. In a plane with p1 at (x1, y1) and p2 at (x2, y2), it is |x1 - x2| + |y1 - y2|.") Manhattan
-                .ui.button.euclidian(data-content="Euclidean distance or simply 'distance' examines the root of square differences between coordinates of a pair of objects.") Euclidian
-                .ui.button.supremum(data-content="This is the maximum difference between any component of the vectors.") Supremum
-                .ui.top.right.search.pointing.dropdown.button.minkowski(data-content="The Minkowski distance between two variabes X and Y is defined as (∑i=1n|Xi−Yi|p)1/p . The case where p = 1 is equivalent to the Manhattan distance and the case where p = 2 is equivalent to the Euclidean distance.") Minkowski
-                    .menu
-                        .item
-                            .ui.input
-                                input(type="number", name="rank", placeholder="3")#rank
-                        .item
-                            .ui.attached.button.submit Save
+    .graph-column
+        .curves-graph-container
+            #curves-chart.chart
+                .default-text
+                    .text No experiment selected for this complex.
+            .space
+            .ui.button#fullscreen-button-chart View in fullscreen
+    .distances-column
+        #nodesGraph
+        .space
+        .ui.button.manhattan(data-content="The distance between two points measured along axes at right angles. In a plane with p1 at (x1, y1) and p2 at (x2, y2), it is |x1 - x2| + |y1 - y2|.") Manhattan
+        .ui.button.euclidian(data-content="Euclidean distance or simply 'distance' examines the root of square differences between coordinates of a pair of objects.") Euclidian
+        .ui.button.supremum(data-content="This is the maximum difference between any component of the vectors.") Supremum
+        .ui.top.right.search.pointing.dropdown.button.minkowski(data-content="The Minkowski distance between two variabes X and Y is defined as (∑i=1n|Xi−Yi|p)1/p . The case where p = 1 is equivalent to the Manhattan distance and the case where p = 2 is equivalent to the Euclidean distance.") Minkowski
+            .menu
+                .item
+                    .ui.input
+                        input(type="number", name="rank", placeholder="3")#rank
+                .item
+                    .ui.attached.button.submit Save
 
-    h3 Distances and Correlations amongst proteins
-    .legend
-        .distance
-            .color-distance
-            .text-distance Distance(euclidian) of 2 proteins (white: distant; green: close)
-        .correlation
-            .color-correlation
-            .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
-    .table-container
-        table.ui.definition.collapsing.celled.single.line.table
-            thead#ppi-thead
-                th Loading...
-            tbody#ppi-tbody
-    .space
-    .ui.button#fullscreen-button-ppi View in fullscreen
-    .ui.button#relative-absolute-corr-button Relative correlation
+    .ppi-table
+        h3 Distances and Correlations amongst proteins
+        .legend
+            .distance
+                .color-distance
+                .text-distance Distance(euclidian) of 2 proteins (white: distant; green: close)
+            .correlation
+                .color-correlation
+                .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
+        .table-container
+            table.ui.definition.collapsing.celled.single.line.table
+                thead#ppi-thead
+                    th Loading...
+                tbody#ppi-tbody
+        .space
+        .ui.button#fullscreen-button-ppi View in fullscreen
+        .ui.button#relative-absolute-corr-button Relative correlation
 
-    h3 Select/Deselect Proteins
-    .grid-container
-        .text Click to remove
-        .isoGrid
-    .space
+    .protein-list
+        h3 Select/Deselect Proteins
+        .grid-container
+            .text Click to remove
+            .isoGrid
+        .space
 
 block settings
     .divider
