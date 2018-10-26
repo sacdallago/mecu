@@ -90,6 +90,12 @@ module.exports = function(context) {
             return response.render('storage-proteins-fullscreen', {
                 title: 'Proteins Fullscreen'
             });
+        },
+
+        ppiFullscreen: function(request, response) {
+            return response.render('ppi-fullscreen', {
+                title: 'Distances and Correlations amongst proteins'
+            });
         }
     }
 };

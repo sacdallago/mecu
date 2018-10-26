@@ -14,5 +14,6 @@ module.exports = function(context) {
         .get('/experiments', frontendController.experiments)
         .get('/experiment', frontendController.experiment)
         .get('/storage-proteins-fullscreen', frontendController.storageProteinsFullscreen)
+        .get('/ppi-fullscreen', frontendController.ppiFullscreen)
         ;
 }
