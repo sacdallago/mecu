@@ -134,14 +134,16 @@ FullscreenHelper.drawPPITable = (theadIdentifier, tbodyIdentifier, data, relativ
         tbody.appendChild(row);
 
         setTimeout(() => {
-            if(i+1 < proteinArray.length && proteinArray.length > 0) {
+            if(i+1 < proteinArray.length) {
                 process(i+1);
             }
         }, 0);
 
     }
 
-    setTimeout(() => {process(0);}, 10);
+    if(proteinArray.length > 0) {
+        setTimeout(() => {process(0);}, 10);
+    }
 
     console.log('done drawing table', (new Date() - start)/1000);
 }
