@@ -1,36 +1,9 @@
-.two.column.row{
-    max-height: 500px
-}
-.column {
-    height: 90%;
-}
-.curves-graph-container {
-    height: 100%;
-}
-.chart {
-    width: 100%;
-    height: 100%;
-    font-size: 0.25em;
-    padding:0;
-    border: .2rem solid rgba(66, 66, 66, 0.57);
-    transition: border-color 1000ms ease;
-}
-
-#nodesGraph {
-    width: 100%;
-    height: 100%;
-    padding:0;
-    font-size: 0.2em;
-    border: .2rem solid rgba(66, 66, 66, 0.57);
-    transition: border-color 1000ms ease;
-}
-
 /* if not supported, the divs will just be arranged as rows */
 @supports (display: grid) {
     #spacedText {
         display: grid;
         grid-template-rows: .3fr auto auto auto auto;
-        grid-row-gap: 1em;
+        grid-row-gap: 1.5em;
         grid-template-areas:
             "settings"
             "graph-column"
@@ -43,7 +16,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto auto auto auto;
-            grid-row-gap: 1.5em;
+            grid-row-gap: 3.5em;
             grid-column-gap: 1.5em;
             grid-template-areas:
                 "settings settings"
@@ -70,9 +43,10 @@
 
     .settings {
         display: grid;
-        grid-template-rows: repeat(3, .2fr auto);
+        grid-template-rows: .2fr repeat(3, .2fr auto);
         grid-row-gap: 1em;
         grid-template-areas:
+            "settings-title"
             "text-coloring"
             "coloring"
             "text-experiments"
@@ -83,15 +57,19 @@
     @media (min-width: 700px) {
         .settings {
             display: grid;
+            grid-template-rows: .2fr auto auto auto;
             grid-template-columns: 1fr 3fr;
-            grid-template-rows: 1fr 1fr auto;
             grid-row-gap: 1.5em;
             grid-column-gap: 1.5em;
             grid-template-areas:
-                "text-coloring coloring coloring coloring coloring"
-                "text-experiments experiments experiments experiments experiments"
-                "text-proteins proteins proteins proteins proteins"
+                "settings-title ."
+                "text-coloring coloring"
+                "text-experiments experiments"
+                "text-proteins proteins"
         }
+    }
+    .settings-title{
+        grid-area: settings-title;
     }
     .text-coloring{
         grid-area: text-coloring;
@@ -113,6 +91,42 @@
     }
 }
 
+.two.column.row{
+    max-height: 500px
+}
+.column {
+    height: 90%;
+}
+.curves-graph-container {
+    height: 100%;
+}
+.chart {
+    width: 100%;
+    height: 100%;
+    font-size: 0.25em;
+    padding:0;
+    border: .2rem solid rgba(66, 66, 66, 0.57);
+    transition: border-color 1000ms ease;
+}
+
+.default-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 400px;
+    font-size: 7em;
+}
+
+#nodesGraph {
+    width: 100%;
+    height: 100%;
+    padding:0;
+    font-size: 0.2em;
+    border: .2rem solid rgba(66, 66, 66, 0.57);
+    transition: border-color 1000ms ease;
+}
+
 .table-container table {
     background-color: #fbfbfb !important;
 }
@@ -123,6 +137,7 @@
 } */
 
 .table-container {
+    padding: 5px 0px;
     width: 100% !important;
 }
 .table-container td {
@@ -140,7 +155,10 @@
     text-align: center;
 }
 .legend{
+    /* border: 0.5px solid silver;
+    background-color: lightgrey; */
     padding: 5px 0px;
+
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

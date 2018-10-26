@@ -37,9 +37,9 @@ module.exports = function(context) {
             });
         },
 
-        curves: function(request, response) {
-            return response.render('curves', {
-                title: 'My Selected curves'
+        analyzeProteins: function(request, response) {
+            return response.render('analyze-proteins', {
+                title: 'Analyze selected proteins'
             });
         },
 

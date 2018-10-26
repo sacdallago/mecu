@@ -19,7 +19,6 @@ const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
 proteinCurvesGrid.on('click', '.grid-item', function(){
     let self = this;
     const content = $(this).data('grid-item-contents');
-    console.log('item contents', content);
     if(!data) return;
     return StorageManager.toggle(
         [{
@@ -110,6 +109,7 @@ function populateGlobalsGraphs(coloringType){
     if(proteins.length === 0 || experimentsToDraw.length === 0 || proteinsToDraw.length === 0) {
         $('#curves-chart').empty();
         $('#nodesGraph').empty();
+        $('#curves-chart').append($('<div />').addClass('default-text').append($('<div />').text('Nothing to display selected') ));
         return;
     }
 
@@ -144,25 +144,11 @@ function populateGlobalsGraphs(coloringType){
             };
             highChartsCurvesConfigObject['series'] = series;
             highChartsCurvesConfigObject['tooltip'] = {
-                // valueSuffix: '',
-                // split: true,
                 distance: 30,
                 padding: 5,
                 formatter: function() {
                     return `<b>${this.series.name}</b><br><b>${this.x}</b> C°<br /><b>${(this.y*100).toFixed(2)}</b> %`;
                 }
-                // if you want to show the whole line(vertical) in one tooltip
-                // formatter: function() {
-                //     var s = [];
-                //
-                //     $.each(this.points, function(i, point) {
-                //         s.push('<span style="color:#D31B22;font-weight:bold;">'+ point.series.name +' : '+
-                //             point.y +'<span>');
-                //     });
-                //
-                //     return s.join(' and ');
-                // },
-                // shared: true
             };
             Highcharts.chart('curves-chart', highChartsCurvesConfigObject);
 

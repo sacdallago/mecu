@@ -38,7 +38,7 @@ block content
         .heatmap#heatmap Here you will see a which experiment has which protein.
         
         .show-button
-            a.ui.disabled.button#show-button(href='/curves')
+            a.ui.disabled.button#analyze-button(href='/analyze-proteins')
                 i.eye.icon
                 span Analyze
         
@@ -57,7 +57,7 @@ block settings
     .divider
     a(href='/complexes').item Search Complex
     a(href='/experiments').item Search Experiments
-    a(href='/curves').item Analyze
+    a(href='/analyze-proteins').item Analyze
 
 block scripts
     - var delta = 50
