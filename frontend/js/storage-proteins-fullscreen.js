@@ -60,7 +60,7 @@ function populateGlobalsGraphs(proteinsToDraw, experimentsToDraw, coloringType){
 $(document).ready(() => {
     Promise.resolve()
         .then(() => {
-            const fullScreenData = StorageManager.getFullScreenProteinsSet();
+            const fullScreenData = StorageManager.getFullScreenProteinsSettings();
             console.log('fullScreenData', fullScreenData);
             populateGlobalsGraphs(
                 fullScreenData.proteins,

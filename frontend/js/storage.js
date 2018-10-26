@@ -211,7 +211,7 @@ StorageManager.getMinTemp = function() {
 
 StorageManager.setFullScreenProteinsSettings = (proteins, experiments, coloring) => {
     return store.set(
-            'fullscreenSettings',
+            'fullscreenProteinSettings',
             {
                 proteins: proteins,
                 experiments: experiments,
@@ -219,9 +219,9 @@ StorageManager.setFullScreenProteinsSettings = (proteins, experiments, coloring)
             }
         );
 }
-StorageManager.getFullScreenProteinsSet = () => {
+StorageManager.getFullScreenProteinsSettings = () => {
     const ret = {proteins: [], experiments: [], coloring: 0};
-    return store.get('fullscreenSettings') || ret;
+    return store.get('fullscreenProteinSettings') || ret;
 }
 
 // check structure of 'proteins' in local storage
