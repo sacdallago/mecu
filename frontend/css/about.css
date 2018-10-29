@@ -1,9 +1,11 @@
-.protein-x-protein-interaction-data {
+#spacedText {
+    padding-top: 80px;
 }
 
-.protein-x-protein-interaction-data .field {
-
+#spacedText > * {
+    margin-bottom: 20px;
 }
 
-.protein-x-protein-interaction-data .value {
+.creators, .data-courtesy {
+    text-align: center;
 }

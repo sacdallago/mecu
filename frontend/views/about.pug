@@ -4,14 +4,18 @@ block postStyles
     link(rel='stylesheet', href='/public/css/about.css')
 
 block content
-    p
+    .creators
         | Webpage and design by
-        span  Christian Dallago
-    p
+        span  
+            a(href=`mailto:christian.dallago@tum.de`) Christian Dallago
+        |  and
+        span 
+            a(href=`mailto:klaus.niedermair007@gmail.com`) Klaus Niedermair
+    .data-courtesy
         | Data courtesy of
-        span  Chris Soon Heng Tan & colleagues
-    p
-        | Data
+        span  
+            a(href=`http://science.sciencemag.org/content/early/2018/02/07/science.aan0346` target="_blank") Chris Soon Heng Tan & colleagues
+    .data
         .protein-x-protein-interaction-data
             .field Protein interaction data:
             ul.value
