@@ -7,18 +7,18 @@ let ppiTableRelativeCorrelation = true;
 
 const AMOUNT_OF_PPI_TO_DRAW = 20;
 
-const proteinCurvesGridIdentifier = '.isoGrid';
+const proteinCurvesGridIdentifier = `.isoGrid`;
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
-    itemSelector: '.grid-item',
-    layoutMode: 'packery',
+    itemSelector: `.grid-item`,
+    layoutMode: `packery`,
     packery: {
         gutter: 10
     }
 });
 
-proteinCurvesGrid.on('click', '.grid-item', function(){
+proteinCurvesGrid.on(`click`, `.grid-item`, function(){
     let self = this;
-    const content = $(this).data('grid-item-contents');
+    const content = $(this).data(`grid-item-contents`);
     if(!content) return;
     return StorageManager.toggle(
         [{
@@ -27,15 +27,15 @@ proteinCurvesGrid.on('click', '.grid-item', function(){
         }],
         function(inStorage, added, removed) {
             if(added === 0){
-                $(self).removeClass('inStore');
+                $(self).removeClass(`inStore`);
             } else if(removed === 0) {
-                $(self).addClass('inStore');
+                $(self).addClass(`inStore`);
             } else {
-                if ($(self).hasClass('inStore')){
-                    $(self).removeClass('inStore');
+                if ($(self).hasClass(`inStore`)){
+                    $(self).removeClass(`inStore`);
                 }
-                if (!$(self).hasClass('partiallyInStore')){
-                    $(self).addClass('partiallyInStore');
+                if (!$(self).hasClass(`partiallyInStore`)){
+                    $(self).addClass(`partiallyInStore`);
                 }
             }
 
@@ -58,16 +58,15 @@ function loadProteins() {
 
     // move into own (utils?) file
     let createIdOfProt = (protein) => {
-        return (protein.uniprotId + protein.experiments.map(e => e.experiment).join('E')).replace(/\s|\//g, '_');
-    }
+        return (protein.uniprotId + protein.experiments.map(e => e.experiment).join(`E`)).replace(/\s|\//g, `_`);
+    };
 
     TemperatureService.temperatureReadsToProteinsAndExperimentPairs(StorageManager.splitUpProteins(proteins))
         .then(proteins => {
 
             const proteinExperimentObject = [];
-            let index = 0;
             proteins.forEach(protein => {
-                protein.experiments.forEach((experiment, i, a) => {
+                protein.experiments.forEach((experiment, i) => {
                     proteinExperimentObject.push({
                         uniprotId: protein.uniprotId,
                         experiments: [experiment],
@@ -78,27 +77,27 @@ function loadProteins() {
 
             const toAppend = (obj, exp) => {
                 return [
-                    $('<p />')
-                        .addClass('grid-item-text')
+                    $(`<p />`)
+                        .addClass(`grid-item-text`)
                         .css({
-                            'position': 'absolute',
-                            'text-align': 'center',
-                            'width': '100%',
-                            'line-height': '35px',
-                            'font-size': '1.2rem'
+                            'position': `absolute`,
+                            'text-align': `center`,
+                            'width': `100%`,
+                            'line-height': `35px`,
+                            'font-size': `1.2rem`
                         })
                         .text(obj.uniprotId),
-                    $('<div />')
-                        .addClass(['experimentNumber', 'grid-item-text'])
+                    $(`<div />`)
+                        .addClass([`experimentNumber`, `grid-item-text`])
                         .text(`Experiment ${exp.experiment}`),
-                    $('<div />')
-                        .addClass('selected-curve-dot')
+                    $(`<div />`)
+                        .addClass(`selected-curve-dot`)
                 ];
             };
 
             HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
         });
-};
+}
 
 let globalGraph;
 
@@ -108,9 +107,9 @@ function populateGlobalsGraphs(coloringType){
     proteins = proteins.filter(p => experimentsToDraw.indexOf(p.experiment) > -1 && proteinsToDraw.indexOf(p.uniprotId) > -1);
 
     if(proteins.length === 0 || experimentsToDraw.length === 0 || proteinsToDraw.length === 0) {
-        $('#curves-chart').empty();
-        $('#nodesGraph').empty();
-        $('#curves-chart').append($('<div />').addClass('default-text').append($('<div />').text('Nothing to display selected') ));
+        $(`#curves-chart`).empty();
+        $(`#nodesGraph`).empty();
+        $(`#curves-chart`).append($(`<div />`).addClass(`default-text`).append($(`<div />`).text(`Nothing to display selected`) ));
         return;
     }
 
@@ -121,37 +120,37 @@ function populateGlobalsGraphs(coloringType){
             data.forEach(protein => {
                 protein.experiments.forEach(experiment => {
                     series.push({
-                        name: protein.uniprotId+' - '+experiment.experiment,
+                        name: protein.uniprotId+` - `+experiment.experiment,
                         data: experiment.reads.map(r => [r.t, r.r]),
                         color: coloringType === 0 ?
                             HelperFunctions.stringToColor(protein.uniprotId):
-                            HelperFunctions.stringToColor(experiment.experiment*12+''),
-                        marker: {symbol: 'circle'}
-                    })
-                })
+                            HelperFunctions.stringToColor(experiment.experiment*12+``),
+                        marker: {symbol: `circle`}
+                    });
+                });
             });
 
             // configuring and plotting highcharts
-            highChartsCurvesConfigObject['title'] = {
-                text: 'TPCA melting curve'
+            highChartsCurvesConfigObject[`title`] = {
+                text: `TPCA melting curve`
             };
-            highChartsCurvesConfigObject['xAxis']['title'] = {
+            highChartsCurvesConfigObject[`xAxis`][`title`] = {
                 enabled: true,
-                text: 'Temperature'
+                text: `Temperature`
             };
-            highChartsCurvesConfigObject['yAxis']['title'] = {
+            highChartsCurvesConfigObject[`yAxis`][`title`] = {
                 enabled: true,
-                text: '% alive'
+                text: `% alive`
             };
-            highChartsCurvesConfigObject['series'] = series;
-            highChartsCurvesConfigObject['tooltip'] = {
+            highChartsCurvesConfigObject[`series`] = series;
+            highChartsCurvesConfigObject[`tooltip`] = {
                 distance: 30,
                 padding: 5,
                 formatter: function() {
                     return `<b>${this.series.name}</b><br><b>${this.x}</b> C°<br /><b>${(this.y*100).toFixed(2)}</b> %`;
                 }
             };
-            Highcharts.chart('curves-chart', highChartsCurvesConfigObject);
+            Highcharts.chart(`curves-chart`, highChartsCurvesConfigObject);
 
             // plot distances
             // globalGraph = new MecuGraph({element: "#nodesGraph"});
@@ -163,57 +162,54 @@ function populateGlobalsGraphs(coloringType){
 }
 
 const getColoringValue = () => {
-    return parseInt(document.querySelector('#coloring-dropdown .value').value);
-}
-const getExperimentsValue = () => {
-    return parseInt(document.querySelector('#experiments-dropdown .value').value);
-}
+    return parseInt(document.querySelector(`#coloring-dropdown .value`).value);
+};
 const drawExperimentsSelect = (experiments) => {
-    const menu = document.querySelector('#experiments-dropdown .menu');
+    const menu = document.querySelector(`#experiments-dropdown .menu`);
     experiments.forEach(exp => {
-        let newExp = document.createElement('div');
-        newExp.classList.add('item');
-        newExp.setAttribute('data-value', exp);
-        newExp.innerText = 'Experiment '+exp;
+        let newExp = document.createElement(`div`);
+        newExp.classList.add(`item`);
+        newExp.setAttribute(`data-value`, exp);
+        newExp.innerText = `Experiment `+exp;
         menu.appendChild(newExp);
     });
 
-    document.querySelector('#experiments-dropdown .value').setAttribute('value', experiments.join(','));
+    document.querySelector(`#experiments-dropdown .value`).setAttribute(`value`, experiments.join(`,`));
 
     experimentsToDraw = experiments;
 
-    $('#experiments-dropdown').dropdown({
+    $(`#experiments-dropdown`).dropdown({
         clearable: false,
         onChange: (e) => {
-            experimentsToDraw = e.split(',').map(e => parseInt(e));
+            experimentsToDraw = e.split(`,`).map(e => parseInt(e));
             populateGlobalsGraphs(getColoringValue());
             drawPPITable();
         }
     });
-}
+};
 const drawProteinsSelect = (proteins) => {
-    const menu = document.querySelector('#proteins-dropdown .menu');
+    const menu = document.querySelector(`#proteins-dropdown .menu`);
     proteins.forEach(p => {
-        let newProt = document.createElement('div');
-        newProt.classList.add('item');
-        newProt.setAttribute('data-value', p);
+        let newProt = document.createElement(`div`);
+        newProt.classList.add(`item`);
+        newProt.setAttribute(`data-value`, p);
         newProt.innerText = p;
         menu.appendChild(newProt);
     });
 
-    document.querySelector('#proteins-dropdown .value').setAttribute('value', proteins.join(','));
+    document.querySelector(`#proteins-dropdown .value`).setAttribute(`value`, proteins.join(`,`));
 
     proteinsToDraw = proteins;
 
-    $('#proteins-dropdown').dropdown({
+    $(`#proteins-dropdown`).dropdown({
         clearable: false,
         onChange: (e) => {
-            proteinsToDraw = e.split(',');
+            proteinsToDraw = e.split(`,`);
             populateGlobalsGraphs(getColoringValue());
             drawPPITable();
         }
     });
-}
+};
 
 const drawPPITable = () => {
     const filteredData = ppiTableData.filter(obj => {
@@ -226,8 +222,8 @@ const drawPPITable = () => {
         return false;
     });
 
-    FullscreenHelper.drawPPITable('ppi-thead', 'ppi-tbody', filteredData, ppiTableRelativeCorrelation, MAX_ROW_COLS_PPI_TABLE);
-}
+    FullscreenHelper.drawPPITable(`ppi-thead`, `ppi-tbody`, filteredData, ppiTableRelativeCorrelation, MAX_ROW_COLS_PPI_TABLE);
+};
 
 const populateDropdowns = () => {
     // populate experiments/proteins dropdown
@@ -244,92 +240,92 @@ const populateDropdowns = () => {
     drawExperimentsSelect(experimentList);
 
     return {proteinList: proteinList, experimentList: experimentList};
-}
+};
 
 
-$('#coloring-dropdown').dropdown({
+$(`#coloring-dropdown`).dropdown({
     onChange: () => {
         populateGlobalsGraphs(getColoringValue());
     }
 });
 
 // Change Distance Metrics logic
-$('.ui.button.manhattan').on('click', function(event){
+$(`.ui.button.manhattan`).on(`click`, function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.manhattan);
-}).popup({position: 'bottom left'});
-$('.ui.button.euclidian').on('click', function(event){
+}).popup({position: `bottom left`});
+$(`.ui.button.euclidian`).on(`click`, function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.euclidian);
-}).popup({position: 'bottom left'});
-$('.ui.button.supremum').on('click', function(event){
+}).popup({position: `bottom left`});
+$(`.ui.button.supremum`).on(`click`, function(event){
     event.preventDefault();
 
     globalGraph.changeDistanceMetric(Disi.supremum);
-}).popup({position: 'bottom left'});
-$('.ui.dropdown.button.minkowski').dropdown({
+}).popup({position: `bottom left`});
+$(`.ui.dropdown.button.minkowski`).dropdown({
     action: function(e) {
-        const rank = $('#rank').val();
+        const rank = $(`#rank`).val();
         if(rank) {
-            console.log('setting minkowski rank: ', $('#rank').val());
+            console.log(`setting minkowski rank: `, $(`#rank`).val());
             event.preventDefault();
             globalGraph.changeDistanceMetric((a,b) => Disi.minkowski(a,b,rank));
         }
 
     }
-}).popup({position: 'bottom left'});
+}).popup({position: `bottom left`});
 
-$('#fullscreen-button-chart').on('click', function() {
+$(`#fullscreen-button-chart`).on(`click`, function() {
     // set storage settings for fullscreen
     StorageManager.setFullScreenProteinsSettings(
         proteinsToDraw,
         experimentsToDraw,
-        parseInt(document.querySelector('#coloring-dropdown .value').value)
+        parseInt(document.querySelector(`#coloring-dropdown .value`).value)
     );
 
-    window.open(`/storage-proteins-fullscreen`, '_blank');
+    window.open(`/storage-proteins-fullscreen`, `_blank`);
 });
-$('#relative-absolute-corr-button').on('click', function() {
-    switch($('#relative-absolute-corr-button').text()) {
-        case 'Relative correlation':
-            ppiTableRelativeCorrelation = true;
-            drawPPITable();
-            $('#relative-absolute-corr-button').text('Absolute Correlation');
-            break;
-        case 'Absolute Correlation':
-            ppiTableRelativeCorrelation = false;
-            drawPPITable();
-            $('#relative-absolute-corr-button').text('Relative correlation');
-            break;
+$(`#relative-absolute-corr-button`).on(`click`, function() {
+    switch($(`#relative-absolute-corr-button`).text()) {
+    case `Relative correlation`:
+        ppiTableRelativeCorrelation = true;
+        drawPPITable();
+        $(`#relative-absolute-corr-button`).text(`Absolute Correlation`);
+        break;
+    case `Absolute Correlation`:
+        ppiTableRelativeCorrelation = false;
+        drawPPITable();
+        $(`#relative-absolute-corr-button`).text(`Relative correlation`);
+        break;
 
     }
 });
-$('#fullscreen-button-ppi').on('click', function() {
+$(`#fullscreen-button-ppi`).on(`click`, function() {
 
     // set storage settings for fullscreen
     StorageManager.setFullscreenPPISettings(
         proteinsToDraw,
         experimentsToDraw,
-        $('#relative-absolute-corr-button').text() === 'Relative correlation'
+        $(`#relative-absolute-corr-button`).text() === `Relative correlation`
     );
 
-    window.open(`/ppi-fullscreen`, '_blank');
+    window.open(`/ppi-fullscreen`, `_blank`);
 });
 
 // on page drawing finished, start requests
 $(document).ready(() => {
     const data = populateDropdowns();
 
-    const ppiDistances = ProteinService.getProteinXProteinDistances(data.proteinList, data.experimentList)
+    ProteinService.getProteinXProteinDistances(data.proteinList, data.experimentList)
         .then(result => {
-            console.log('ppiDistances', result);
+            console.log(`ppiDistances`, result);
             // IMPROVEMENT: only save the ones which should be drawn (limited by MAX_ROW_COLS_PPI_TABLE));
             // IMPROVEMENT 2: only request the ones you want to draw!
             ppiTableData = result;
             drawPPITable();
-        })
+        });
 
     Promise.resolve()
         .then(() => populateGlobalsGraphs(getColoringValue(), []))

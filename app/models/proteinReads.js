@@ -1,18 +1,8 @@
-/**
- * meltingRead model
- *
- * Created by Christian Dallago on 20161226 .
- */
-
-const sequelize = require('sequelize');
-
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
 
-    const experimentsModel = context.component('models').module('experiments');
-    const proteinsModel = context.component('models').module('proteins');
-
-    return context.dbConnection.define('proteinRead', {
+    return context.dbConnection.define(`proteinRead`, {
         experiment: {
             type: sequelize.INTEGER,
         },

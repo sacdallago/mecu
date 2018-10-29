@@ -22,18 +22,18 @@ StorageManager.splitUpProteinIntoExperiments = (protein) => {
         return protein.experiment.map(e => ({
             uniprotId: protein.uniprotId,
             experiment: e
-        }))
+        }));
     }
     // case if it's protein data from the server
     else if(protein.experiments && protein.experiments.constructor === Array){
         return protein.experiments.map(e => ({
             uniprotId: protein.uniprotId,
             experiment: e.experiment
-        }))
+        }));
     } else {
         return [protein];
     }
-}
+};
 
 /**
  * takes a list of proteins, hands them to the StorageManager.splitUpProteinIntoExperiments function
@@ -46,7 +46,7 @@ StorageManager.splitUpProteins = (proteins) => {
         tmp = tmp.concat(StorageManager.splitUpProteinIntoExperiments(p));
     });
     return tmp;
-}
+};
 
 StorageManager.add = function(proteins, callback) {
     if (proteins.constructor !== Array) {
@@ -55,7 +55,7 @@ StorageManager.add = function(proteins, callback) {
         StorageManager.splitUpProteins(proteins);
     }
 
-    let current = store.get('proteins') || {};
+    let current = store.get(`proteins`) || {};
     let removed = 0;
     let added = 0;
 
@@ -72,7 +72,7 @@ StorageManager.add = function(proteins, callback) {
         }
     });
 
-    store.set('proteins', current);
+    store.set(`proteins`, current);
 
     // TODO use promise instead of callback
     callback(current, added, removed);
@@ -114,7 +114,7 @@ StorageManager.toggle = function(proteins, callback) {
         StorageManager.splitUpProteins(proteins);
     }
 
-    let current = store.get('proteins') || {};
+    let current = store.get(`proteins`) || {};
     let removed = 0;
     let added = 0;
 
@@ -141,7 +141,7 @@ StorageManager.toggle = function(proteins, callback) {
         }
     });
 
-    store.set('proteins', current);
+    store.set(`proteins`, current);
 
     // TODO use promise instead of callback
     callback(current, added, removed);
@@ -157,7 +157,7 @@ StorageManager.has = function(proteins, callback) {
     }
 
 
-    let current = store.get('proteins') || {};
+    let current = store.get(`proteins`) || {};
     let has = 0;
     let hasNot = 0;
 
@@ -184,53 +184,53 @@ StorageManager.has = function(proteins, callback) {
 };
 
 StorageManager.getProteins = function() {
-    let proteinsObj = store.get('proteins') || {};
+    let proteinsObj = store.get(`proteins`) || {};
     return Object.keys(proteinsObj).map(i => ({uniprotId:i, experiment: proteinsObj[i]})) || [];
 };
 
 StorageManager.clear = function() {
-    store.remove('proteins');
+    store.remove(`proteins`);
     return;
-}
+};
 
 StorageManager.setMaxTemp = function(temp) {
-    return store.set('maxTemp', parseFloat(temp));
+    return store.set(`maxTemp`, parseFloat(temp));
 };
 StorageManager.setMinTemp = function(temp) {
-    return store.setItem('minTemp', parseFloat(temp));
+    return store.setItem(`minTemp`, parseFloat(temp));
 };
 
 StorageManager.getMaxTemp = function() {
-    let t = store.get('maxTemp');
-    return (t != "NaN" ? t : undefined);
+    let t = store.get(`maxTemp`);
+    return (t != `NaN` ? t : undefined);
 };
 StorageManager.getMinTemp = function() {
-    let t = store.get('minTemp');
-    return (t != "NaN" ? t : undefined);
+    let t = store.get(`minTemp`);
+    return (t != `NaN` ? t : undefined);
 };
 
 StorageManager.setFullScreenProteinsSettings = (proteins, experiments, coloring) => {
     return store.set(
-            'fullscreenProteinSettings',
-            {
-                proteins: proteins,
-                experiments: experiments,
-                coloring: coloring
-            }
-        );
-}
+        `fullscreenProteinSettings`,
+        {
+            proteins: proteins,
+            experiments: experiments,
+            coloring: coloring
+        }
+    );
+};
 StorageManager.getFullScreenProteinsSettings = () => {
     const ret = {proteins: [], experiments: [], coloring: 0};
-    return store.get('fullscreenProteinSettings') || ret;
-}
+    return store.get(`fullscreenProteinSettings`) || ret;
+};
 
 StorageManager.setFullscreenPPISettings = (proteinList, experimentList, relativeCorrelation) => {
-    return store.set('fullscreenPPISettings', {data: {proteinList: proteinList, experimentList: experimentList}, relativeCorrelation: relativeCorrelation});
-}
+    return store.set(`fullscreenPPISettings`, {data: {proteinList: proteinList, experimentList: experimentList}, relativeCorrelation: relativeCorrelation});
+};
 StorageManager.getFullScreenPPISettings = () => {
     const ret = {data:{proteinList: [], experimentList: []}, relativeCorrelation: true};
-    return store.get('fullscreenPPISettings') || ret;
-}
+    return store.get(`fullscreenPPISettings`) || ret;
+};
 
 // check structure of 'proteins' in local storage
 (function (s) {
@@ -238,7 +238,7 @@ StorageManager.getFullScreenPPISettings = () => {
     let ok = true;
     if(proteins.constructor !== Array){
         ok = false;
-        console.error('Local storage had faulty values... (L0)', proteins);
+        console.error(`Local storage had faulty values... (L0)`, proteins);
     } else {
         for(let i = 0; i<proteins.length; i++) {
             if(
@@ -250,15 +250,15 @@ StorageManager.getFullScreenPPISettings = () => {
                 proteins[i].experiment.constructor !== Array
             ) {
                 ok = false;
-                console.error('Local storage had faulty values... (L1)', proteins[i]);
+                console.error(`Local storage had faulty values... (L1)`, proteins[i]);
                 break;
             }
 
             for(let j = 0; j<proteins[i].experiment.length; j++) {
                 if(proteins[i].experiment[j] === null || proteins[i].experiment[j].constructor !== Number) {
-                    console.log('null value found or not a number ');
+                    console.log(`null value found or not a number `);
                     ok = false;
-                    console.error('Local storage had faulty values... (L2)', proteins[i].experiment);
+                    console.error(`Local storage had faulty values... (L2)`, proteins[i].experiment);
                     break;
                 }
             }
@@ -266,9 +266,9 @@ StorageManager.getFullScreenPPISettings = () => {
 
         if(!ok) {
             s.clear();
-            console.error('Local storage had faulty values... cleared local storage', proteins);
+            console.error(`Local storage had faulty values... cleared local storage`, proteins);
         } else {
-            console.log('Local Storage data is viable');
+            console.log(`Local Storage data is viable`);
         }
     }
 })(StorageManager);

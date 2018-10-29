@@ -3,15 +3,15 @@ class PaginationComponent{
     // TODO for now the pagination component is redrawn every time the page is changed
     //      but I could actually only update the component if there was a page change
     constructor(htmlId, totalItemCount, itemsPerPage, now = 1, fun, maxNumberPagesToShow) {
-        this.pageElementClass = 'page';
-        this.pageElementWithClickHandlerClass = 'page-nr';
-        this.arrowLeftClass = 'arrow-left';
-        this.arrowRightClass = 'arrow-right';
-        this.arrowLeft = '❮';
-        this.arrowRight = '❯';
+        this.pageElementClass = `page`;
+        this.pageElementWithClickHandlerClass = `page-nr`;
+        this.arrowLeftClass = `arrow-left`;
+        this.arrowRightClass = `arrow-right`;
+        this.arrowLeft = `❮`;
+        this.arrowRight = `❯`;
         this.maxNumberPagesToShow = maxNumberPagesToShow || 7; // should be odd
         if(this.maxNumberPagesToShow % 2 == 0) {
-            console.warn(`Max number of pages elements to show in pagination component has to be odd (${maxNumberPagesToShow})`)
+            console.warn(`Max number of pages elements to show in pagination component has to be odd (${maxNumberPagesToShow})`);
             return;
         }
 
@@ -38,11 +38,11 @@ class PaginationComponent{
             elementCount = this.maxNumberPagesToShow;
             elementsStashed = true;
         }
-        const elementSize = 500 / elementCount-2;
+        // const elementSize = 500 / elementCount-2;
 
-        let container = $('<div />').attr({'class':'container'});
-        let arrowElement = $('<div />').addClass(this.pageElementClass);
-        let pageElement = $('<div />')
+        let container = $(`<div />`).attr({'class':`container`});
+        let arrowElement = $(`<div />`).addClass(this.pageElementClass);
+        let pageElement = $(`<div />`)
             .addClass(`${this.pageElementClass} ${this.pageElementWithClickHandlerClass}`);
 
         // append left arrow
@@ -50,9 +50,9 @@ class PaginationComponent{
             arrowElement.clone()
                 .addClass(this.arrowLeftClass)
                 .append(
-                    $('<div />').text(this.arrowLeft)
+                    $(`<div />`).text(this.arrowLeft)
                 )
-            );
+        );
 
         let startPage = 0;
         let endPage = elementCount;
@@ -69,23 +69,23 @@ class PaginationComponent{
         if(startPage > 0){
             container.append(
                 arrowElement.clone()
-                    .append($('<div />').text('...'))
+                    .append($(`<div />`).text(`...`))
             );
         }
         for(let i=startPage; i<endPage; i++) {
             if(i === this.now-1) {
                 container.append(
                     pageElement.clone()
-                    .attr({'data-page':i})
-                    .addClass(`chosen`)
-                    .append($('<div />').text(i+1))
+                        .attr({'data-page':i})
+                        .addClass(`chosen`)
+                        .append($(`<div />`).text(i+1))
                 );
             } else {
                 container.append(
                     pageElement.clone()
-                    .attr({'data-page':i})
-                    .addClass(`${this.pageElementClass}`)
-                    .append($('<div />').text(i+1))
+                        .attr({'data-page':i})
+                        .addClass(`${this.pageElementClass}`)
+                        .append($(`<div />`).text(i+1))
                 );
             }
         }
@@ -93,7 +93,7 @@ class PaginationComponent{
         if(endPage < totalPageCount) {
             container.append(
                 arrowElement.clone()
-                    .append($('<div />').text('...'))
+                    .append($(`<div />`).text(`...`))
             );
         }
 
@@ -102,9 +102,9 @@ class PaginationComponent{
             arrowElement.clone()
                 .addClass(this.arrowRightClass)
                 .append(
-                    $('<div />').text(this.arrowRight)
+                    $(`<div />`).text(this.arrowRight)
                 )
-            );
+        );
 
         htmlId.append(container);
 
@@ -116,14 +116,14 @@ class PaginationComponent{
         const pagesDivs = $(`${this.htmlId} .${this.pageElementWithClickHandlerClass}`);
         const arrowLeftDiv = $(`${this.htmlId} .${this.arrowLeftClass}`);
         const arrowRightDiv = $(`${this.htmlId} .${this.arrowRightClass}`);
-        arrowLeftDiv[0].addEventListener('click', () => {
+        arrowLeftDiv[0].addEventListener(`click`, () => {
             if(this.now !== 1) {
                 this.now = this.now-1;
                 this.draw();
                 this.fun(this.now);
             }
         });
-        arrowRightDiv[0].addEventListener('click', (e) => {
+        arrowRightDiv[0].addEventListener(`click`, () => {
             if(this.now < this.totalPageCount()) {
                 this.now = this.now+1;
                 this.draw();
@@ -131,8 +131,8 @@ class PaginationComponent{
             }
         });
         for(let i=0; i<pagesDivs.length; i++) {
-            pagesDivs[i].addEventListener('click', function(e) {
-                let newPage = parseInt(this.getAttribute('data-page'))+1;
+            pagesDivs[i].addEventListener(`click`, function() {
+                let newPage = parseInt(this.getAttribute(`data-page`))+1;
                 self.now = newPage;
                 self.draw();
                 self.fun(self.now);

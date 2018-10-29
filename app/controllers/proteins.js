@@ -1,13 +1,13 @@
-const extractUserGoogleId = require('../helper.js').retrieveUserGoogleId;
+const extractUserGoogleId = require(`../helper.js`).retrieveUserGoogleId;
 
 module.exports = function(context) {
 
     // Imports
-    const proteinsDao = context.component('daos').module('proteins');
-    const proteinReadsDao = context.component('daos').module('proteinReads');
-    const proteinXproteinsDao = context.component('daos').module('proteinXproteins');
-    const temperatureReadsDao = context.component('daos').module('temperatureReads');
-    const experimentsDao = context.component('daos').module('experiments');
+    const proteinsDao = context.component(`daos`).module(`proteins`);
+    const proteinReadsDao = context.component(`daos`).module(`proteinReads`);
+    const proteinXproteinsDao = context.component(`daos`).module(`proteinXproteins`);
+    const temperatureReadsDao = context.component(`daos`).module(`temperatureReads`);
+    const experimentsDao = context.component(`daos`).module(`experiments`);
 
     return {
         getProteinByUniProtId: function(request, response) {
@@ -33,17 +33,17 @@ module.exports = function(context) {
             temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray, extractUserGoogleId(request))
                 .then(r => response.status(200).send(r))
                 .catch(err => {
-                    console.error('getProteinsFromExp', err);
+                    console.error(`getProteinsFromExp`, err);
                     response.send([]);
-                })
+                });
         },
 
         getSpecProt: function(request, response) {
             Promise.all([
-                    temperatureReadsDao.getSingleProteinXExperiment(request.params.name, request.params.expid, extractUserGoogleId(request)),
-                    proteinReadsDao.findProteinExperiment(request.params.name, request.params.expid, extractUserGoogleId(request)),
-                    experimentsDao.findExperiment(request.params.expid, extractUserGoogleId(request))
-                ])
+                temperatureReadsDao.getSingleProteinXExperiment(request.params.name, request.params.expid, extractUserGoogleId(request)),
+                proteinReadsDao.findProteinExperiment(request.params.name, request.params.expid, extractUserGoogleId(request)),
+                experimentsDao.findExperiment(request.params.expid, extractUserGoogleId(request))
+            ])
                 .then(([tempData, proteinData, experimentData]) => {
 
                     if(tempData.length > 0) {
@@ -63,12 +63,12 @@ module.exports = function(context) {
                             e_updatedAt: experimentData.updatedAt
                         });
                     } else {
-                        console.log('getSpecProt: no experimentXprotein data found', request.params.name, request.params.expid);
+                        console.log(`getSpecProt: no experimentXprotein data found`, request.params.name, request.params.expid);
                         response.status(200).send({});
                     }
                 })
                 .catch(err => {
-                    console.error('getSpecProt', err);
+                    console.error(`getSpecProt`, err);
                     response.send({});
                 });
         },
@@ -81,7 +81,7 @@ module.exports = function(context) {
                     result.forEach(r => {
                         setOfProteins.add(r.interactor1);
                         setOfProteins.add(r.interactor2);
-                    })
+                    });
                     setOfProteins = Array.from(setOfProteins);
 
                     return Promise.all([
@@ -113,7 +113,7 @@ module.exports = function(context) {
                 })
                 .then(result => response.status(200).send(result))
                 .catch(error => {
-                    console.error('getProteinInteractions', error);
+                    console.error(`getProteinInteractions`, error);
                     return response.status(500).send({});
                 });
         },
@@ -127,9 +127,9 @@ module.exports = function(context) {
             proteinsDao.findProteinExperimentCombinations(protExpArray, extractUserGoogleId(request))
                 .then(r => response.status(200).send(r))
                 .catch(err => {
-                    console.error('getProteinExperimentCombinations', err);
+                    console.error(`getProteinExperimentCombinations`, err);
                     response.send([]);
-                })
+                });
         },
 
         getProteinXProteinDistances: function(request, response) {
@@ -139,13 +139,13 @@ module.exports = function(context) {
             const start = new Date();
             proteinXproteinsDao.getProteinXProteinDistances(proteinList, experimentList, extractUserGoogleId(request))
                 .then(r => {
-                    console.log('DURATION getProteinXProteinDistances', (Date.now()-start)/1000);
+                    console.log(`DURATION getProteinXProteinDistances`, (Date.now()-start)/1000);
                     response.status(200).send(r);
                 })
                 .catch(err => {
-                    console.error('getProteinXProteinDistances', err);
+                    console.error(`getProteinXProteinDistances`, err);
                     response.send([]);
-                })
+                });
         }
-    }
-}
+    };
+};

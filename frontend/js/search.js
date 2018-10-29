@@ -23,21 +23,21 @@ const REGEX_CAN_MATCH_UNIPROTID = /(((?:[OPQ]|$)(?:[0-9]|$)(?:[A-Z0-9]{3}|$)[0-9
 const ITEM_PER_PAGE_COUNT = 25;
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
 const proteinsQuery = {
-    search: '',
+    search: ``,
     limit: ITEM_PER_PAGE_COUNT,
     offset: 0,
-    sortBy: 'id',
+    sortBy: `id`,
     order: 1
 };
 
 // search input field
-const searchInput = $('.search-header .search .field');
+const searchInput = $(`.search-header .search .field`);
 
-const grid = $('.grid').isotope({
+const grid = $(`.grid`).isotope({
     // main isotope options
-    itemSelector: '.grid-item',
+    itemSelector: `.grid-item`,
     // set layoutMode
-    layoutMode: 'packery',
+    layoutMode: `packery`,
     packery: {
         gutter: 10
     }
@@ -46,8 +46,8 @@ const grid = $('.grid').isotope({
 /**
  * redirect to the protein page of the clicked protein
  */
-grid.on('click', '.grid-item', function(){
-    const data = $(this).data('grid-item-contents');
+grid.on(`click`, `.grid-item`, function(){
+    const data = $(this).data(`grid-item-contents`);
     document.location.href = `/protein?protein=${data.obj.uniprotId}&experiment=${data.experiment.experiment}`;
 });
 
@@ -57,7 +57,7 @@ grid.on('click', '.grid-item', function(){
  * @param  {[type]} e [description]
  * @return {[type]}   [description]
  */
-searchInput.keydown(function(e) {
+searchInput.keydown(function() {
     HelperFunctions.delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
 });
 
@@ -73,41 +73,41 @@ const handleInput = (page, resetOffset) => {
     const inputValue = searchInput.val().trim();
 
     if(inputValue.length === 0) {
-        console.log('not searching for empty string, or listing all proteins...');
+        console.log(`not searching for empty string, or listing all proteins...`);
         return;
     }
 
     // IMPROVEMENT: at the moment, only the longest matching string, is searched for
     // HOWTO split input string by space, and match that -> this way multiples Proteins could be
     // searched for at the same time
-    let match = inputValue.match(REGEX_CAN_MATCH_UNIPROTID).filter(v => !!v || v != '');
+    let match = inputValue.match(REGEX_CAN_MATCH_UNIPROTID).filter(v => !!v || v != ``);
 
     if(match.length) {
-        let searchValue = '';
-        match.forEach(v => v && v.length > searchValue.length ? searchValue = v : '');
+        let searchValue = ``;
+        match.forEach(v => v && v.length > searchValue.length ? searchValue = v : ``);
         proteinsQuery.search = searchValue;
         TemperatureService.queryUniprotIdReceiveTemperatureReads(proteinsQuery)
             .then(response => {
-                console.log('response', response);
+                console.log(`response`, response);
                 drawProteinCurves(response.data);
                 drawPaginationComponent(page+1, response.total);
-            })
+            });
     } else {
-        console.log('requesting from external...');
+        console.log(`requesting from external...`);
         ExternalService.getUniprotIdsFromText(inputValue)
             .then(list => {
-                console.log('external service uniprotId list', list);
+                console.log(`external service uniprotId list`, list);
                 proteinsQuery.search = list;
                 return proteinsQuery;
             })
             .then(q => TemperatureService.queryUniprotIdReceiveTemperatureReads(q))
             .then(response => {
-                console.log('response', response);
+                console.log(`response`, response);
                 drawProteinCurves(response.data);
                 drawPaginationComponent(page+1, response.total);
             });
     }
-}
+};
 
 /**
  * draw protein curves
@@ -123,41 +123,41 @@ const drawProteinCurves = (data) => {
             proteinExperimentObject.push({
                 uniprotId: d.uniprotId,
                 experiments: [e]
-            })
-        })
+            });
+        });
     });
 
     const toAppend = (obj, exp) => {
         return [
-            $('<p />')
-                .addClass('grid-item-text')
+            $(`<p />`)
+                .addClass(`grid-item-text`)
                 .css({
-                    'position': 'absolute',
-                    'text-align': 'center',
-                    'width': '100%',
-                    'line-height': '35px',
-                    'font-size': '1.2rem',
-                    'transition-property': 'opacity',
-                    'transition-duration': '1s'
+                    'position': `absolute`,
+                    'text-align': `center`,
+                    'width': `100%`,
+                    'line-height': `35px`,
+                    'font-size': `1.2rem`,
+                    'transition-property': `opacity`,
+                    'transition-duration': `1s`
                 })
                 .text(obj.uniprotId),
-            $('<div />')
-                .addClass(['experimentNumber', 'grid-item-text'])
+            $(`<div />`)
+                .addClass([`experimentNumber`, `grid-item-text`])
                 .css({
-                    'transition-property': 'opacity',
-                    'transition-duration': '1s'
+                    'transition-property': `opacity`,
+                    'transition-duration': `1s`
                 })
-                .text('Experiment '+ exp.experiment)
+                .text(`Experiment `+ exp.experiment)
         ];
     };
 
-    HelperFunctions.drawItemForEveryExperiment('.grid', proteinExperimentObject, toAppend);
+    HelperFunctions.drawItemForEveryExperiment(`.grid`, proteinExperimentObject, toAppend);
 
-}
+};
 
 const drawPaginationComponent = (actualPage, totalPages) => {
     new PaginationComponent(
-        '#pagination-component',
+        `#pagination-component`,
         totalPages,
         proteinsQuery.limit,
         actualPage,
@@ -167,8 +167,8 @@ const drawPaginationComponent = (actualPage, totalPages) => {
         },
         5
     );
-}
+};
 
 (function(){
-    searchInput.trigger('focus');
+    searchInput.trigger(`focus`);
 })();

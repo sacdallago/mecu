@@ -1,8 +1,8 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = (context) => {
     // Imports
-    const complexesModel = context.component('models').module('complexes');
+    const complexesModel = context.component(`models`).module(`complexes`);
 
     return {
         getComplex: (id) => {
@@ -11,36 +11,36 @@ module.exports = (context) => {
                     id
                 }
             })
-            .then(([result, metadata]) => result || {});
+                .then(([result]) => result || {});
         },
 
         findComplex: ({limit, offset, sortBy, order, search}) => {
 
-            const name = search.name || '';
+            const name = search.name || ``;
             const proteinList = search.proteinList || [];
 
             const replacements = {
-                name: '%'+name+'%',
+                name: `%`+name+`%`,
                 limit: limit,
                 offset: offset,
                 sortBy: sortBy
             };
 
-            let nameWhereQuery = '';
+            let nameWhereQuery = ``;
             if(search.name.length !== 0) {
-                nameWhereQuery = ' and name like :name ';
+                nameWhereQuery = ` and name like :name `;
             }
 
-            let proteinWhereQuery = '';
+            let proteinWhereQuery = ``;
             if(proteinList && proteinList.length > 0) {
-                proteinWhereQuery = '  where ';
+                proteinWhereQuery = `  where `;
                 proteinList.forEach((p,i) => {
                     proteinWhereQuery += ` "uniprotId" = :p${i} `;
-                    replacements['p'+i] = p;
+                    replacements[`p`+i] = p;
                     if(i !== proteinList.length - 1) {
-                        proteinWhereQuery += ' or ';
+                        proteinWhereQuery += ` or `;
                     }
-                })
+                });
             }
 
             const query = `
@@ -62,11 +62,11 @@ module.exports = (context) => {
             `;
 
             return context.dbConnection.query(
-                    query,
-                    {replacements: replacements},
-                    {type: sequelize.QueryTypes.SELECT}
-                )
-                .then(([result, metadata]) => result);
+                query,
+                {replacements: replacements},
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(([result]) => result);
         },
 
         getComplexWhichHasProtein: (uniprotId) => {
@@ -76,11 +76,11 @@ module.exports = (context) => {
                 where c.id = cp."complexId" and p."uniprotId" = cp."uniprotId" and p."uniprotId" = :uniprotId;
             `;
             return context.dbConnection.query(
-                    query,
-                    {replacements: {uniprotId: uniprotId}},
-                    {type: sequelize.QueryTypes.SELECT}
-                )
-                .then(([result, metadata]) => result);
+                query,
+                {replacements: {uniprotId: uniprotId}},
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(([result]) => result);
         },
 
         getAverageComplexDistancePerExperiment: (complexId, requester) => {
@@ -93,19 +93,19 @@ module.exports = (context) => {
             order by ac.avg;
             `;
             return context.dbConnection.query(
-                    query,
-                    {
-                        replacements: {
-                            complexId: complexId,
-                            uploader: requester
-                        }
-                    },
-                    {
-                        type: sequelize.QueryTypes.SELECT,
-                        plain: true
+                query,
+                {
+                    replacements: {
+                        complexId: complexId,
+                        uploader: requester
                     }
-                )
-                .then(([result, metadata]) => result);
+                },
+                {
+                    type: sequelize.QueryTypes.SELECT,
+                    plain: true
+                }
+            )
+                .then(([result]) => result);
         }
     };
 };
