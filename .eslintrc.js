@@ -32,20 +32,20 @@ module.exports = {
             }
         ],
         "globals": [
-            "HelperFunctions",
-            "ModalService",
-            "highChartsCurvesConfigObject",
-            "highChartsHeatMapConfigObj",
-            "TemperatureService",
-            "ExperimentService",
-            "ProteinService",
-            "ComplexService",
-            "ExternalService",
-
+            "$"
+            // "HelperFunctions",
+            // "ModalService",
+            // "highChartsCurvesConfigObject",
+            // "highChartsHeatMapConfigObj",
+            // "TemperatureService",
+            // "ExperimentService",
+            // "ProteinService:false",
+            // "ComplexService",
+            // "ExternalService"
         ],
-        "globals": {
-            "HelperFunctions": false
-        },
+        // "globals": {
+        //     "HelperFunctions": false
+        // },
         "no-undef": [
             "warn"
         ]

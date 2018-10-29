@@ -56,11 +56,6 @@ function loadProteins() {
         return;
     }
 
-    // move into own (utils?) file
-    let createIdOfProt = (protein) => {
-        return (protein.uniprotId + protein.experiments.map(e => e.experiment).join(`E`)).replace(/\s|\//g, `_`);
-    };
-
     TemperatureService.temperatureReadsToProteinsAndExperimentPairs(StorageManager.splitUpProteins(proteins))
         .then(proteins => {
 
@@ -266,7 +261,7 @@ $(`.ui.button.supremum`).on(`click`, function(event){
     globalGraph.changeDistanceMetric(Disi.supremum);
 }).popup({position: `bottom left`});
 $(`.ui.dropdown.button.minkowski`).dropdown({
-    action: function(e) {
+    action: function() {
         const rank = $(`#rank`).val();
         if(rank) {
             console.log(`setting minkowski rank: `, $(`#rank`).val());
