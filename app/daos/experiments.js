@@ -35,6 +35,13 @@ module.exports = function(context) {
             })
                 .then(result => result.length > 0 ? result[0].dataValues : {});
         },
+        findExperimentWithoutCheck: function(id) {
+            return experimentsModel.findAll({
+                attributes: [`id`, `name`, `metaData`, `uploader`, `private`, `createdAt`, `updatedAt`],
+                where: {id: id}
+            })
+                .then(result => result.length > 0 ? result[0].dataValues : {});
+        },
 
         update: function(id, update) {
             return experimentsModel.update(
