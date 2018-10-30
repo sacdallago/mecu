@@ -1,3 +1,9 @@
+const lAExperimentNumber = new LoadingAnimation(`.experiment-number-loading-animation`, {size: 20});
+const lAProteinCurve = new LoadingAnimation(`#protein-curve`);
+const lAExperimentCurves = new LoadingAnimation(`#experiments-container .grid`, {size: 50});
+const lARelComplexesCurves = new LoadingAnimation(`#related-complexes-container .grid`, {size: 50});
+const lARelProteinsCurves = new LoadingAnimation(`#related-proteins-container .grid`, {size: 50});
+
 let showModal = !(StorageManager.getProteins().length === 0);
 const modalIdentifier = `#add-protein-modal`;
 ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
@@ -132,7 +138,10 @@ const drawProteinCurve = ({uniprotId, experiment, reads}) => {
             padding: 5
         };
         highChartsCurvesConfigObject[`legend`] = {enabled: false};
+        lAProteinCurve.stop();
+
         Highcharts.chart(`protein-curve`, highChartsCurvesConfigObject);
+
         resolve(true);
     });
 };
@@ -189,6 +198,14 @@ const drawOtherExperimentsSelect = (experiments, uniprotId, actualExperiment) =>
         });
         menuContainer.append(otherExperiments);
 
+        lAExperimentNumber.stop();
+
+        $(dropDownSelector).dropdown({
+            match: `both`,
+            fullTextSearch: true,
+            glyphWidth: 3.0
+        });
+
         resolve(true);
     });
 };
@@ -243,6 +260,8 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
             ];
         };
 
+        lAExperimentCurves.stop();
+
         HelperFunctions.drawItemForEveryExperiment(expWithProteinGridIdentifier, proteinExperimentObject, toAppend);
 
         resolve(true);
@@ -252,6 +271,14 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
 
 const drawRelatedComplexes = (complexes) => {
     return new Promise((resolve) => {
+
+        if(complexes.length === 0) {
+            lARelComplexesCurves.stop();
+            document.querySelector(complexesWithProteinGridIdentifier).textContent = `No complexes containing this protein found.`;
+            resolve(true);
+            return;
+        }
+
         // split up protein/experiments pairs into protein/experiment(single) pairs
         const proteinExperimentObject = [];
         let index = 0;
@@ -318,7 +345,13 @@ const drawRelatedComplexes = (complexes) => {
 
 const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperiment, experimentId) => {
     return new Promise((resolve) => {
-        interactionsGrid.empty();
+
+        if(proteinInteractions.length === 0) {
+            lARelProteinsCurves.stop();
+            document.querySelector(interactionsGridIdentifier).textContent = `No protein interactions for this protein in the database.`;
+            resolve(true);
+            return;
+        }
 
         // split up protein/experiments pairs into protein/experiment(single) pairs
         const proteinExperimentObject = [];
@@ -482,6 +515,12 @@ $(document).ready(() => {
                 return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, query.experiment);
             });
 
+        lAExperimentNumber.start();
+        lAProteinCurve.start();
+        lAExperimentCurves.start();
+        lARelComplexesCurves.start();
+        lARelProteinsCurves.start();
+
         proteinCurveAndMetaData
             .then(() => console.log(`proteinCurveAndMetaData`))
             .then(() => otherExperimentsAndSelect)
@@ -491,11 +530,6 @@ $(document).ready(() => {
             .then(() => ppi)
             .then(() => console.log(`ppi`))
             .then(() => {
-                $(dropDownSelector).dropdown({
-                    match: `both`,
-                    fullTextSearch: true,
-                    glyphWidth: 3.0
-                });
                 console.log(`done`);
             })
             .catch(error => {

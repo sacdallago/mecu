@@ -5,11 +5,13 @@ block postStyles
 
 block content
     .modal#add-protein-modal
+
     .protein-header
         .protein
         .experiment
             .experiment-number#experiment-number
                 .dropdown.dropdown-search
+                    .experiment-number-loading-animation
                     input(type='hidden' name='experiments' value='default').text-input
                     .text
                         .value Select
@@ -104,5 +106,6 @@ block scripts
     script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
     script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
     script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
     script(type="text/javascript", src="/public/js/modal.js")
     script(type="text/javascript", src="/public/js/protein.js")

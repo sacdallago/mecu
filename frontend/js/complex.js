@@ -1,8 +1,14 @@
+const lAExperimentNumber = new LoadingAnimation(`.experiment-number-loading-animation`);
+const lAComplexCurve = new LoadingAnimation(`#curvesGraph`);
+const lAMetaData = new LoadingAnimation(`.column-right-loading-animation`);
+const lAComplexCurves = new LoadingAnimation(`#curves-grid .grid`, {size: 50});
+
+
 let showModal = !(StorageManager.getProteins().length === 0);
 const dropDownSelector = `#experiment-number .dropdown`;
 
 const modalIdentifier = `#add-protein-modal`;
-const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
 const selectAllButtonSelector = `#select-all-button`;
 
 // grid proteins from the complex
@@ -49,10 +55,13 @@ proteinCurvesGrid.on(`click`, gridItemIdentifier, function(){
 
 });
 
-const drawComplexMetadata = (complex, avgDistances) => {
+const drawComplexMetadata = (complex) => {
     return new Promise((resolve) => {
 
+        lAMetaData.stop();
+
         const dataContainer = $(`.column-right`);
+        dataContainer.empty();
 
         const itemContainer = $(`<div />`).addClass(`item-container`);
         const text = $(`<div />`).addClass(`text`);
@@ -233,6 +242,8 @@ const drawOtherExperimentsSelect = (experiments, complexId, actualExperiment) =>
         });
         menuContainer.append(otherExperiments);
 
+        lAExperimentNumber.stop();
+
         resolve(true);
     });
 };
@@ -263,6 +274,9 @@ const drawCombinedProteinCurves = (proteins) => {
             distance: 30,
             padding: 5
         };
+
+        lAComplexCurve.stop();
+
         Highcharts.chart(`curvesGraph`, highChartsCurvesConfigObject);
 
         resolve(true);
@@ -335,6 +349,8 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
 
             return ret;
         };
+
+        lAComplexCurves.stop();
 
         HelperFunctions.drawItemsAllExperimentsInOneItem(proteinCurvesGridIdentifier, proteinsToDraw, toAppend);
 
@@ -423,6 +439,11 @@ $(document).ready(() => {
         const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(query.id);
         const averageDistanceToOtherExperimentsComplex = ComplexService.getAverageDistancesToOtherExperiments(query.id);
 
+        lAExperimentNumber.start();
+        lAComplexCurve.start();
+        lAMetaData.start();
+        lAComplexCurves.start();
+
         experimentsWhichHaveComplex
             .then(exps => {
                 console.log(`experiments which have complex`, exps);
@@ -440,9 +461,9 @@ $(document).ready(() => {
                 return [complex, avgDist];
             })
             .then(([complex, avgDist]) => {
-                drawComplexMetadata(complex, avgDist, query.experiment);
+                drawComplexMetadata(complex);
                 return Promise.all([
-                    averageDistanceToOtherExperimentsComplex,
+                    avgDist,
                     complex
                 ]);
             })

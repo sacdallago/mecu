@@ -1,3 +1,17 @@
+const lAExperimentsList = new LoadingAnimation(`#experiments-list-container`, {
+    size: 20,
+    subElementCreateFunction: () => {
+        const highestElement = document.createElement(`tr`);
+        const lowestElement = document.createElement(`td`);
+        lowestElement.setAttribute(`colspan`, `1`);
+        lowestElement.style.display = `flex`;
+        lowestElement.style[`justify-content`] = `center`;
+        lowestElement.style[`align-items`] = `center`;
+        highestElement.appendChild(lowestElement);
+        return [highestElement, lowestElement];
+    }
+});
+
 const ITEM_PER_PAGE_COUNT = 10;
 let experimentsQuery = {
     search: undefined,
@@ -8,10 +22,13 @@ let experimentsQuery = {
 };
 
 const pullPaginatedExperiments = (query) => {
+    emptyTable();
+    lAExperimentsList.start();
     return ExperimentService.paginatedExperiments(query)
         .then(result => {
             // draw the data retrieved onto the experiments table
             console.log(`result`, result);
+            lAExperimentsList.stop();
             drawExperimentsTable(result.data);
 
             return result;
@@ -31,17 +48,24 @@ const drawPaginationComponent = (actualPage, totalPages) => {
     );
 };
 
+const emptyTable = () => {
+    const t = document.querySelector(`#experiments-list-container`);
+    while(t.firstChild) {
+        t.removeChild(t.firstChild);
+    }
+};
+
 /**
  * draw the experiments data table from the retrieved data
  * @param  [{id: number, description: string, lysate: boolean, uploader:string}] data               [description]
  * @param  string checkboxIdentifier how should the checkboxes be identified
  */
 const drawExperimentsTable = (data) => {
+    emptyTable();
     let table = $(`#experiments-list-container`);
     let tr = $(`<tr />`).addClass(`table-row`);
     let td = $(`<td />`);
     let link = $(`<a />`, {'target':`_blank`});
-    table.empty();
     data.forEach(exp => {
         let row = tr.clone();
 

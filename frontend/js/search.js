@@ -19,6 +19,8 @@ Regex =
 |((?:[A-NR-Z]+|$)(?:[A-Z0-9]{1,2}|$))
 )
  */
+const loadingAnimation = new LoadingAnimation(`.grid-container`);
+
 const REGEX_CAN_MATCH_UNIPROTID = /(((?:[OPQ]|$)(?:[0-9]|$)(?:[A-Z0-9]{3}|$)[0-9])|((?:[OPQ]|$)(?:[0-9]|$)(?:[A-Z0-9]{1,3}|$))|((?:[OPQ]+|$)(?:[0-9]|$)))|(((?:[A-NR-Z]|$)(?:[0-9]|$)(?:([A-Z][A-Z0-9]{1,2}[0-9])|$)(?:([A-Z][A-Z0-9]{0,2}[0-9]?)|$))|((?:[A-NR-Z]|$)(?:[0-9]|$)(?:(([A-Z][A-Z0-9]{1,2}[0-9]?))|$))|((?:[A-NR-Z]+|$)(?:[A-Z0-9]{1,2}|$)))/g;
 const ITEM_PER_PAGE_COUNT = 25;
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
@@ -33,7 +35,7 @@ const proteinsQuery = {
 // search input field
 const searchInput = $(`.search-header .search .field`);
 
-const grid = $(`.grid`).isotope({
+const grid = $(`.grid-container`).isotope({
     // main isotope options
     itemSelector: `.grid-item`,
     // set layoutMode
@@ -76,6 +78,8 @@ const handleInput = (page, resetOffset) => {
         console.log(`not searching for empty string, or listing all proteins...`);
         return;
     }
+
+    loadingAnimation.start();
 
     // IMPROVEMENT: at the moment, only the longest matching string, is searched for
     // HOWTO split input string by space, and match that -> this way multiples Proteins could be
@@ -151,7 +155,7 @@ const drawProteinCurves = (data) => {
         ];
     };
 
-    HelperFunctions.drawItemForEveryExperiment(`.grid`, proteinExperimentObject, toAppend);
+    HelperFunctions.drawItemForEveryExperiment(`.grid-container`, proteinExperimentObject, toAppend);
 
 };
 

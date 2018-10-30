@@ -180,3 +180,7 @@
     width: 50px;
     background: linear-gradient(to right, white, rgba(52,152,219,1));
 }
+
+.grid-container {
+    min-height: 70px;
+}
