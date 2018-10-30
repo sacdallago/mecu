@@ -5,33 +5,44 @@ block postStyles
     link(rel='stylesheet', href='/public/css/pagination.css')
 
 block content
-    h3
-        span Experiment: 
-        span#experiment-id
-    .experiment-container.data-container#experiment-container
-        .name
-            .text Name
-            .value 
-        .uploader
-            .text Uploader
-            .value 
-        .is-private
-            .text Is private
-            .value 
+    h3.header
+        span Experiment 
+        span#experiment-id 
             
-    .meta-data.data-container#meta-data
-        .description
-            .text Description
-            .value
+    form.ui.form#experiment-form
+        .field.experiment-name
+            label Name
+            input(type="text" name="experiment-name" placeholder="Name of the experiment")#experiment-name
+        .field.nine.wide.uploader
+            label Uploader
+            a#uploader
+        .inline.field.is-private
+            .ui.checkbox
+                input(type="checkbox" tabindex="0" class="hidden" name="cb-private")#cb-private
+                label Private
+            
+        .field.description
+            label Description
+            textarea(rows="5" name="description")#description
         .lysate
-            .text Lysate
-            .value 
+            .ui.slider.checkbox
+                input(type="checkbox" tabindex="0" class="hidden" name="cb-lysate")#cb-lysate
+                label Lysate
+        
+        .space
+        input(type="submit" value="Submit").ui.button#submit-button
+        
+        .ui.success.message
+            .header Success
+            p Updating experiment was successful!
+        .ui.error.message
+            .header Error
+            p An error occured while updating the experiment. Try again or contact the administrator if it happens again.
     
-    .save-experiment-button-container.data-container#save-experiment-button-container
-    
-    .experiment-statistics.data-container#experiment-statistics
-    
-    .error-container.data-container#error-container
+    form.ui.form#not-allowed-form(style="dispaly:none")
+        .ui.error.message
+            .header Error
+            p You are not allowed to view this experiment.
 
 block settings
     .divider

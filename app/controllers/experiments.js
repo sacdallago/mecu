@@ -218,15 +218,17 @@ module.exports = function(context) {
         },
 
         getExperiment: function(request, response) {
-            console.log(`request.params`, request.params);
-            experimentsDao.findExperiment(request.params.id, extractUserGoogleId(request))
+
+            const requester = extractUserGoogleId(request);
+
+            experimentsDao.findExperimentWithoutCheck(request.params.id)
                 .then(toSend => {
-                    if(toSend.private === true && toSend.uploader !== extractUserGoogleId(request)){
-                        console.error(`not the owner of the experiment`);
+                    if(toSend.private === true && toSend.uploader !== requester){
+                        console.error(`${requester} not the owner of the experiment ${request.params.id}`);
                         toSend = {error: `You are not the owner of the experiment and the experiment is not open to be viewed by others`};
                     }
 
-                    if(toSend.uploader === extractUserGoogleId(request)){
+                    if(toSend.uploader === requester){
                         toSend.isUploader = true;
                     }
 
@@ -246,8 +248,10 @@ module.exports = function(context) {
                 let experimentToUpdate = request.body;
                 delete experimentToUpdate.id;
                 experimentsDao.update(request.params.id, experimentToUpdate)
-                    .then(result => result[1].length > 0 ? result[1][0]: {})
-                    .then(toSend => response.status(200).send(toSend))
+                    .then(result => result[1][0])
+                    .then(({id, name, metaData, description}) => {
+                        response.status(200).send({id, name, metaData, description});
+                    })
                     .catch(error => {
                         console.error(`updateExperiment`, error);
                         return response.status(500).send(error);
