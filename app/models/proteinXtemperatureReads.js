@@ -1,21 +1,21 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
-    return context.dbConnection.define('protein_temperatureRead', {
+    return context.dbConnection.define(`protein_temperatureRead`, {
         uniprotId: {
             type: sequelize.STRING,
             primaryKey: true,
             references: {
-                model: 'proteins',
-                key: 'uniprotId'
+                model: `proteins`,
+                key: `uniprotId`
             }
         },
         temperatureReadId: {
             type: sequelize.INTEGER,
             primaryKey: true,
             references: {
-                model: 'temperatureReads',
-                key: 'id'
+                model: `temperatureReads`,
+                key: `id`
             }
         }
     });

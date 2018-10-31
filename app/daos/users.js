@@ -1,13 +1,8 @@
-/**
- * users DAO
- *
- * Created by Christian Dallago on 20160626 .
- */
 
 module.exports = function(context) {
 
     // Imports
-    const usersModel = context.component('models').module('users');
+    const usersModel = context.component(`models`).module(`users`);
 
     return {
         findOrCreate: function(document) {

@@ -1,18 +1,7 @@
-const experimentContainerIdentifier = '#experiment-container';
-const metaDataContaierIdentifier = '#meta-data';
-const saveExperimentButtonContainerIdentifier = '#save-experiment-button-container';
-const experimentsStatisticsContainerIdentifier = '#experiment-statistics';
-const errorContainerIdentifier = '#error-container';
 
-const drawError = (error) => {
-    $(experimentContainerIdentifier).css({'display':'none'});
-    $(metaDataContaierIdentifier).css({'display':'none'});
-    $(errorContainerIdentifier).append($('<div />').text(error));
-    $(saveExperimentButtonContainerIdentifier).removeClass('data-container');
-    $(experimentsStatisticsContainerIdentifier).removeClass('data-container');
-};
 
 const drawExperiment = (experiment) => {
+    document.querySelector(`#experiment-form`).classList.remove(`loading`);
     if(experiment.isUploader === true) {
         drawExperimentMutable(experiment);
     } else {
@@ -21,88 +10,108 @@ const drawExperiment = (experiment) => {
 };
 
 const drawExperimentConstant = (experiment) => {
-    $(experimentContainerIdentifier+' .name .value').text(experiment.name);
-    $(experimentContainerIdentifier+' .uploader .value').append(
-        $('<a />')
-            .attr({'target':'_blank','href':'https://plus.google.com/'+experiment.uploader})
-            .text(experiment.uploader)
-    );
-    $(experimentContainerIdentifier+' .is-private').removeAttr('hidden');
-    $(experimentContainerIdentifier+' .is-private .value').text(experiment.private === true ? 'yes' : 'no');
+    const expName = document.querySelector(`#experiment-name`);
+    expName.setAttribute(`readonly`, ``);
+    expName.value = experiment.name;
+    const uploader = document.querySelector(`#uploader`);
+    uploader.setAttribute(`target`, `_blank`);
+    uploader.setAttribute(`href`, `https://plus.google.com/`+experiment.uploader);
+    uploader.text = experiment.uploader;
+    const cbPrivate = document.querySelector(`#cb-private`);
+    cbPrivate.checked = experiment.private === true;
+    cbPrivate.setAttribute(`disabled`, `disabled`);
+    const description = document.querySelector(`#description`);
+    description.setAttribute(`readonly`, ``);
+    description.value = experiment.metaData.description;
+    const cbLysate = document.querySelector(`#cb-lysate`);
+    cbPrivate.checked = experiment.private === true;
+    cbLysate.setAttribute(`disabled`, `disabled`);
 
-    // meta-data
-    $(metaDataContaierIdentifier+' .description .value').text(experiment.metaData.description);
-    $(metaDataContaierIdentifier+' .lysate .value').text(experiment.metaData.lysate === true ? 'yes' : 'no');
-
-    $(saveExperimentButtonContainerIdentifier).removeClass('data-container');
-    $(experimentsStatisticsContainerIdentifier).removeClass('data-container');
-    $(errorContainerIdentifier).removeClass('data-container');
-}
+    document.querySelector(`#submit-button`).style.display = `none`;
+};
 
 const drawExperimentMutable = (experiment) => {
-    $(experimentContainerIdentifier+' .name .value').append(
-        $('<input>').attr({id: 'name'}).val(experiment.name)
-    );
-    $(experimentContainerIdentifier+' .uploader .value').append(
-        $('<a />')
-            .attr({'target':'_blank','href':'https://plus.google.com/'+experiment.uploader})
-            .text(experiment.uploader)
-    );
-    const yesOption = $('<option>').text('yes');
-    const noOption = $('<option>').text('no');
-    experiment.private === true ? yesOption.attr({'selected':'selected'}) : noOption.attr({'selected':'selected'});
-    $(experimentContainerIdentifier+' .is-private .value').append(
-        $('<select>').attr({id:'private-select'}).append([yesOption.clone(),noOption.clone()])
-    );
+    const expName = document.querySelector(`#experiment-name`);
+    expName.value = experiment.name;
+    const uploader = document.querySelector(`#uploader`);
+    uploader.setAttribute(`target`, `_blank`);
+    uploader.setAttribute(`href`, `https://plus.google.com/`+experiment.uploader);
+    uploader.text = experiment.uploader;
+    const cbPrivate = document.querySelector(`#cb-private`);
+    cbPrivate.checked = experiment.private === true;
+    const description = document.querySelector(`#description`);
+    description.value = experiment.metaData.description;
+    const cbLysate = document.querySelector(`#cb-lysate`);
+    cbLysate.checked = experiment.metaData.lysate === true;
+};
 
-    // meta-data
-    $(metaDataContaierIdentifier+' .description .value').append($('<textarea>').attr({id:'description'}).val(experiment.metaData.description));
-    yesOption.removeAttr('selected');
-    noOption.removeAttr('selected');
-    experiment.metaData.lysate === 'yes' ? yesOption.attr({'selected':'selected'}) : noOption.attr({'selected':'selected'});
-    $(metaDataContaierIdentifier+' .lysate .value').append(
-        $('<select>').attr({id:'lysate-select'}).append([yesOption.clone(),noOption.clone()])
-    );
+const drawError = () => {
+    document.querySelector(`#experiment-form`).style.display = `none`;
+    document.querySelector(`#not-allowed-form`).style.display = `block`;
+    document.querySelector(`#not-allowed-form`).classList.add(`error`);
+};
 
-    drawSaveButton();
 
-    $(experimentsStatisticsContainerIdentifier).removeClass('data-container');
-    $(errorContainerIdentifier).removeClass('data-container');
-}
+$(`#experiment-form`).form({
+    fields: {
+        'experiment-name': `minLength[10]`
+    },
+    on: `change`,
+    revalidate: true,
+    inline: true,
+    onSuccess: function (event, fields) {
 
-const drawSaveButton = () => {
-    $(saveExperimentButtonContainerIdentifier).append(
-        $('<button>').attr({id:'save-button'}).text('Save')
-    );
-
-    $('#save-button').on('click', () => {
-        const id = $('#experiment-id').text();
+        const id = $(`#experiment-id`).text();
         const experimentNew = {
-            name: $('#name').val(),
-            private: $('#private-select').find(':selected').text(),
+            name: fields[`experiment-name`],
+            private: fields[`cb-private`] === `on`,
             metaData: {
-                lysate: $('#lysate-select').find(':selected').text() === 'yes' ? true : false,
-                description: $('#description').val()
+                lysate: fields[`cb-lysate`] === `on`,
+                description: fields[`description`]
             }
         };
 
         console.log(id, experimentNew);
+        document.querySelector(`#experiment-form`).classList.add(`loading`);
         ExperimentService.updateExperiment(id, experimentNew)
-            .then(updated => console.log('updated', updated))
-            .catch(e => console.error('error updating the experiment', e));
-    });
-}
+            .then(updated => {
+                if(updated.message) {
+                    console.error(`error updating the experiment:`, updated);
+                    document.querySelector(`#experiment-form`).classList.remove(`loading`, `success`);
+                    document.querySelector(`#experiment-form`).classList.add(`error`);
+                } else {
+                    console.log(`updated`, updated);
+                    // drawExperimentMutable(updated); // not necessary, only makes the page flicker
+                    document.querySelector(`#experiment-form`).classList.remove(`loading`, `error`);
+                    document.querySelector(`#experiment-form`).classList.add(`success`);
+                }
+            });
+        event.preventDefault();
+    },
+    onFailure: function (formErrors, fields) {
+        console.log(fields);
+        event.preventDefault();
+    },
+    onValid: function () {
+        document.querySelector(`#experiment-form`).classList.remove(`error`, `success`);
+        console.log(`removing success error`);
+    }
+});
+
+$(`.ui.checkbox`).checkbox();
 
 $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     if(query.id) {
 
-        $('#experiment-id').text(query.id);
+        $(`#experiment-id`).text(query.id);
+
+        document.querySelector(`#experiment-form`).classList.add(`loading`);
 
         ExperimentService.getExperiment(query.id)
             .then(experiment => {
-                console.log('data', experiment);
+                console.log(`data`, experiment);
                 if(experiment.error) {
                     drawError(experiment.error);
                 } else {

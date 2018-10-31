@@ -1,47 +1,61 @@
+const lAExperimentsList = new LoadingAnimation(`#experiments-list-container`, {
+    size: 20,
+    subElementCreateFunction: () => {
+        const highestElement = document.createElement(`tr`);
+        const lowestElement = document.createElement(`td`);
+        lowestElement.setAttribute(`colspan`, `1`);
+        lowestElement.style.display = `flex`;
+        lowestElement.style[`justify-content`] = `center`;
+        lowestElement.style[`align-items`] = `center`;
+        highestElement.appendChild(lowestElement);
+        return [highestElement, lowestElement];
+    }
+});
+const lAHeatmap = new LoadingAnimation(`#heatmap`);
+
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
-const modalIdentifier = '#add-protein-modal';
-const addProteinModal = ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
-const analyzeButtonIdentifier = '#analyze-button';
+const modalIdentifier = `#add-protein-modal`;
+ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+const analyzeButtonIdentifier = `#analyze-button`;
 const uniprotAccessionRegex = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
-const matchCount = $('.stats > span > strong');
+const matchCount = $(`.stats > span > strong`);
 const ITEM_PER_PAGE_COUNT = 10;
 
 let selectedExperiments = new Set();
 let selectedProteins = new Set();
-let localStorageDeleted = StorageManager.getProteins().length === 0;
 let experimentsQuery = {
     search: undefined,
     limit: ITEM_PER_PAGE_COUNT,
     offset: 0,
-    sortBy: 'id',
+    sortBy: `id`,
     order: 1
 };
 
-const pullPaginatedExperiments = (query, page) => {
+const pullPaginatedExperiments = (query) => {
     return ExperimentService.paginatedExperiments(query)
         .then(result => {
             // draw the data retrieved onto the experiments table
-            console.log('experiments data', result.data);
-            drawExperimentsTable(result.data, 'exp-table-cb');
+            console.log(`experiments data`, result.data);
+            drawExperimentsTable(result.data, `exp-table-cb`);
 
             // add event handlers to the checkboxes of the experiments table
-            addEventHandlerToExperimentsTable('exp-table-cb');
+            addEventHandlerToExperimentsTable(`exp-table-cb`);
             return result;
         });
-}
+};
 
 const drawPaginationComponent = (actualPage, totalPages) => {
     new PaginationComponent(
-        '#pagination-component',
+        `#pagination-component`,
         totalPages,
         experimentsQuery.limit,
         actualPage,
         (newPage) => {
             experimentsQuery.offset = (newPage-1)*ITEM_PER_PAGE_COUNT;
-            pullPaginatedExperiments(experimentsQuery, newPage)
+            pullPaginatedExperiments(experimentsQuery);
         }
     );
-}
+};
 
 /**
  * fetch melting curves accoring to the experiments and proteins given
@@ -51,10 +65,12 @@ const drawPaginationComponent = (actualPage, totalPages) => {
  */
 const fetchMeltingCurves = function(experiments, proteins){
 
+    lAHeatmap.start();
+
     // always empty table before new request
     if(experiments.length < 1 || proteins.length < 1){
-        $('#heatmap').empty();
-        $('#heatmap').text('Here you will see a which experiment has which protein.');
+        $(`#heatmap`).empty();
+        $(`#heatmap`).text(`Here you will see a which experiment has which protein.`);
         return;
     }
 
@@ -64,11 +80,11 @@ const fetchMeltingCurves = function(experiments, proteins){
     const arr = [];
     experiments.forEach(e =>
         proteins.forEach(p => arr.push({uniprotId: p, experiment: e}))
-    )
+    );
 
     ProteinService.getProteinExperimentCombinations(arr)
         .then(data => {
-            console.log('getProteinExperimentCombinations', data);
+            console.log(`getProteinExperimentCombinations`, data);
             return data;
         })
         .then(data => drawProteinXExperimentHeatmap(experiments, proteins, data));
@@ -80,49 +96,59 @@ const fetchMeltingCurves = function(experiments, proteins){
  * @param  string checkboxIdentifier how should the checkboxes be identified
  */
 const drawExperimentsTable = (data, checkboxIdentifier) => {
+
+    lAExperimentsList.stop();
+    if(data.length === 0) {
+        const noData = document.createElement(`td`);
+        noData.textContent = `No experiments found`;
+        document.querySelector(`#experiments-list-container`).appendChild(
+            document.createElement(`tr`).appendChild(noData)
+        );
+    }
+
     const selectedExperimentsArray = Array.from(selectedExperiments);
-    let table = $('#experiments-list-container');
-    let tr = $('<tr />');
-    let td = $('<td />');
-    let div = $('<div />', {'class': 'ui checkbox'});
-    let input = $('<input />', {'class':checkboxIdentifier, 'type':'checkbox', 'tabindex':'0'});
-    let label = $('<label />');
-    let link = $('<a />', {'target':'_blank'});
+    let table = $(`#experiments-list-container`);
+    let tr = $(`<tr />`);
+    let td = $(`<td />`);
+    let div = $(`<div />`, {'class': `ui checkbox`});
+    let input = $(`<input />`, {'class':checkboxIdentifier, 'type':`checkbox`, 'tabindex':`0`});
+    let label = $(`<label />`);
+    let link = $(`<a />`, {'target':`_blank`});
     table.empty();
     data.forEach(exp => {
         let row = tr.clone();
 
         // checkbox attributes
-        let cbAttriutes = {'id':'cbE'+exp.id, 'data-id':exp.id};
+        let cbAttriutes = {'id':`cbE`+exp.id, 'data-id':exp.id};
         if(selectedExperimentsArray.indexOf(exp.id) > -1) {
-            cbAttriutes.checked = 'true';
+            cbAttriutes.checked = `true`;
         }
 
         row.append(
             td.clone().append(
                 div.clone().append([
                     input.clone().attr(cbAttriutes),
-                    label.clone().attr({'for':'cbE'+exp.id})
+                    label.clone().attr({'for':`cbE`+exp.id})
                 ])
             )
         );
         row.append(td.clone().text(exp.id));
-        row.append(td.clone().addClass('name').text(exp.name));
-        row.append(td.clone().addClass('description').text(
+        row.append(td.clone().addClass(`name`).text(exp.name));
+        row.append(td.clone().addClass(`description`).text(
             exp.metaData.description && exp.metaData.description.length > 200 ?
-            exp.metaData.description.slice(0,200)+'...' :
-            exp.metaData.description));
+                exp.metaData.description.slice(0,200)+`...` :
+                exp.metaData.description));
         row.append(
-            td.clone().addClass('uploader').append(
+            td.clone().addClass(`uploader`).append(
                 link.clone()
-                    .attr({'href':'https://plus.google.com/'+exp.uploader})
-                    .text('Google Plus Profile')
-                )
+                    .attr({'href':`https://plus.google.com/`+exp.uploader})
+                    .text(`Google Plus Profile`)
+            )
         );
 
         table.append(row);
     });
-}
+};
 
 /**
  * when checking a checkbox in the experiments table, reload the experiments data
@@ -131,19 +157,19 @@ const drawExperimentsTable = (data, checkboxIdentifier) => {
 const addEventHandlerToExperimentsTable = (checkboxIdentifier) => {
     let list = document.getElementsByClassName(checkboxIdentifier);
     for(let i = 0; i<list.length; i++) {
-        list[i].addEventListener('click', function() {
+        list[i].addEventListener(`click`, function() {
             if (this.checked) {
-                let experimentId = $(this).data('id');
+                let experimentId = $(this).data(`id`);
                 selectedExperiments.add(experimentId);
                 fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
             } else {
-                let experimentId = $(this).data('id');
+                let experimentId = $(this).data(`id`);
                 selectedExperiments.delete(experimentId);
                 fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins));
             }
-        })
-    };
-}
+        });
+    }
+};
 
 /**
  * TODO draw proteinXexperiment heatmap
@@ -156,28 +182,28 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     // create table content
     let tableData = [];
     let totalRow = {
-        name: 'Total',
+        name: `Total`,
         values: new Array(experiments.length).fill(0),
         rating: new Array(experiments.length).fill(0)
     };
     proteins.forEach(p => tableData.push({name: p, values: new Array(experiments.length).fill(0)}));
 
-    data.forEach((d, i, a) => {
+    data.forEach(d => {
         let tableProt = tableData.find(td => td.name === d.uniprotId);
 
         d.experiments.forEach(e => {
             let idx = experiments.indexOf(e);
             StorageManager.has({uniprotId: d.uniprotId, experiment: e},
-                (c,h,n) => {
+                (c,h) => {
                     if(h == 1) {
                         tableProt.values[idx] = 2; // 2 means: in localStorage
                     } else {
                         tableProt.values[idx] = 1; // 1 means: not in localStorage
                     }
                 }
-            )
+            );
             totalRow.values[idx] += 1;
-        })
+        });
     });
 
     // -----------------HEATMAP-----------------------
@@ -186,11 +212,11 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     // configuring and drawing heatmap
     highChartsHeatMapConfigObj.title = {text: null};
     highChartsHeatMapConfigObj.xAxis = {
-        categories: experiments.map(e => ''+e),
+        categories: experiments.map(e => ``+e),
         title: {
-            align: 'high',
+            align: `high`,
             offset: 0,
-            text: 'Experiments',
+            text: `Experiments`,
             rotation: 0,
             y: 20,
             x: 0 // 20
@@ -199,18 +225,12 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     highChartsHeatMapConfigObj.yAxis = {
         categories: tableData.map(d => d.name).reverse(), // test [...Array(100).keys()]
         title: {
-            align: 'high',
+            align: `high`,
             offset: 0,
-            text: 'Proteins',
+            text: `Proteins`,
             rotation: 0,
             y: 0,
             x: -10
-        },
-        labels: {
-            style: {
-                fontSize: 8
-            },
-            y: -5
         },
         endOnTick: false,
         labels: {
@@ -218,9 +238,9 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
         }
     };
 
-    const cNotContained = $('.heatmap-container .legend .c1 .sample').css('background-color');
-    const cContained = $('.heatmap-container .legend .c2 .sample').css('background-color');
-    const cInStorage = $('.heatmap-container .legend .c3 .sample').css('background-color');
+    const cNotContained = $(`.heatmap-container .legend .c1 .sample`).css(`background-color`);
+    const cContained = $(`.heatmap-container .legend .c2 .sample`).css(`background-color`);
+    const cInStorage = $(`.heatmap-container .legend .c3 .sample`).css(`background-color`);
 
     // count contained, selected and total protein/experiment pairs, to decide, which color
     // scheme to use (has to do with how highcharts heatmap coloring works)
@@ -291,19 +311,19 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     highChartsHeatMapConfigObj.colorAxis = colorAxis;
 
     let seriesData = [];
-    tableData.forEach((d,i,a) => {
-        d.values.forEach((v,j,a2) => {
+    tableData.forEach((d,i) => {
+        d.values.forEach((v,j) => {
             if(seriesData[j]) {
                 seriesData[j].push([j, tableData.length-1-i, v]);
             } else {
                 seriesData[j] = [[j, tableData.length-1-i, v]];
             }
-        })
+        });
     });
     highChartsHeatMapConfigObj.series = seriesData.map((s,i,a) => ({
-        name: 'Series '+i,
+        name: `Series `+i,
         borderWidth: .4,
-        borderColor: '#000000',
+        borderColor: `#000000`,
         data: s
     }));
     highChartsHeatMapConfigObj.tooltip = {
@@ -324,7 +344,7 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
             events: {
                 click: function(e) {
                     let tmpList = [];
-                    tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : '');
+                    tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : ``);
 
                     ModalService.openModalAndDoAction(
                         () => {},
@@ -352,7 +372,7 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
             heatmap: {
                 states: {
                     hover: {
-                        color: '#000000'
+                        color: `#000000`
                     }
                 }
             }
@@ -367,23 +387,25 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
     const heatmapWidth = highChartsHeatMapConfigObj.chart.marginRight +
         highChartsHeatMapConfigObj.chart.marginLeft +
         experiments.length*colSize;
-    $('#heatmap').attr(
+    $(`#heatmap`).attr(
         {'style':`height:${heatmapHeight}px; width:${heatmapWidth}px`}
     );
 
-    Highcharts.chart('heatmap', highChartsHeatMapConfigObj);
-}
+    lAHeatmap.stop();
+
+    Highcharts.chart(`heatmap`, highChartsHeatMapConfigObj);
+};
 
 const enableShowButton = () => {
-    $(analyzeButtonIdentifier).removeClass('disabled').addClass('green');
-}
+    $(analyzeButtonIdentifier).removeClass(`disabled`).addClass(`green`);
+};
 
 const populateProteinSearch = () => {
-    const text = Array.from(selectedProteins).reduce((acc,c) => acc+=(c+' '), '');
-    $('textarea.protein-list').val(text);
-}
+    const text = Array.from(selectedProteins).reduce((acc,c) => acc+=(c+` `), ``);
+    $(`textarea.protein-list`).val(text);
+};
 
-$('textarea.inline.prompt.maxWidth.textarea')
+$(`textarea.inline.prompt.maxWidth.textarea`)
     .keyup(function(){
         let matches = $(this).val().match(uniprotAccessionRegex);
 
@@ -410,6 +432,8 @@ $(document)
             if(storageData.length > 0) {
                 enableShowButton();
             }
+
+            lAExperimentsList.start();
         })
         .then(() => populateProteinSearch())
         .then(() => pullPaginatedExperiments(experimentsQuery))

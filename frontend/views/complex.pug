@@ -8,6 +8,7 @@ block content
 
     .experiment-number#experiment-number
         .dropdown.dropdown-search
+            .experiment-number-loading-animation
             input(type='hidden' name='experiments' value='default').text-input
             .text
                 .value Select
@@ -17,11 +18,9 @@ block content
         
     .column-left
         #curvesGraph
-            .default-text
-                .text No experiment selected for this complex.
-                    br
-                    | To view complex data from a specific experiment, select a experiment on the top right.
+            
     .column-right
+        .column-right-loading-animation
     
     .curves-grid#curves-grid
         h3.title Contained Proteins
@@ -44,6 +43,7 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
     script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
     script(type="text/javascript", src="/public/js/helper.js")
     script(type="text/javascript", src="/public/js/modal.js")
     script(type="text/javascript", src="/public/js/complex.js")

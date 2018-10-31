@@ -1,8 +1,7 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
     // Imports
-    const proteinXproteinModel = context.component('models').module('proteinXprotein');
 
     return {
         getProteinInteraction: function(uniprotId) {
@@ -13,16 +12,16 @@ module.exports = function(context) {
                     select interactor2 as interactor1, interactor1 as interactor2, correlation, experiments, species from protein_proteins where interactor2 = :interactor2
                     order by correlation desc;`;
             return context.dbConnection.query(
-                    query,
-                    {
-                        replacements: {
-                            interactor1: uniprotId,
-                            interactor2: uniprotId
-                        }
-                    },
-                    {type: sequelize.QueryTypes.SELECT}
-                )
-            .then(([result, metadata]) => result);
+                query,
+                {
+                    replacements: {
+                        interactor1: uniprotId,
+                        interactor2: uniprotId
+                    }
+                },
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(([result]) => result);
         },
 
         getProteinXProteinDistances: function(proteinList, experimentList, requester) {
@@ -33,25 +32,25 @@ module.exports = function(context) {
                 uploader: requester
             };
 
-            let proteinWhereClause =  ' ( ';
+            let proteinWhereClause =  ` ( `;
             proteinList.forEach((p,i) => {
                 proteinWhereClause += `"uniprotId" = :protein${i} `;
-                replacements['protein'+i] = p;
+                replacements[`protein`+i] = p;
                 if(i !== proteinList.length - 1) {
-                    proteinWhereClause += ' or ';
+                    proteinWhereClause += ` or `;
                 }
             });
-            proteinWhereClause += ' ) ';
+            proteinWhereClause += ` ) `;
 
-            let experimentWhereClause = ' ( ';
+            let experimentWhereClause = ` ( `;
             experimentList.forEach((e,i) => {
                 experimentWhereClause += ` experiment = :exp${i}`;
-                replacements['exp'+i] = e;
+                replacements[`exp`+i] = e;
                 if(i !== experimentList.length - 1) {
-                    experimentWhereClause += ' or ';
+                    experimentWhereClause += ` or `;
                 }
             });
-            experimentWhereClause += ' ) ';
+            experimentWhereClause += ` ) `;
 
             const query = `
             select t.*, pp.correlation as correlation
@@ -92,13 +91,13 @@ module.exports = function(context) {
             ;`;
 
             return context.dbConnection.query(
-                    query,
-                    {
-                        replacements: replacements
-                    },
-                    {type: sequelize.QueryTypes.SELECT}
-                )
-            .then(([result, metadata]) => result);
+                query,
+                {
+                    replacements: replacements
+                },
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(([result]) => result);
         }
     };
 };

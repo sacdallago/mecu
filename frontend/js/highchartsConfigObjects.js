@@ -1,15 +1,15 @@
 highChartsCurvesConfigObject = {
     chart: {
-        backgroundColor: '#fbfbfb'
+        backgroundColor: `#fbfbfb`
     },
 
     title: {
-        text: ''
+        text: ``
     },
 
     xAxis: {
         title: {
-            text: ''
+            text: ``
         },
         startOnTick: true,
         tickInterval: 1,
@@ -18,13 +18,13 @@ highChartsCurvesConfigObject = {
     },
     yAxis: {
         title: {
-            text: ''
+            text: ``
         }
     },
     legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle'
+        layout: `vertical`,
+        align: `right`,
+        verticalAlign: `middle`
     },
 
     plotOptions: {
@@ -45,9 +45,9 @@ highChartsCurvesConfigObject = {
             },
             chartOptions: {
                 legend: {
-                    layout: 'horizontal',
-                    align: 'center',
-                    verticalAlign: 'bottom'
+                    layout: `horizontal`,
+                    align: `center`,
+                    verticalAlign: `bottom`
                 }
             }
         }]
@@ -69,13 +69,13 @@ highChartsHeatMapConfigObj = {
 
     chart: {
         title: undefined,
-        type: 'heatmap',
+        type: `heatmap`,
         marginTop: 40,
         marginBottom: 40,
         marginRight: 20,
         marginLeft: 60,
         plotBorderWidth: 1,
-        backgroundColor: '#fbfbfb'
+        backgroundColor: `#fbfbfb`
     },
 
     legend: {

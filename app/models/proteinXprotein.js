@@ -1,13 +1,13 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
-    return context.dbConnection.define('protein_protein', {
+    return context.dbConnection.define(`protein_protein`, {
         interactor1: {
             type: sequelize.STRING,
             primaryKey: true,
             references: {
-                model: 'proteins',
-                key: 'uniprotId'
+                model: `proteins`,
+                key: `uniprotId`
             }
         },
         geneId1: {
@@ -17,8 +17,8 @@ module.exports = function(context) {
             type: sequelize.STRING,
             primaryKey: true,
             references: {
-                model: 'proteins',
-                key: 'uniprotId'
+                model: `proteins`,
+                key: `uniprotId`
             }
         },
         geneId2: {

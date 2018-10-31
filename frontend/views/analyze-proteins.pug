@@ -31,9 +31,7 @@ block content
         h3.graph-title 2. Selected Curves
         .graph-description All selected curves are displayed here
         .curves-graph-container
-            #curves-chart.chart
-                .default-text
-                    .text Loading...
+            .chart#curves-chart
             .space
             .ui.button#fullscreen-button-chart View in fullscreen
     .distances-column
@@ -56,14 +54,14 @@ block content
         h3 4. Distances and Correlations amongst proteins
         .ppi-table-description The first few selected proteins and their distances as well as correlations with each other. To view all of them click 'View in fullscreen'.
         .table-container
+            .ppi-table-loading-animation
             table.ui.definition.collapsing.celled.single.line.table
                 thead#ppi-thead
-                    th Loading...
                 tbody#ppi-tbody
         .legend
             .distance
                 .color-distance
-                .text-distance Distance(euclidian) of 2 proteins (white: distant; green: close)
+                .text-distance Distance(euclidian) of 2 proteins (white: close; green: distant)
             .correlation
                 .color-correlation
                 .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
@@ -74,7 +72,6 @@ block content
         h3 Deselect Proteins
         .text Click to remove
         .grid-container
-            .isoGrid
 
 block settings
     .divider
@@ -90,5 +87,6 @@ block scripts
     script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
     script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
     script(type="text/javascript", src="/public/js/fullscreen-helper.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
     script(type="text/javascript", src="/public/js/helper.js")
     script(type="text/javascript", src="/public/js/analyze-proteins.js")

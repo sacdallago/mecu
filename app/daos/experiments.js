@@ -1,10 +1,9 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
 
     // Imports
-    const experimentsModel = context.component('models').module('experiments');
-    const temperatureReadsModel = context.component('models').module('temperatureReads');
+    const experimentsModel = context.component(`models`).module(`experiments`);
 
     return {
         create: function(item, options) {
@@ -13,7 +12,7 @@ module.exports = function(context) {
 
         getExperiments: function(options = {}, requester){
             return experimentsModel.findAll({
-                attributes: ['id', 'name', 'metaData', 'uploader'],
+                attributes: [`id`, `name`, `metaData`, `uploader`],
                 where: {
                     [sequelize.Op.or]: [
                         {private: false},
@@ -25,16 +24,23 @@ module.exports = function(context) {
 
         findExperiment: function(id, requester) {
             return experimentsModel.findAll({
-                    attributes: ['id', 'name', 'metaData', 'uploader', 'private', 'createdAt', 'updatedAt'],
-                    where: {
-                        id: id,
-                        [sequelize.Op.or]: [
-                            {private: false},
-                            {uploader: requester}
-                        ]
-                    }
-                })
-                .then(result => result.length > 0 ? result[0].dataValues : {})
+                attributes: [`id`, `name`, `metaData`, `uploader`, `private`, `createdAt`, `updatedAt`],
+                where: {
+                    id: id,
+                    [sequelize.Op.or]: [
+                        {private: false},
+                        {uploader: requester}
+                    ]
+                }
+            })
+                .then(result => result.length > 0 ? result[0].dataValues : {});
+        },
+        findExperimentWithoutCheck: function(id) {
+            return experimentsModel.findAll({
+                attributes: [`id`, `name`, `metaData`, `uploader`, `private`, `createdAt`, `updatedAt`],
+                where: {id: id}
+            })
+                .then(result => result.length > 0 ? result[0].dataValues : {});
         },
 
         update: function(id, update) {
@@ -52,29 +58,29 @@ module.exports = function(context) {
         getExperimentsPaged: function(options, requester) {
             // add search if necessary
             return Promise.all([
-                    experimentsModel.count({
-                        where: {
-                            [sequelize.Op.or]: [
-                                {private: false},
-                                {uploader: requester}
-                            ]
-                        }
-                    }),
-                    experimentsModel.findAll({
-                        attributes: ['id', 'name', 'metaData', 'uploader'],
-                        where: {
-                            [sequelize.Op.or]: [
-                                {private: false},
-                                {uploader: requester}
-                            ]
-                        },
-                        limit: options.limit,
-                        offset: options.offset,
-                        order: [
-                            [options.sortBy, (options.order === -1 ? 'DESC' : 'ASC')]
+                experimentsModel.count({
+                    where: {
+                        [sequelize.Op.or]: [
+                            {private: false},
+                            {uploader: requester}
                         ]
-                    })
-                ])
+                    }
+                }),
+                experimentsModel.findAll({
+                    attributes: [`id`, `name`, `metaData`, `uploader`],
+                    where: {
+                        [sequelize.Op.or]: [
+                            {private: false},
+                            {uploader: requester}
+                        ]
+                    },
+                    limit: options.limit,
+                    offset: options.offset,
+                    order: [
+                        [options.sortBy, (options.order === -1 ? `DESC` : `ASC`)]
+                    ]
+                })
+            ])
                 .then(([count, result]) => ({count, data:result}));
         },
 
@@ -83,7 +89,7 @@ module.exports = function(context) {
                 return experimentsModel.findById(
                     id,
                     {
-                        attributes: ['rawData', 'id'],
+                        attributes: [`rawData`, `id`],
                         where: {
                             [sequelize.Op.or]: [
                                 {private: false},
@@ -95,7 +101,7 @@ module.exports = function(context) {
             } else {
                 return experimentsModel.findAll(
                     {
-                        attributes: ['rawData', 'id'],
+                        attributes: [`rawData`, `id`],
                         where: {
                             [sequelize.Op.or]: [
                                 {private: false},
@@ -117,15 +123,15 @@ module.exports = function(context) {
                     (e.private = false or e.uploader = :uploader);
             `;
             return context.dbConnection.query(
-                    query,
-                    {
-                        replacements: {
-                            uniprotId,
-                            uploader: requester
-                        }
-                    },
-                    {type: sequelize.QueryTypes.SELECT}
-                )
+                query,
+                {
+                    replacements: {
+                        uniprotId,
+                        uploader: requester
+                    }
+                },
+                {type: sequelize.QueryTypes.SELECT}
+            )
                 .then(r => r.length > 0 ? r[0] : []);
         },
 
@@ -142,15 +148,15 @@ module.exports = function(context) {
                     (e.private = false or e.uploader = :uploader);
             `;
             return context.dbConnection.query(
-                    query,
-                    {
-                        replacements: {
-                            complexId,
-                            uploader: requester
-                        }
-                    },
-                    {type: sequelize.QueryTypes.SELECT}
-                )
+                query,
+                {
+                    replacements: {
+                        complexId,
+                        uploader: requester
+                    }
+                },
+                {type: sequelize.QueryTypes.SELECT}
+            )
                 .then(result => result[0]);
         }
     };

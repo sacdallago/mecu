@@ -26,7 +26,7 @@ module.exports = function(context) {
                 (e.private = false or e.uploader = :uploader) and
                 tr."uniprotId" = p."uniprotId" and
                 tr.experiment = e.id
-            `
+            `;
             if(uniprotId !== undefined){
                 whereClause += `p."uniprotId" = :uniprotId and`;
                 replacements.uniprotId = uniprotId;
@@ -41,10 +41,10 @@ module.exports = function(context) {
                 ${whereClause};
             `;
             return context.dbConnection.query(
-                    query,
-                    {replacements: replacements},
-                    {type: sequelize.QueryTypes.SELECT}
-                )
+                query,
+                {replacements: replacements},
+                {type: sequelize.QueryTypes.SELECT}
+            )
                 .then(r => r.length > 0 ? r[0] : []);
         },
 

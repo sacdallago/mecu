@@ -1,13 +1,7 @@
-/**
- * user model
- *
- * Created by Christian Dallago on 20160626 .
- */
-
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
-    return context.dbConnection.define('user', {
+    return context.dbConnection.define(`user`, {
         googleId: {
             type: sequelize.STRING,
             allowNull: false,

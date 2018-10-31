@@ -1,9 +1,9 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
 
     // Imports
-    const proteinReadsModel = context.component('models').module('proteinReads');
+    const proteinReadsModel = context.component(`models`).module(`proteinReads`);
 
     return {
         bulkCreate: function(items, options) {
@@ -22,17 +22,17 @@ module.exports = function(context) {
                 (e.private = false or e.uploader = :uploader);
             `;
             return context.dbConnection.query(
-                    query,
-                    {
-                        replacements: {
-                            uniprotId,
-                            experimentId: experiment,
-                            uploader: requester
-                        }
-                    },
-                    {type: sequelize.QueryTypes.SELECT}
-                )
-                .then(([result, metadata]) => result.length > 0 ? result[0] : {});
+                query,
+                {
+                    replacements: {
+                        uniprotId,
+                        experimentId: experiment,
+                        uploader: requester
+                    }
+                },
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(([result]) => result.length > 0 ? result[0] : {});
         }
     };
 };

@@ -1,8 +1,8 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
 
-    const model = context.dbConnection.define('complex', {
+    const model = context.dbConnection.define(`complex`, {
         id: {
             type: sequelize.INTEGER,
             allowNull: false,
@@ -78,12 +78,12 @@ module.exports = function(context) {
 
         createdAt: {
             type: sequelize.DATE(3),
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP(3)'),
+            defaultValue: sequelize.literal(`CURRENT_TIMESTAMP(3)`),
         },
         updatedAt: {
             type: sequelize.DATE(3),
-            defaultValue: sequelize.literal('CURRENT_TIMESTAMP(3)'),
-            onUpdate: sequelize.literal('CURRENT_TIMESTAMP(3)')
+            defaultValue: sequelize.literal(`CURRENT_TIMESTAMP(3)`),
+            onUpdate: sequelize.literal(`CURRENT_TIMESTAMP(3)`)
         },
         deletedAt: {
             type: sequelize.DATE(3)
@@ -94,4 +94,4 @@ module.exports = function(context) {
 
 
     return model;
-}
+};

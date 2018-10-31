@@ -1,9 +1,9 @@
-const sequelize = require('sequelize');
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
 
     // Imports
-    const proteinsModel = context.component('models').module('proteins');
+    const proteinsModel = context.component(`models`).module(`proteins`);
 
     return {
         create: function(item) {
@@ -26,7 +26,7 @@ module.exports = function(context) {
                     {
                         type: sequelize.QueryTypes.INSERT
                     }
-                ))
+                ));
             });
             return p;
         },
@@ -35,12 +35,12 @@ module.exports = function(context) {
             item.updatedAt = Date.now();
 
             return proteinsModel.update({ "uniprotId": item.uniprotId }, item, {
-                    upsert: true,
-                    setDefaultsOnInsert : true
-                })
+                upsert: true,
+                setDefaultsOnInsert : true
+            })
                 .catch(err => {
-                    conole.error(error);
-                    return Promise.reject(error);
+                    console.error(err);
+                    return Promise.reject(err);
                 });
         },
 
@@ -69,13 +69,13 @@ module.exports = function(context) {
                 uploader: requester,
                 isPrivate: false
             };
-            let whereClause = '';
-            proteinExperimentPairs.forEach((v,i,a) => {
+            let whereClause = ``;
+            proteinExperimentPairs.forEach((v,i) => {
                 if(i != 0) {
-                    whereClause += ' OR '
-                };
-                let replStrExp = 'Exp'+i;
-                let replStrPrt = 'Prt'+i;
+                    whereClause += ` OR `;
+                }
+                let replStrExp = `Exp`+i;
+                let replStrPrt = `Prt`+i;
                 whereClause += `(pe."uniprotId" = :${replStrPrt} AND pe."experimentId" = :${replStrExp})`;
                 replacements[replStrPrt] = v.uniprotId;
                 replacements[replStrExp] = v.experiment;
@@ -108,10 +108,10 @@ module.exports = function(context) {
 
             const start = new Date();
             return context.dbConnection.query(
-                    query,
-                    {replacements: replacements},
-                    {type: sequelize.QueryTypes.SELECT}
-                )
+                query,
+                {replacements: replacements},
+                {type: sequelize.QueryTypes.SELECT}
+            )
                 .then(r => {
                     console.log(`DURATION findProteinExperimentCombinations  ${(Date.now()-start)/1000} ms`);
                     return r;
