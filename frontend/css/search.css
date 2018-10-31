@@ -22,6 +22,6 @@
 }
 
 
-.grid-container, .descriptive-info {
-    /* padding-left: 3.6%; */
+.grid-container {
+    min-height: 70px ;
 }

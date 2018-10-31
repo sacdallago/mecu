@@ -1,3 +1,18 @@
+const lAExperimentsList = new LoadingAnimation(`#experiments-list-container`, {
+    size: 20,
+    subElementCreateFunction: () => {
+        const highestElement = document.createElement(`tr`);
+        const lowestElement = document.createElement(`td`);
+        lowestElement.setAttribute(`colspan`, `1`);
+        lowestElement.style.display = `flex`;
+        lowestElement.style[`justify-content`] = `center`;
+        lowestElement.style[`align-items`] = `center`;
+        highestElement.appendChild(lowestElement);
+        return [highestElement, lowestElement];
+    }
+});
+const lAHeatmap = new LoadingAnimation(`#heatmap`);
+
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
 const modalIdentifier = `#add-protein-modal`;
 ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
@@ -50,6 +65,8 @@ const drawPaginationComponent = (actualPage, totalPages) => {
  */
 const fetchMeltingCurves = function(experiments, proteins){
 
+    lAHeatmap.start();
+
     // always empty table before new request
     if(experiments.length < 1 || proteins.length < 1){
         $(`#heatmap`).empty();
@@ -79,6 +96,16 @@ const fetchMeltingCurves = function(experiments, proteins){
  * @param  string checkboxIdentifier how should the checkboxes be identified
  */
 const drawExperimentsTable = (data, checkboxIdentifier) => {
+
+    lAExperimentsList.stop();
+    if(data.length === 0) {
+        const noData = document.createElement(`td`);
+        noData.textContent = `No experiments found`;
+        document.querySelector(`#experiments-list-container`).appendChild(
+            document.createElement(`tr`).appendChild(noData)
+        );
+    }
+
     const selectedExperimentsArray = Array.from(selectedExperiments);
     let table = $(`#experiments-list-container`);
     let tr = $(`<tr />`);
@@ -364,6 +391,8 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
         {'style':`height:${heatmapHeight}px; width:${heatmapWidth}px`}
     );
 
+    lAHeatmap.stop();
+
     Highcharts.chart(`heatmap`, highChartsHeatMapConfigObj);
 };
 
@@ -403,6 +432,8 @@ $(document)
             if(storageData.length > 0) {
                 enableShowButton();
             }
+
+            lAExperimentsList.start();
         })
         .then(() => populateProteinSearch())
         .then(() => pullPaginatedExperiments(experimentsQuery))

@@ -1,3 +1,17 @@
+const lAComplexesList = new LoadingAnimation(`#complex-list-container`, {
+    size: 20,
+    subElementCreateFunction: () => {
+        const highestElement = document.createElement(`tr`);
+        const lowestElement = document.createElement(`td`);
+        lowestElement.setAttribute(`colspan`, `1`);
+        lowestElement.style.display = `flex`;
+        lowestElement.style[`justify-content`] = `center`;
+        lowestElement.style[`align-items`] = `center`;
+        highestElement.appendChild(lowestElement);
+        return [highestElement, lowestElement];
+    }
+});
+
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
 const UNIPROT_REGEX = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
 const ITEM_PER_PAGE_COUNT = 12;
@@ -15,14 +29,17 @@ const searchInputProteinList = $(`#protein-list-search`);
 
 
 
-searchInputComplexName.keydown(function(e) {
+searchInputComplexName.keydown(function() {
     HelperFunctions.delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
 });
-searchInputProteinList.keydown(function(e) {
+searchInputProteinList.keydown(function() {
     HelperFunctions.delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
 });
 
 const handleInput = (page, resetOffset) => {
+
+    emptyTable();
+    lAComplexesList.start();
 
     if(resetOffset) complexesQuery.offset = 0;
     const complexNameInputValue = searchInputComplexName.val().trim();
@@ -33,18 +50,27 @@ const handleInput = (page, resetOffset) => {
     ComplexService.findComplex(complexesQuery)
         .then(response => {
             console.log(`response`, response);
+            lAComplexesList.stop();
             drawComplexTable(response);
             drawPaginationComponent(page+1, response.length > 0 ? response[0].total : 0 );
         });
 
 };
 
+const emptyTable = () => {
+    const t = document.querySelector(`#complex-list-container`);
+    while(t.firstChild) {
+        t.removeChild(t.firstChild);
+    }
+};
+
 const drawComplexTable = (data) => {
+
+    emptyTable();
 
     let table = $(`#complex-list-container`);
     let tr = $(`<tr />`).addClass(`table-row`);
     let td = $(`<td />`);
-    table.empty();
 
     data.forEach(complex => {
         let row = tr.clone();

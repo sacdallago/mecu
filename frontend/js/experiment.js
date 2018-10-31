@@ -1,6 +1,7 @@
 
 
 const drawExperiment = (experiment) => {
+    document.querySelector(`#experiment-form`).classList.remove(`loading`);
     if(experiment.isUploader === true) {
         drawExperimentMutable(experiment);
     } else {
@@ -105,6 +106,8 @@ $(document).ready(() => {
     if(query.id) {
 
         $(`#experiment-id`).text(query.id);
+
+        document.querySelector(`#experiment-form`).classList.add(`loading`);
 
         ExperimentService.getExperiment(query.id)
             .then(experiment => {

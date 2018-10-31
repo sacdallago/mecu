@@ -1,11 +1,14 @@
 .protein-header, .experiments-container, .related-proteins-container, .related-complexes {
     padding: 20px;
 }
+.experiments-container .grid, .related-proteins-container .grid, .related-complexes .grid {
+    min-height: 50px;
+}
 
 .protein-header {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-end;
 }
 
 .protein-container {

@@ -1,3 +1,8 @@
+const lACurvesChart = new LoadingAnimation(`#curves-chart`);
+const lANodesGraph = new LoadingAnimation(`#nodesGraph`);
+const lAPPITable = new LoadingAnimation(`.ppi-table-loading-animation`);
+const lAProteinCurves = new LoadingAnimation(`.grid-container`, {size: 50});
+
 let experimentsToDraw = [];
 let proteinsToDraw = [];
 
@@ -7,7 +12,7 @@ let ppiTableRelativeCorrelation = true;
 
 const AMOUNT_OF_PPI_TO_DRAW = 20;
 
-const proteinCurvesGridIdentifier = `.isoGrid`;
+const proteinCurvesGridIdentifier = `.grid-container`;
 const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
     itemSelector: `.grid-item`,
     layoutMode: `packery`,
@@ -48,7 +53,7 @@ proteinCurvesGrid.on(`click`, `.grid-item`, function(){
 
 function loadProteins() {
     // Grid
-    proteinCurvesGrid.empty();
+    lAProteinCurves.start();
 
     // load stored proteins
     let proteins = StorageManager.getProteins();
@@ -90,6 +95,8 @@ function loadProteins() {
                 ];
             };
 
+            lAProteinCurves.stop();
+
             HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
         });
 }
@@ -97,6 +104,9 @@ function loadProteins() {
 let globalGraph;
 
 function populateGlobalsGraphs(coloringType){
+
+    lACurvesChart.start();
+    lANodesGraph.start();
 
     let proteins = StorageManager.splitUpProteins(StorageManager.getProteins());
     proteins = proteins.filter(p => experimentsToDraw.indexOf(p.experiment) > -1 && proteinsToDraw.indexOf(p.uniprotId) > -1);
@@ -145,6 +155,10 @@ function populateGlobalsGraphs(coloringType){
                     return `<b>${this.series.name}</b><br><b>${this.x}</b> C°<br /><b>${(this.y*100).toFixed(2)}</b> %`;
                 }
             };
+
+            lACurvesChart.stop();
+            lANodesGraph.stop();
+
             Highcharts.chart(`curves-chart`, highChartsCurvesConfigObject);
 
             // plot distances
@@ -177,6 +191,7 @@ const drawExperimentsSelect = (experiments) => {
         clearable: false,
         onChange: (e) => {
             experimentsToDraw = e.split(`,`).map(e => parseInt(e));
+
             populateGlobalsGraphs(getColoringValue());
             drawPPITable();
         }
@@ -200,6 +215,7 @@ const drawProteinsSelect = (proteins) => {
         clearable: false,
         onChange: (e) => {
             proteinsToDraw = e.split(`,`);
+
             populateGlobalsGraphs(getColoringValue());
             drawPPITable();
         }
@@ -313,12 +329,17 @@ $(`#fullscreen-button-ppi`).on(`click`, function() {
 $(document).ready(() => {
     const data = populateDropdowns();
 
+    lAPPITable.start();
+
     ProteinService.getProteinXProteinDistances(data.proteinList, data.experimentList)
         .then(result => {
             console.log(`ppiDistances`, result);
             // IMPROVEMENT: only save the ones which should be drawn (limited by MAX_ROW_COLS_PPI_TABLE));
             // IMPROVEMENT 2: only request the ones you want to draw!
             ppiTableData = result;
+
+            lAPPITable.stop();
+
             drawPPITable();
         });
 
