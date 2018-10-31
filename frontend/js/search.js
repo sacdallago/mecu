@@ -1,239 +1,178 @@
-$.fn.api.settings.api = {
-    'get from proteins': '/api/proteins/search/{query}',
-    'get from temperature reads': '/api/reads/temperature/search/{query}'
+// TODO pagination for the grid
+/*
+this regex is one motherfucker
+this is the test-data and how I came up with it:
+Match these:
+P1, P12, P120, P12004
+A0, A0A, A0A0, A0A02, A0A022, A0A022, A0A022Y, A0A022YW, A0A022YWF, A0A022YWF9
+A2, A2B, A2BC, A2BC1, A2BC19
+Regex =
+(
+((?:[OPQ]|$)(?:[0-9]|$)(?:[A-Z0-9]{3}|$)[0-9])
+|((?:[OPQ]|$)(?:[0-9]|$)(?:[A-Z0-9]{1,3}|$))
+|((?:[OPQ]+|$)(?:[0-9]|$))
+)
+|
+(
+((?:[A-NR-Z]|$)(?:[0-9]|$)(?:([A-Z][A-Z0-9]{1,2}[0-9])|$)(?:([A-Z][A-Z0-9]{0,2}[0-9]?)|$))
+|((?:[A-NR-Z]|$)(?:[0-9]|$)(?:(([A-Z][A-Z0-9]{1,2}[0-9]?))|$))
+|((?:[A-NR-Z]+|$)(?:[A-Z0-9]{1,2}|$))
+)
+ */
+const loadingAnimation = new LoadingAnimation(`.grid-container`);
+
+const REGEX_CAN_MATCH_UNIPROTID = /(((?:[OPQ]|$)(?:[0-9]|$)(?:[A-Z0-9]{3}|$)[0-9])|((?:[OPQ]|$)(?:[0-9]|$)(?:[A-Z0-9]{1,3}|$))|((?:[OPQ]+|$)(?:[0-9]|$)))|(((?:[A-NR-Z]|$)(?:[0-9]|$)(?:([A-Z][A-Z0-9]{1,2}[0-9])|$)(?:([A-Z][A-Z0-9]{0,2}[0-9]?)|$))|((?:[A-NR-Z]|$)(?:[0-9]|$)(?:(([A-Z][A-Z0-9]{1,2}[0-9]?))|$))|((?:[A-NR-Z]+|$)(?:[A-Z0-9]{1,2}|$)))/g;
+const ITEM_PER_PAGE_COUNT = 25;
+const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
+const proteinsQuery = {
+    search: ``,
+    limit: ITEM_PER_PAGE_COUNT,
+    offset: 0,
+    sortBy: `id`,
+    order: 1
 };
 
-let aggregate = true;
-let showMean = true;
+// search input field
+const searchInput = $(`.search-header .search .field`);
 
-const grid = $('.grid').isotope({
+const grid = $(`.grid-container`).isotope({
     // main isotope options
-    itemSelector: '.grid-item',
+    itemSelector: `.grid-item`,
     // set layoutMode
-    layoutMode: 'packery',
+    layoutMode: `packery`,
     packery: {
         gutter: 10
     }
 });
 
-curves = [];
+/**
+ * redirect to the protein page of the clicked protein
+ */
+grid.on(`click`, `.grid-item`, function(){
+    const data = $(this).data(`grid-item-contents`);
+    document.location.href = `/protein?protein=${data.obj.uniprotId}&experiment=${data.experiment.experiment}`;
+});
 
-grid.on('click', '.grid-item', function(){
-    let self = this;
-    return StorageManager.toggle($(this).data('protein'), function(inStorage, added, removed) {
-        if(added === 0){
-            $(self).removeClass('inStore');
-        } else if(removed === 0) {
-            $(self).addClass('inStore');
-        } else {
-            if ($(self).hasClass('inStore')){
-                $(self).removeClass('inStore');
-            }
-            if (!$(self).hasClass('partiallyInStore')){
-                $(self).addClass('partiallyInStore');
-            }
-        }
+/**
+ * on keyup in the input field, wait some time, before sending the request
+ * this delays the sending the request for 300 ms, every time a key is pressed in the field
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+searchInput.keydown(function() {
+    HelperFunctions.delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
+});
+
+/**
+ * when some string has been input into the seach field
+ * either:
+ *  - if it might be a uniprotId    -> send request to our server and search for matching curves
+ *  - if it's not a uniprotId       -> send request to external server, convert string into array of
+ *      uniprotId's and then request matching curves from our server
+ */
+const handleInput = (page, resetOffset) => {
+    if(resetOffset) proteinsQuery.offset = 0;
+    const inputValue = searchInput.val().trim();
+
+    if(inputValue.length === 0) {
+        console.log(`not searching for empty string, or listing all proteins...`);
+        return;
+    }
+
+    loadingAnimation.start();
+
+    // IMPROVEMENT: at the moment, only the longest matching string, is searched for
+    // HOWTO split input string by space, and match that -> this way multiples Proteins could be
+    // searched for at the same time
+    let match = inputValue.match(REGEX_CAN_MATCH_UNIPROTID).filter(v => !!v || v != ``);
+
+    if(match.length) {
+        let searchValue = ``;
+        match.forEach(v => v && v.length > searchValue.length ? searchValue = v : ``);
+        proteinsQuery.search = searchValue;
+        TemperatureService.queryUniprotIdReceiveTemperatureReads(proteinsQuery)
+            .then(response => {
+                console.log(`response`, response);
+                drawProteinCurves(response.data);
+                drawPaginationComponent(page+1, response.total);
+            });
+    } else {
+        console.log(`requesting from external...`);
+        ExternalService.getUniprotIdsFromText(inputValue)
+            .then(list => {
+                console.log(`external service uniprotId list`, list);
+                proteinsQuery.search = list;
+                return proteinsQuery;
+            })
+            .then(q => TemperatureService.queryUniprotIdReceiveTemperatureReads(q))
+            .then(response => {
+                console.log(`response`, response);
+                drawProteinCurves(response.data);
+                drawPaginationComponent(page+1, response.total);
+            });
+    }
+};
+
+/**
+ * draw protein curves
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
+const drawProteinCurves = (data) => {
+
+    // split up protein/experiments pairs into protein/experiment(single) pairs
+    const proteinExperimentObject = [];
+    data.forEach(d => {
+        d.experiments.forEach(e => {
+            proteinExperimentObject.push({
+                uniprotId: d.uniprotId,
+                experiments: [e]
+            });
+        });
     });
-});
 
-grid.on('click', '.cube', function(event) {
-    // Will avoid opening the modal!
-    event.stopPropagation();
+    const toAppend = (obj, exp) => {
+        return [
+            $(`<p />`)
+                .addClass(`grid-item-text`)
+                .css({
+                    'position': `absolute`,
+                    'text-align': `center`,
+                    'width': `100%`,
+                    'line-height': `35px`,
+                    'font-size': `1.2rem`,
+                    'transition-property': `opacity`,
+                    'transition-duration': `1s`
+                })
+                .text(obj.uniprotId),
+            $(`<div />`)
+                .addClass([`experimentNumber`, `grid-item-text`])
+                .css({
+                    'transition-property': `opacity`,
+                    'transition-duration': `1s`
+                })
+                .text(`Experiment `+ exp.experiment)
+        ];
+    };
 
-    // Filter only by selected localization type
-    grid.isotope({ filter: "." + $(this).data('localization') });
+    HelperFunctions.drawItemForEveryExperiment(`.grid-container`, proteinExperimentObject, toAppend);
 
-    // Change button color, text
-    $('.clearButton').text("Viewing: " + $(this).data('localization') + ", click to view all");
-});
+};
 
-$('.clearButton').on('click', function(){
-    grid.isotope({ filter: "*"});
-    $(this).text("");
-});
+const drawPaginationComponent = (actualPage, totalPages) => {
+    new PaginationComponent(
+        `#pagination-component`,
+        totalPages,
+        proteinsQuery.limit,
+        actualPage,
+        (newPage) => {
+            proteinsQuery.offset = (newPage-1)*ITEM_PER_PAGE_COUNT;
+            handleInput(newPage-1);
+        },
+        5
+    );
+};
 
-// Get the searchInput element: used to read the value of it later and reset the URI with the right query
-const searchInput = $('.prompt.inline');
-
-
-$('.ui.search').search({
-    apiSettings: {
-        action: 'get from temperature reads',
-
-    },
-    minCharacters : 2,
-    onResultsAdd: function(response) {
-        // Don't add HTML
-        return false;
-    },
-    onResults: function(response) {
-
-        //renderProgress();
-
-        // Update URL query
-        var currentUri = URI(window.location.href);
-        let query = {'q': searchInput.val()};
-        if(aggregate === false){
-            query.a = false;
-        }
-        if(showMean === false){
-            query.m = false;
-        }
-        currentUri.search(query);
-
-        window.history.replaceState(query, "MeCu", currentUri.resource());
-
-        // Grid
-        grid.empty();
-
-        // Curves
-        curves = [];
-
-        var items = [];
-
-        response.forEach(function(responseProtein){
-            let proteins = [];
-
-            if(aggregate){
-                proteins.push(responseProtein);
-            } else {
-                responseProtein.experiments.forEach(function(experiment){
-                    proteins.push({
-                        uniprotId: responseProtein.uniprotId,
-                        experiments: [experiment]
-                    });
-                });
-            }
-
-
-            proteins.forEach(function(protein) {
-                var html = '';
-
-                html += '<div class="grid-item"' + protein.experiments.map(function(expRead){
-                        return (expRead.experiment + "").replace(/\s|\//g, "_")
-                    }).join('E') + ' id="' + protein.uniprotId + protein.experiments.map(function(expRead){
-                        return (expRead.experiment + "").replace(/\s|\//g, "_")
-                    }).join('E') + '">';
-
-                html += '<p style="position: absolute; text-align: center; width: 100%; height: 100%; line-height: 200px; font-size: 1.5rem">' + protein.uniprotId + '</p>';
-                html += '<div class="cube"></div>';
-                if(protein.experiments.length == 1){
-                    html += '<div class="experimentNumber">E' + protein.experiments[0].experiment + '</div>';
-                } else if(protein.experiments.length > 5) {
-                    let notShowing = protein.experiments.length - 5;
-                    html += '<div class="experimentNumber">+' + notShowing + '</div>';
-                }
-                html += '</div>';
-
-                var element = $(html);
-                element.data("protein", protein);
-                StorageManager.has(protein, function(storage, hasCount) {
-                    if(hasCount === protein.experiments.length){
-                        element.addClass('inStore');
-                    } else if(hasCount > 0) {
-                        element.addClass('partiallyInStore');
-                    }
-                });
-                items.push(element[0]);
-            });
-        });
-
-        grid.isotope('insert', items);
-
-        response.forEach(function(responseProtein){
-            let proteins = [];
-
-            if(aggregate){
-                proteins.push(responseProtein);
-            } else {
-                responseProtein.experiments.forEach(function(experiment){
-                    proteins.push({
-                        uniprotId: responseProtein.uniprotId,
-                        experiments: [experiment]
-                    });
-                });
-            }
-
-            proteins.forEach(function(protein) {
-                let curve = new MecuLine({
-                    element: "#"+protein.uniprotId+protein.experiments.map(function(expRead){
-                        return (expRead.experiment + "").replace(/\s|\//g, "_")
-                    }).join('E'), width:"200", height:"200",
-                    limit: 5,
-                    minTemp: 41,
-                    maxTemp: 71,
-                    minRatio: 0.1,
-                    //maxRatio: 1
-                });
-
-                curve.add(protein);
-
-                // If not aggregated: not more then one curve per box; if no show mean --> no show mean. If only one curve, no mean needed
-                if(aggregate === true && showMean === true && protein.experiments.length > 1){
-                    curve.toggleAverage();
-                }
-                curves.push(curve);
-            });
-        });
-
-        return false;
-    },
-});
-
-// Set val of searchInput equal to query element, if any
 (function(){
-    const currentUri = URI(window.location.href);
-    const query = currentUri.search(true);
-    if(query && query.q){
-        searchInput.val(query.q);
-        if(query.a){
-            aggregate = false;
-        }
-        if(query.m){
-            showMean = false;
-        }
-        searchInput.trigger('focus');
-    }
+    searchInput.trigger(`focus`);
 })();
-
-// Aggregate or de-aggregate curves
-$('.item.filterExperiments').on('click', function(event){
-    event.preventDefault();
-
-    // Update URL query
-    var currentUri = URI(window.location.href);
-    let query = currentUri.search(true);
-    if(aggregate === false){
-        query.a = false;
-        aggregate = true;
-    } else {
-        delete query.a;
-        aggregate = false;
-    }
-    currentUri.search(query);
-
-    window.history.replaceState(query, "MeCu", currentUri.resource());
-
-    searchInput.trigger('focus');
-});
-
-// Draw or don't draw means
-$('.item.showMean').on('click', function(event){
-    event.preventDefault();
-
-    // Update URL query
-    var currentUri = URI(window.location.href);
-    let query = currentUri.search(true);
-
-    if(showMean === false){
-        showMean = true;
-        delete query.m;
-    } else {
-        query.m = false;
-        showMean = false;
-    }
-
-    window.history.replaceState(query, "MeCu", currentUri.resource());
-
-    searchInput.trigger('focus');
-});

@@ -1,0 +1,11 @@
+#spacedText {
+    padding-top: 80px;
+}
+
+#spacedText > * {
+    margin-bottom: 20px;
+}
+
+.creators, .data-courtesy {
+    text-align: center;
+}

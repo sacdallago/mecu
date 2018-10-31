@@ -1,12 +1,80 @@
+
 .maxWidth {
     width: 100%
 }
 
+.step {
+    margin-bottom: 3px !important;
+}
+
+.ui.table td {
+    padding: 5px !important;
+}
+.table .name {
+    max-width: 400px;
+}
+.table .uploader {
+    min-width: 118px;
+}
+
+.ui.input.search {
+    border: silver 1px solid;
+}
 .textarea {
     height: 6em;
+    border-radius: 3px;
 }
 
 .prompt.inline {
     font-size: 1.2rem !important;
     text-decoration: none !important;
+}
+
+.heatmap-container {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px;
+}
+.heatmap-container > *{
+    margin: 5 0 5 0px;
+}
+.heatmap-container .legend {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    border: 0.5px solid silver;
+    background-color: rgba(226, 226, 226, 0.48);
+}
+.heatmap-container .legend .l-item{
+    display:flex;
+    padding: 3 5 3 5px;
+}
+.heatmap-container .legend .sample {
+    width: 25px;
+    height: 25px;
+    border-radius: 3px
+}
+.heatmap-container .legend .c1 .sample {
+    background-color: #d6d6d6;
+}
+.heatmap-container .legend .c2 .sample {
+    background-color: #40a9ff;
+}
+.heatmap-container .legend .c3 .sample {
+    background-color: #005aa4;
+}
+.heatmap-container .legend .text {
+    padding-left: 5px;
+    display: flex;
+    align-items: center;
+}
+
+
+/* workaround so that the highcharts tooltip is not cut off*/
+.highcharts-container {
+    overflow: visible !important;
+}
+
+.highcharts-container svg {
+    overflow: visible !important;
 }

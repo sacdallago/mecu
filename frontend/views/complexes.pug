@@ -1,0 +1,41 @@
+extends base
+
+block postStyles
+        link(rel='stylesheet', href='/public/css/complexes.css')
+        link(rel='stylesheet', href='/public/css/pagination.css')
+
+block content
+    .search-header
+        .complex-search-text Enter a complex name or part of it:
+        .search-complex-name
+            input(type="text", name="complex-name", placeholder="e.g. COP9" value="").field#complex-search
+        .separator or
+        .protein-list-search-text Enter a list of UniProt identifiers:
+        .search-protein-list
+            input(type="text", name="protein-list", placeholder="e.g. P12004 P40692" value="").field#protein-list-search
+    
+    h4 List of found complexes
+    table.ui.celled.table
+        thead
+            tr
+                th Name
+                th Contained Proteins
+        tbody#complex-list-container
+    
+    .pagination#pagination-component
+
+
+block settings
+    .divider
+    a(href='/search').item Search list of proteins
+    a(href='/experiments').item Search Experiments
+    a(href='/analyze-proteins').item Analyze
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
+    script(type="text/javascript", src="/public/js/pagination.js")
+    script(type="text/javascript", src="/public/js/complexes.js")

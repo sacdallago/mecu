@@ -3,10 +3,12 @@
  */
 
 module.exports = function(context) {
-    const temperatureReadsController = context.component('controllers').module('temperatureReads');
+    const temperatureReadsController = context.component(`controllers`).module(`temperatureReads`);
     context.api
-        .get('/reads/temperature/search/:id', temperatureReadsController.searchByUniprotId)
-        .get('/reads/temperatures', temperatureReadsController.getTemperatures)
-        .post('/reads/temperature', temperatureReadsController.getByUniProtIdsAndExerminets);
+        .get(`/reads/temperatures/raw`, temperatureReadsController.getTemperaturesRaw)
+        .get(`/reads/temperatures/raw/:e`, temperatureReadsController.getTemperaturesRaw)
+        .post(`/reads/temperature/search`, temperatureReadsController.searchByUniprotId)
+        // .post('/reads/temperature', temperatureReadsController.getByUniProtIdsAndExperiments)
+    ;
 
 };

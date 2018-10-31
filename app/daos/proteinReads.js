@@ -1,90 +1,38 @@
-/**
- * proteinReads DAO
- *
- * Created by Christian Dallago on 20170103 .
- */
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
 
     // Imports
-    const proteinReadsModel = context.component('models').module('proteinReads');
-    const Op = context.Sequelize.Op;
+    const proteinReadsModel = context.component(`models`).module(`proteinReads`);
 
     return {
         bulkCreate: function(items, options) {
             return proteinReadsModel.bulkCreate(items, options);
         },
 
-        findProteins: function(identifier, transaction) {
-            if(transaction){
-                return proteinReadsModel.findAll({
-                        attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
-                        where: {
-                            uniprotId: {
-                                [Op.like]: identifier + "%"
-                            }
-                        },
-                        transaction: transaction
+        findProteinExperiment: function(uniprotId, experiment, requester) {
+            const query = `
+            SELECT pr."uniprotId", pr.experiment, pr.peptides, pr.psms, pr."createdAt", pr."updatedAt"
+            FROM "proteinReads" pr, "experiment_proteinReads" e_pr, experiments e
+            WHERE
+                pr."uniprotId" = :uniprotId AND
+                pr.id = e_pr."proteinReadId" AND
+                e_pr."experimentId" = e.id AND
+                e.id = :experimentId AND
+                (e.private = false or e.uploader = :uploader);
+            `;
+            return context.dbConnection.query(
+                query,
+                {
+                    replacements: {
+                        uniprotId,
+                        experimentId: experiment,
+                        uploader: requester
                     }
-                );
-            } else {
-                return proteinReadsModel.findAll({
-                        attributes: ['experiment', 'uniprotId', 'peptides', 'psms'],
-                        where: {
-                            uniprotId: {
-                                [Op.like]: identifier + "%"
-                            }
-                        }
-                    }
-                );
-            }
-
-        },
-
-        findUniprotIdsLike: function(identifier, transaction) {
-            if(transaction){
-                return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: {
-                                [Op.like]: identifier + "%"
-                            }
-                        },
-                        transaction: transaction
-                    }
-                );
-            } else {
-                return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: {
-                                [Op.like]: identifier + "%"
-                            }
-                        }
-                    }
-                );
-            }
-        },
-
-        findUniprotIds: function(uniprotIds, transaction) {
-            if(transaction){
-                return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: uniprotIds
-                        },
-                        transaction: transaction
-                    }
-                );
-            } else {
-                return proteinReadsModel.findAll({
-                        attributes: [[context.sequelize.fn('DISTINCT', context.sequelize.col('uniprotId')), 'uniprotId']],
-                        where: {
-                            uniprotId: uniprotIds
-                        }
-                    }
-                );
-            }
-        },
+                },
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(([result]) => result.length > 0 ? result[0] : {});
+        }
     };
 };

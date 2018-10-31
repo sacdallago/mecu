@@ -1,40 +1,42 @@
-/**
- * experiment model
- *
- * Created by Christian Dallago on 20161226 .
- */
+const sequelize = require(`sequelize`);
+
 
 module.exports = function(context) {
-    const userModel = context.component('models').module('users');
+    const userModel = context.component(`models`).module(`users`);
 
-    return context.sequelize.define('experiment', {
-        lysate: {
-            type: context.Sequelize.BOOLEAN,
+    return context.dbConnection.define(`experiment`, {
+        name: {
+            type: sequelize.TEXT,
             allowNull: false
         },
-        description: {
-            type: context.Sequelize.STRING,
-            allowNull: false
+        metaData: {
+            type: sequelize.JSON
         },
         rawData: {
-            type: context.Sequelize.JSONB,
+            type: sequelize.JSONB,
             allowNull: false
         },
         uploader: {
-            type: context.Sequelize.STRING,
+            type: sequelize.STRING,
             allowNull: false,
-            onDelete: "CASCADE",
-            onUpdate: "CASCADE",
+            onDelete: `CASCADE`,
+            onUpdate: `CASCADE`,
             references: {
                 // This is a reference to another model
                 model: userModel,
-
                 // This is the column name of the referenced model
-                key: 'googleId',
-
+                key: `googleId`,
                 // This declares when to check the foreign key constraint. PostgreSQL only.
-                deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE
+                deferrable: sequelize.Deferrable.INITIALLY_IMMEDIATE
             }
         },
+        private: {
+            type: sequelize.BOOLEAN,
+            defaultValue: false,
+            allowNull: false
+        },
+        deletedAt: {
+            type: sequelize.DATE(3)
+        }
     });
 };

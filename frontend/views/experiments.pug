@@ -1,0 +1,32 @@
+extends base
+
+block postStyles
+    link(rel='stylesheet', href='/public/css/experiments.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
+
+block content
+    h3 Experiments
+    .description Click onto a experiment to view details for it.
+    table.ui.celled.table
+        thead
+            tr
+                th ID
+                th Name
+                th Uploader
+        tbody#experiments-list-container
+    
+    .pagination#pagination-component
+
+block settings
+    .divider
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
+    a(href='/analyze-proteins').item Analyze
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
+    script(type="text/javascript", src="/public/js/pagination.js")
+    script(type="text/javascript", src="/public/js/experiments.js")

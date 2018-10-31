@@ -1,17 +1,12 @@
-/**
- * Created by chdallago on 13/02/2017.
- */
-
-
-module.exports = function(context) {
+module.exports = function() {
     return {
         allowedPostRequests: function(request, response, next){
-            if(request.user.get("allowPost") == true){
+            if(request.user.get(`allowPost`) == true){
                 next();
             } else {
-                response.status(403).render('error', {
-                    title: 'Not allowed to send post requests',
-                    message: "Sorry, you don't have the right to send POST requests to the server."
+                response.status(403).render(`error`, {
+                    title: `Not allowed to send post requests`,
+                    message: `Sorry, you don't have the right to send POST requests to the server.`
                 });
             }
         },
@@ -20,11 +15,11 @@ module.exports = function(context) {
             if(request.user){
                 next();
             } else {
-                response.status(403).render('error', {
-                    title: 'Not logged in',
-                    message: "Sorry, you appear not to be logged in."
+                response.status(403).render(`error`, {
+                    title: `Not logged in`,
+                    message: `Sorry, you appear not to be logged in.`
                 });
             }
         }
-    }
-}
+    };
+};

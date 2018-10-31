@@ -1,17 +1,41 @@
 extends base
 
-block content
-    p --> This is a work in progress <--
-    p
-        |Webpage and design by
-        span.green  Christian Dallago
-    p
-        |Data courtesy of
-        span.blue  Chris Soon Heng Tan & colleagues
+block postStyles
+    link(rel='stylesheet', href='/public/css/about.css')
 
-    p
-        | Cite
-        span.red  Some paper
+block content
+    .creators
+        | Webpage and design by
+        span  
+            a(href=`mailto:christian.dallago@tum.de`) Christian Dallago
+        |  and
+        span 
+            a(href=`mailto:klaus.niedermair007@gmail.com`) Klaus Niedermair
+    .data-courtesy
+        | Data courtesy of
+        span  
+            a(href=`http://science.sciencemag.org/content/early/2018/02/07/science.aan0346` target="_blank") Chris Soon Heng Tan & colleagues
+    .data
+        .protein-x-protein-interaction-data
+            .field Protein interaction data:
+            ul.value
+                li
+                    a(href='http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0031826').item Schaefer MH, Fontaine J-F, Vinayagam A, Porras P, Wanker EE, et al. (2012) HIPPIE: Integrating Protein Interaction Networks with Experiment Based Quality Scores. PLoS ONE, 7(2): e31826 [link]
+                li
+                    a(href='http://www.ploscompbiol.org/article/info%3Adoi%2F10.1371%2Fjournal.pcbi.1002860').item Schaefer MH, Lopes TJS, Mah N, Shoemaker JE, Matsuoka Y, et al. (2013) Adding Protein Context to the Human Protein-Protein Interaction Network to Reveal Meaningful Interactions. PLoS Computational Biology, 9(1): e1002860 [link]
+                li
+                    a(href='http://www.ploscompbiol.org/article/info%3Adoi%2F10.1371%2Fjournal.pcbi.1003814').item Suratanee A, Schaefer MH, Betts M, Soons Z, Mannsperger H, et al. (2014) Characterizing Protein Interactions Employing a Genome-Wide siRNA Cellular Phenotyping Screen. PLoS Computational Biology, 10.9: e1003814 [link]
+                li
+                    a(href='http://nar.oxfordjournals.org/content/early/2016/10/28/nar.gkw985').item Alanis-Lobato G, Andrade-Navarro MA, & Schaefer MH. (2016). HIPPIE v2.0: enhancing meaningfulness and reliability of protein-protein interaction networks. Nucleic Acids Research, gkw985
+
+        .complexes-data
+            .field Complex data:
+            ul.value
+                li
+                    a(href='http://www.ncbi.nlm.nih.gov/pubmed/19884131').item Ruepp A, Waegele B, Lechner M, Brauner B, Dunger-Kaltenbach I, Fobo G, Frishman G, Montrone C, Mewes HW. CORUM: the comprehensive resource of mammalian protein complexes—2009. Nucleic Acids Res. 2010 Jan;38(Database issue):D497-501. 19884131
+                li 
+                    a(href='http://www.ncbi.nlm.nih.gov/pubmed?cmd=search&term=17965090').item Ruepp A, Brauner B, Dunger-Kaltenbach I, Frishman G, Montrone C, Stransky M, Waegele B, Schmidt T, Doudieu ON, Stümpflen V, Mewes HW. CORUM: the Comprehensive Resource of Mammalian Protein Complexes. Nucleic Acids Res. 2008 Jan;36(Database issue):D449-54 17965090
+                
 
 block scripts
     - var delta = 50

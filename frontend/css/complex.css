@@ -1,0 +1,167 @@
+/* if not supported, the divs will just be arranged as rows */
+@supports (display: grid) {
+    #spacedText {
+        display: grid;
+        grid-template-rows: 0.05fr 1fr 1fr auto;
+        grid-row-gap: 2em;
+        grid-template-areas:
+            "experiment-number"
+            "column-right"
+            "column-left"
+            "curves-grid"
+    }
+    @media (min-width:700px) {
+        #spacedText {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            grid-row-gap: .5em;
+            grid-column-gap: 1.5em;
+            grid-template-areas:
+                "experiment-number experiment-number"
+                "column-left column-right"
+                "curves-grid curves-grid"
+        }
+    }
+    .experiment-number{
+        grid-area: experiment-number;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .column-left{
+        grid-area: column-left;
+    }
+    .column-right{
+        grid-area: column-right;
+    }
+    .curves-grid{
+        grid-area: curves-grid;
+    }
+}
+
+
+
+.column-right .column-right {
+    padding: 10 20 10 20px;
+    border: 1px solid grey;
+    background-color: #F5F5F5;
+}
+
+.column-right > * {
+    display: flex;
+    align-items: flex-end;
+    border-bottom: 0.5px solid silver;
+    padding: 5px;
+}
+.column-right .text {
+    min-width: 150px;
+}
+.column-right .list {
+    display: flex;
+    flex-wrap: wrap;
+}
+.column-right .list-item {
+    padding: 5px;
+    margin: 2 1 2 1px;
+
+    border-radius: 2px;
+    background-color: #E0E0E0;
+    text-align: center;
+}
+.column-right .id-and-names-list-item {
+    display: flex;
+
+    border-bottom: 0.5px dashed silver;
+}
+.column-right .id-and-names-id {
+    min-width: 80px;
+}
+.column-right .id-and-names-text {
+    word-wrap: break-word;
+}
+
+.curves-grid .grid {
+    padding: 10px;
+}
+.selected-curve-dot {
+    width: 20px;
+    background: green;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.complex-header{
+    display: flex;
+    justify-content: space-between;
+}
+.experiment-number .dropdown {
+    /* width: 100%; */
+
+    display:flex;
+    justify-content: space-between;
+}
+.experiment-number .dropdown-search {
+    border: 1px solid rgb(224, 225, 226, 0.8);
+    border-radius: 3px;
+    background-color: rgb(224, 225, 226, 0.8);
+}
+.experiment-number .dropdown .dropdown-icon {
+    display: flex;
+    justify-content: center;
+}
+.experiment-number .dropdown .text {
+    /* width: 100%; */
+    height: 40px;
+    padding: 0 20px;
+
+    display:flex;
+    align-items: center;
+}
+.experiment-number .dropdown .menu{
+    width: 100%;
+}
+.experiment-number .dropdown .menu .item {
+    width: 100%;
+}
+.experiment-number .dropdown .menu .item:hover {
+    background-color: lightgrey;
+}
+
+.tooltip-content .t-line {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 300px;
+}
+.tooltip-content .t-left {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 30px;
+}
+.ranking-info-text{
+    padding-top: 20px;
+    font-size: 14px;
+    font-style: italic;;
+}
+
+.curves-grid .cube-text-middle {
+    position: absolute;
+    top: 42%;
+    left: 9px;
+    font-size: 13pt;
+}
+
+#curvesGraph {
+    height: 550px;
+}
+#curvesGraph .highcharts-container{
+    height: 100%;
+}
+
+#curves-grid .grid {
+    min-height: 50px;
+}

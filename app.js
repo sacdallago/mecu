@@ -6,6 +6,8 @@ const cluster           = require('cluster');
 const consoleStamp      = require('console-stamp');
 const path              = require('path');
 
+// const seedComplexes =  require('./app/seeds/loadComplexes');
+
 if (cluster.isMaster) {
     // Setup timestamps for logging
     consoleStamp(console,{
@@ -87,15 +89,15 @@ if (cluster.isMaster) {
         app.use(compression());
 
         // Export static folders
+        // custom js scripts
         app.use("/public/js", express.static(path.join(__dirname, "frontend", "js")));
+        // custom css scripts
         app.use("/public/css", express.static(path.join(__dirname, "frontend", "css")));
-
-        app.use("/public/libs/mecu-graph", express.static(require.resolve("mecu-graph")));
-        app.use("/public/libs/mecu-utils", express.static(require.resolve("mecu-utils")));
-        app.use("/public/libs/mecu-line", express.static(require.resolve("mecu-line")));
-        app.use("/public/libs/disi", express.static(require.resolve("disi")));
-
+        // the old libs (TODO should be removed completely)
         app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
+        // new libs should all be loaded from the node_modules
+        app.use("/public/modules", express.static(path.join(__dirname, "node_modules")));
+
         app.use("/public", express.static(path.join(__dirname, "frontend", "public")));
         app.use(favicon(path.join(__dirname, "frontend", "public", "images", "mecu.ico")));
 
@@ -107,7 +109,7 @@ if (cluster.isMaster) {
         app.use(session({
             secret: context.config.sessionSecret || 'mecuSecret',
             store: new SequelizeStore({
-                db: context.sequelize
+                db: context.dbConnection
             }),
             resave: true,
             saveUninitialized: true,
@@ -210,17 +212,19 @@ if (cluster.isMaster) {
         context.component('.').module('routes');
 
         // Sync the database --> Write table definitions
-        context.sequelize.sync().then(function() {
-            // Make the process listen to incoming requests
-            app.listen(app.get('port'), function(){
-                console.log("Express server listening on port ", app.get('port'));
-                console.log("According to your configuration, the webapp is reachable at", address);
+        // TODO throw this out, this should only be done once, or when the table is changed
+        // force: true -> drops table and recreates it...
+        // context.dbConnection.sync({force: true}) // this DROPS ALL TABLES and recreates them
+        context.dbConnection.sync()
+            .then(() => app.listen( app.get('port'), function(){
+                    console.log("Express server listening on port ", app.get('port'));
+                    console.log("According to your configuration, the webapp is reachable at", address);
+                })
+            ).catch(function(error) {
+                console.error("There was an error while syncronizing the tables between the application and the database.");
+                console.error(error);
+                process.exit(2);
             });
-        }).catch(function(error) {
-            console.error("There was an error while syncronizing the tables between the application and the database.");
-            console.error(error);
-            process.exit(2);
-        });
     });
 
     // Watch in case of file changes, restart worker (basically can keep up server running forever)

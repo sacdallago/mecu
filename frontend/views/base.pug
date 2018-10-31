@@ -1,8 +1,8 @@
-html
+html(lang="en")
     head
         title= "MeCu - " + title
         block preStyles
-        link(rel='stylesheet', href='/public/libs/semantic/semantic.css')
+        link(rel='stylesheet', href='/public/modules/semantic-ui-css/semantic.min.css')
         link(rel='stylesheet', href='/public/css/style.css')
         link(rel='stylesheet', href='/public/libs/progress/progress.css')
         link(rel='stylesheet', href='/public/libs/onepage/onepage.css')
@@ -54,17 +54,26 @@ html
 
                                 #spacedText
                                     block content
-                                .ui.inverted.vertical.footer.segment
 
 
-        script(type="text/javascript", src="/public/libs/jquery/jquery.js")
-        script(type="text/javascript", src="/public/libs/jquery/jquery.css")
+        //- libraries, loaded from frontend/libs folder (TODO replace with node_modules libs)
         script(type="text/javascript", src="/public/libs/urlRewrite.js")
-        script(type="text/javascript", src="/public/libs/semantic/semantic.js")
         script(type="text/javascript", src='/public/libs/progress/progress.js')
         script(type="text/javascript", src='/public/libs/onepage/onepage.js')
-        script(type="text/javascript", src="/public/js/settings.js")
+        
+        //- libraries, loaded from node_modules
+        script(type="text/javascript", src="/public/modules/jquery/dist/jquery.min.js")
+        script(type="text/javascript", src="/public/modules/semantic-ui-css/semantic.min.js")
+        script(type="text/javascript", src='/public/modules/store/dist/store.legacy.min.js')
+        script(type="text/javascript", src='/public/modules/mecu-graph/build/mecu-graph.js')
+        script(type="text/javascript", src='/public/modules/mecu-line/build/mecu-line.js')
+        script(type="text/javascript", src='/public/modules/mecu-utils/build/mecu-utils.js')
+        
+        //- custom scripts
         script(type="text/javascript", src="/public/js/storage.js")
+        script(type="text/javascript", src="/public/js/settings.js")
+        script(type="text/javascript", src="/public/js/requests.js")
+
         if scripts
             each s in scripts
                 script(type="text/javascript", src=s)

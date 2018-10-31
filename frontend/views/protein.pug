@@ -1,0 +1,111 @@
+extends base
+
+block postStyles
+        link(rel='stylesheet', href='/public/css/protein.css')
+
+block content
+    .modal#add-protein-modal
+
+    .protein-header
+        .protein
+        .experiment
+            .experiment-number#experiment-number
+                .dropdown.dropdown-search
+                    .experiment-number-loading-animation
+                    input(type='hidden' name='experiments' value='default').text-input
+                    .text
+                        .value Select
+                    .dropdown-icon
+                        i.dropdown.icon
+                    .menu
+
+    .protein-container
+        .protein-curve#protein-curve
+        
+        .meta-data-container
+            .protein-data#protein-data
+                h4.container-info Protein:
+                .uniprot-id
+                    .field Uniprot ID:
+                    .separator
+                    a.value
+                .peptides
+                    .field Peptides:
+                    .separator
+                    .value
+                .psms
+                    .field PSMS:
+                    .separator
+                    .value
+                .created
+                    .field Created:
+                    .separator
+                    .value
+                .updated
+                    .field Updated:
+                    .separator
+                    .value
+            
+            .experiment-data#experiment-data
+                h4.container-info Experiment:
+                .name
+                    .field Name:
+                    .separator
+                    .value
+                .description
+                    .field Description:
+                    .separator
+                    .value
+                .lysate
+                    .field Lysate:
+                    .separator
+                    .value
+                .created
+                    .field Created:
+                    .separator
+                    .value
+                .updated
+                    .field Updated:
+                    .separator
+                    .value
+                .uploader
+                    .field Uploader:
+                    .separator
+                    a.value
+            
+    .experiments-container#experiments-container
+        h3 Experiments with this Protein
+        .info Click to select
+        .grid
+    
+    .related-complexes#related-complexes-container
+        h3 Related Complexes
+        .grid
+            
+    .related-proteins-container#related-proteins-container
+        h3 Protein Interactions
+        .header
+            .info Each cube shows the interaction of the protein of the page with the protein in the cube.
+            .select-all-button
+                a.ui.button#select-all-ppi-button
+                    i.check.icon
+                    span Select All
+        .grid
+
+block settings
+    .divider
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
+    a(href='/experiments').item Search Experiments
+    a(href='/analyze-proteins').item Analyze
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
+    script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
+    script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
+    script(type="text/javascript", src="/public/js/modal.js")
+    script(type="text/javascript", src="/public/js/protein.js")
