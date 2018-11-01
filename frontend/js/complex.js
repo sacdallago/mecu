@@ -479,6 +479,16 @@ $(document).ready(() => {
                             drawCurvesItems(proteinData, complex.proteins, query.experiment);
                         });
                 } else {
+                    lAComplexCurve.stop();
+                    const complexCurvesContainer = document.querySelector(`#curvesGraph`);
+                    const defaultText = document.createTextNode(`Select experiment (upper right) to view corresponding curves.`);
+                    complexCurvesContainer.append(defaultText);
+
+                    lAComplexCurves.stop();
+                    const complexCurvesGridContainer = document.querySelector(`#curves-grid .grid`);
+                    const defaultText2 = document.createTextNode(`Select experiment (upper right) to view corresponding curves.`);
+                    complexCurvesGridContainer.append(defaultText2);
+
                     return Promise.resolve();
                 }
             })
