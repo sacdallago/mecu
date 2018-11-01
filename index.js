@@ -111,7 +111,7 @@ module.exports = {
 
         return context.dbConnection
             .authenticate()
-            .then(function(err) {
+            .then(function() {
                 console.log(`Connection has been established successfully.`);
                 return callback(context);
             })
