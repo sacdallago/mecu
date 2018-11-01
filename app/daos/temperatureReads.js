@@ -58,6 +58,7 @@ module.exports = function(context) {
             };
             let whereClause = ``;
             if(query.search.constructor === Array) {
+                whereClause += `AND (`;
                 query.search.forEach((v,i,a) => {
                     if(i != 0) {
                         whereClause += ` or `;
@@ -66,6 +67,7 @@ module.exports = function(context) {
                     whereClause += `p."uniprotId" like :`+replStr;
                     replacements[replStr] = v;
                 });
+                whereClause += `)`;
             } else {
                 whereClause = `p."uniprotId" like :search`;
             }
@@ -79,8 +81,8 @@ module.exports = function(context) {
                         (e.private = :isPrivate or e.uploader = :uploader) AND
                         e_tr."temperatureReadId" = tr.id AND
                         p_tr."uniprotId" = p."uniprotId" AND
-                        p_tr."temperatureReadId" = tr.id AND
-                        (${whereClause})
+                        p_tr."temperatureReadId" = tr.id
+                        ${whereClause}
                     GROUP BY tr."experiment", tr."uniprotId"
                     ORDER BY "uniprotId" asc, experiment asc
                     OFFSET :offset
@@ -97,8 +99,8 @@ module.exports = function(context) {
                         (e.private = :isPrivate or e.uploader = :uploader) AND
                         e_tr."temperatureReadId" = tr.id AND
                         p_tr."uniprotId" = p."uniprotId" AND
-                        p_tr."temperatureReadId" = tr.id AND
-                        (${whereClause})
+                        p_tr."temperatureReadId" = tr.id
+                        ${whereClause}
                     GROUP BY tr."experiment", tr."uniprotId"
                 ) t;
             `;
