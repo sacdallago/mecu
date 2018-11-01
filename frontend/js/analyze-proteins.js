@@ -263,17 +263,14 @@ $(`#coloring-dropdown`).dropdown({
 // Change Distance Metrics logic
 $(`.ui.button.manhattan`).on(`click`, function(event){
     event.preventDefault();
-
     globalGraph.changeDistanceMetric(Disi.manhattan);
 }).popup({position: `bottom left`});
 $(`.ui.button.euclidian`).on(`click`, function(event){
     event.preventDefault();
-
     globalGraph.changeDistanceMetric(Disi.euclidian);
 }).popup({position: `bottom left`});
 $(`.ui.button.supremum`).on(`click`, function(event){
     event.preventDefault();
-
     globalGraph.changeDistanceMetric(Disi.supremum);
 }).popup({position: `bottom left`});
 $(`.ui.dropdown.button.minkowski`).dropdown({
@@ -323,7 +320,7 @@ $(`#fullscreen-button-ppi`).on(`click`, function() {
     );
 
     window.open(`/ppi-fullscreen`, `_blank`);
-});
+}).popup({position: `bottom left`});
 
 // on page drawing finished, start requests
 $(document).ready(() => {
