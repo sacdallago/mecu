@@ -48,14 +48,10 @@
         "universal-analytics": "latest",
         "webpack": "^4.1.0"
     },
-    "devDependencies": {
-        "synp": "^1.2.1"
-    },
+    "devDependencies": {},
     "scripts": {
         "start": "node app.js",
         "create-complex-sql": "node scripts/createComplexesSQL.js",
-        "create-protein-sql": "node scripts/createProteinXProteinSQL.js",
-        "yarn-lock-to-npm": "synp --source-file ./yarn.lock",
-        "npm-lock-to-yarn": "synp --source-file package-lock.json"
+        "create-protein-sql": "node scripts/createProteinXProteinSQL.js"
     }
 }
