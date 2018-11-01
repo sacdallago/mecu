@@ -162,8 +162,8 @@ function populateGlobalsGraphs(coloringType){
             Highcharts.chart(`curves-chart`, highChartsCurvesConfigObject);
 
             // plot distances
-            // globalGraph = new MecuGraph({element: "#nodesGraph"});
-            // globalGraph.add(data);
+            globalGraph = new MecuGraph({element: `#nodesGraph`});
+            globalGraph.add(data);
         })
         .catch(error => {
             console.error(error);

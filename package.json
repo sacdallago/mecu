@@ -31,7 +31,7 @@
         "highcharts": "^6.1.1",
         "jquery": "^3.3.1",
         "json2csv": "^4.0.1",
-        "mecu-graph": "latest",
+        "mecu-graph": "^0.1.4",
         "mecu-line": "latest",
         "mecu-utils": "^0.1.1",
         "node-uuid": "latest",
