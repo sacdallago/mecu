@@ -33,7 +33,7 @@ module.exports = function(context) {
             };
 
             let proteinWhereClause =  ` ( `;
-            proteinList.forEach((p,i) => {
+            proteinList.slice(0,100).forEach((p,i) => {
                 proteinWhereClause += `"uniprotId" = :protein${i} `;
                 replacements[`protein`+i] = p;
                 if(i !== proteinList.length - 1) {
@@ -43,7 +43,7 @@ module.exports = function(context) {
             proteinWhereClause += ` ) `;
 
             let experimentWhereClause = ` ( `;
-            experimentList.forEach((e,i) => {
+            experimentList.slice(0,20).forEach((e,i) => {
                 experimentWhereClause += ` experiment = :exp${i}`;
                 replacements[`exp`+i] = e;
                 if(i !== experimentList.length - 1) {

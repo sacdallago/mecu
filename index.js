@@ -4,8 +4,8 @@
  * Created by Christian Dallago on 20160416 .
  */
 
-const Sequelize = require('sequelize');
-const path = require('path');
+const Sequelize = require(`sequelize`);
+const path = require(`path`);
 
 
 var context;
@@ -30,15 +30,15 @@ module.exports = {
             return {
                 module: function(moduleName) {
                     if (!context[componentName][moduleName]) {
-                        console.log('Loading component ' + componentName);
-                        context[componentName][moduleName] = require(path.join(__dirname, "app", componentName, moduleName))(context,
+                        console.log(`Loading component ` + componentName);
+                        context[componentName][moduleName] = require(path.join(__dirname, `app`, componentName, moduleName))(context,
                             componentName, moduleName);
-                        console.log('LOADED ' + componentName + '.' + moduleName);
+                        console.log(`LOADED ` + componentName + `.` + moduleName);
                     }
 
                     return context[componentName][moduleName];
                 }
-            }
+            };
         };
 
         callback(context);
@@ -46,13 +46,19 @@ module.exports = {
     },
     connect: function(callback){
         const context   = this.start();
-        const config    = require(__dirname + "/config");
+        let req;
+        try {
+            req = require(__dirname+`/private/config`);
+        } catch(e) {
+            console.error(`No private/config.js found... continuing with default config`);
+        }
+        const config    = Object.assign({}, require(__dirname + `/config`), req );
 
         context.config  = config;
 
         //Create the DB connection string
         var databaseParams = config.database;
-        var dbConnection = "postgres://";
+        var dbConnection = `postgres://`;
 
         var configDB = {
             database: databaseParams.collection, //env var: PGDATABASE
@@ -69,28 +75,28 @@ module.exports = {
         }
 
         if (databaseParams.username  && databaseParams.username.length > 0 && databaseParams.password && databaseParams.password.length > 0) {
-            dbConnection += ":" + databaseParams.password;
+            dbConnection += `:` + databaseParams.password;
             configDB.password = databaseParams.password;
         }
 
         if (databaseParams.username  && databaseParams.username.length > 0) {
-            dbConnection += "@";
+            dbConnection += `@`;
         }
 
         dbConnection += databaseParams.uri;
 
-        if(databaseParams.port !== undefined && databaseParams.port !== ""){
+        if(databaseParams.port !== undefined && databaseParams.port !== ``){
 
-            dbConnection += ":" + databaseParams.port;
+            dbConnection += `:` + databaseParams.port;
         }
 
-        if(databaseParams.collection !== undefined && databaseParams.collection !== ""){
+        if(databaseParams.collection !== undefined && databaseParams.collection !== ``){
 
-            dbConnection += "/" + databaseParams.collection;
+            dbConnection += `/` + databaseParams.collection;
         }
 
         context.pgConnectionString = dbConnection;
-        console.log("CONNECTING TO " + dbConnection);
+        console.log(`CONNECTING TO ` + dbConnection);
         context.dbConnection = new Sequelize(dbConnection, {
             pool: {
                 max: 5,
@@ -105,8 +111,8 @@ module.exports = {
 
         return context.dbConnection
             .authenticate()
-            .then(function(err) {
-                console.log('Connection has been established successfully.');
+            .then(function() {
+                console.log(`Connection has been established successfully.`);
                 return callback(context);
             })
             .catch(function (err) {
@@ -117,4 +123,4 @@ module.exports = {
                 return process.exit(1);
             });
     }
-}
+};
