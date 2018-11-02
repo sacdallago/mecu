@@ -20,15 +20,10 @@ const queryParams = (query) => {
 module.exports = function(context) {
 
     // Imports
-    const proteinsDao = context.component(`daos`).module(`proteins`);
     const experimentsDao = context.component(`daos`).module(`experiments`);
-    const proteinReadsDao = context.component(`daos`).module(`proteinReads`);
     const temperatureReadsDao = context.component(`daos`).module(`temperatureReads`);
-    const proteinXExperimentModel = context.component(`models`).module(`proteinXexperiments`);
-    const experimentXProteinReadModel = context.component(`models`).module(`experimentXproteinReads`);
-    const proteinXProteinReadModel = context.component(`models`).module(`proteinXproteinReads`);
-    const proteinXTemperatureReadModel = context.component(`models`).module(`proteinXtemperatureReads`);
-    const experimentXTemperatureReadModel = context.component(`models`).module(`experimentXtemperatureReads`);
+    const uploadExperimentDao = context.component(`daos`).module(`experimentUpload`);
+
 
     return {
         uploadExperiment: function(request, response) {
@@ -86,102 +81,7 @@ module.exports = function(context) {
                             uploader: extractUserGoogleId(request)
                         };
 
-                        return context.dbConnection.transaction(transaction => {
-                            // create the initial experiment
-                            return experimentsDao.create(newExperiment, {transaction: transaction, returning: true})
-                                .then(experiment => {
-
-                                    let proteinList = new Set();
-
-                                    let proteinReads = data.map(element => {
-                                        proteinList.add(element.uniprotId);
-                                        return {
-                                            uniprotId: element.uniprotId,
-                                            experiment: experiment.id,
-                                            peptides: element.peptides,
-                                            psms: element.psms,
-                                            totalExpt: isNaN(element.totalExpt) ? undefined : element.totalExpt
-                                        };
-                                    });
-                                    proteinList = Array.from(proteinList);
-
-                                    let meltingReads = data.map(element => {
-                                        return element.reads.map(tempRead => {
-                                            tempRead.uniprotId = element.uniprotId;
-                                            tempRead.experiment = experiment.id;
-                                            return tempRead;
-                                        });
-                                    }).reduce((elements,element) => elements.concat(element));
-
-                                    const proteinsCreateStartTime = new Date();
-
-                                    // create proteins, necessary for the rest of the m-to-n relationships
-                                    return proteinsDao.bulkCreate(proteinList)
-                                        .then(() => {
-                                            console.log(`DURATION proteinsDao.bulkCreate(${proteinList.length})`, (Date.now()-proteinsCreateStartTime)/1000);
-                                        })
-                                        // protein X experiment table
-                                        .then(() => proteinXExperimentModel.bulkCreate(
-                                            proteinList.map(protein => ({
-                                                uniprotId: protein,
-                                                experimentId: experiment.id
-                                            })),
-                                            {transaction: transaction, returning: true}
-                                        )
-                                        )
-                                        .then(() => {
-
-                                            return Promise.all([
-                                                // proteinReads
-                                                proteinReadsDao.bulkCreate(proteinReads, {transaction: transaction, returning: true})
-                                                    .then(proteinReadsDaoBulkCreateResult => {
-
-                                                        const experimentXProteinRead = [];
-                                                        const proteinXProteinRead = [];
-                                                        proteinReadsDaoBulkCreateResult.forEach(proteinRead => {
-                                                            experimentXProteinRead.push({
-                                                                experimentId: experiment.id,
-                                                                proteinReadId: proteinRead.dataValues.id
-                                                            });
-                                                            proteinXProteinRead.push({
-                                                                uniprotId: proteinRead.dataValues.uniprotId,
-                                                                proteinReadId: proteinRead.dataValues.id
-                                                            });
-                                                        });
-                                                        return Promise.all([
-                                                            // experiment X proteinReads
-                                                            experimentXProteinReadModel.bulkCreate(experimentXProteinRead, {transaction: transaction, returning: true}),
-                                                            // protein X proteinReads
-                                                            proteinXProteinReadModel.bulkCreate(proteinXProteinRead, {transaction: transaction, returning: true})
-                                                        ]);
-                                                    }),
-                                                // temperatureReads
-                                                temperatureReadsDao.bulkCreate(meltingReads, {transaction: transaction, returning: true})
-                                                    .then(temperatureReadsDaoBulkCreateResult => {
-
-                                                        const experimentXTemperatureRead = [];
-                                                        const proteinXTemperatureRead = [];
-                                                        temperatureReadsDaoBulkCreateResult.forEach(temperatureRead => {
-                                                            experimentXTemperatureRead.push({
-                                                                experimentId: experiment.id,
-                                                                temperatureReadId: temperatureRead.dataValues.id
-                                                            });
-                                                            proteinXTemperatureRead.push({
-                                                                uniprotId: temperatureRead.dataValues.uniprotId,
-                                                                temperatureReadId: temperatureRead.dataValues.id
-                                                            });
-                                                        });
-                                                        return Promise.all([
-                                                            // experiment X temperatureReads
-                                                            experimentXTemperatureReadModel.bulkCreate(experimentXTemperatureRead, {transaction: transaction, returning: true}),
-                                                            // protein X temperatureReads
-                                                            proteinXTemperatureReadModel.bulkCreate(proteinXTemperatureRead,{transaction: transaction, returning: true})
-                                                        ]);
-                                                    })
-                                            ]);
-                                        });
-                                });
-                        })
+                        return uploadExperimentDao.uploadExperiment(newExperiment)
                             .then(() => {
                                 console.log(`DURATION TOTAL uploadExperiment`, (Date.now()-uploadExperimentStartTime)/1000);
                                 return response.status(201).render(`success`, {
