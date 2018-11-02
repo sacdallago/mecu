@@ -1,8 +1,7 @@
 'use strict';
 
 // Parallelize
-const numCPUs           = 1; //require('os').cpus().length;
-if(numCPUs === 1) console.warn(`Server running only with 1 worker`);
+const numCPUs           = 1;
 const cluster           = require(`cluster`);
 const consoleStamp      = require(`console-stamp`);
 const path              = require(`path`);
