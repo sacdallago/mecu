@@ -44,61 +44,51 @@ proteinCurvesGrid.on(`click`, `.grid-item`, function(){
                 }
             }
 
-            populateGlobalsGraphs(getColoringValue());
-            loadProteins();
+            const data = populateGlobalsGraphs(getColoringValue());
+            drawProteinsInCubes(data);
             populateDropdowns();
         }
     );
 });
 
-function loadProteins() {
+function drawProteinsInCubes(proteinsData) {
     // Grid
     lAProteinCurves.start();
 
-    // load stored proteins
-    let proteins = StorageManager.getProteins();
-    if(proteins.length === 0) {
-        return;
-    }
-
-    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(StorageManager.splitUpProteins(proteins))
-        .then(proteins => {
-
-            const proteinExperimentObject = [];
-            proteins.forEach(protein => {
-                protein.experiments.forEach((experiment, i) => {
-                    proteinExperimentObject.push({
-                        uniprotId: protein.uniprotId,
-                        experiments: [experiment],
-                        index: i
-                    });
-                });
+    const proteinExperimentObject = [];
+    proteinsData.forEach(protein => {
+        protein.experiments.forEach((experiment, i) => {
+            proteinExperimentObject.push({
+                uniprotId: protein.uniprotId,
+                experiments: [experiment],
+                index: i
             });
-
-            const toAppend = (obj, exp) => {
-                return [
-                    $(`<p />`)
-                        .addClass(`grid-item-text`)
-                        .css({
-                            'position': `absolute`,
-                            'text-align': `center`,
-                            'width': `100%`,
-                            'line-height': `35px`,
-                            'font-size': `1.2rem`
-                        })
-                        .text(obj.uniprotId),
-                    $(`<div />`)
-                        .addClass([`experimentNumber`, `grid-item-text`])
-                        .text(`Experiment ${exp.experiment}`),
-                    $(`<div />`)
-                        .addClass(`selected-curve-dot`)
-                ];
-            };
-
-            lAProteinCurves.stop();
-
-            HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
         });
+    });
+
+    const toAppend = (obj, exp) => {
+        return [
+            $(`<p />`)
+                .addClass(`grid-item-text`)
+                .css({
+                    'position': `absolute`,
+                    'text-align': `center`,
+                    'width': `100%`,
+                    'line-height': `35px`,
+                    'font-size': `1.2rem`
+                })
+                .text(obj.uniprotId),
+            $(`<div />`)
+                .addClass([`experimentNumber`, `grid-item-text`])
+                .text(`Experiment ${exp.experiment}`),
+            $(`<div />`)
+                .addClass(`selected-curve-dot`)
+        ];
+    };
+
+    lAProteinCurves.stop();
+
+    HelperFunctions.drawItemForEveryExperiment(proteinCurvesGridIdentifier, proteinExperimentObject, toAppend, AMOUNT_OF_PPI_TO_DRAW);
 }
 
 let globalGraph;
@@ -111,6 +101,7 @@ function populateGlobalsGraphs(coloringType){
     let proteins = StorageManager.splitUpProteins(StorageManager.getProteins());
     proteins = proteins.filter(p => experimentsToDraw.indexOf(p.experiment) > -1 && proteinsToDraw.indexOf(p.uniprotId) > -1);
 
+
     if(proteins.length === 0 || experimentsToDraw.length === 0 || proteinsToDraw.length === 0) {
         $(`#curves-chart`).empty();
         $(`#nodesGraph`).empty();
@@ -118,8 +109,9 @@ function populateGlobalsGraphs(coloringType){
         return;
     }
 
-    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(proteins)
+    return TemperatureService.temperatureReadsToProteinsAndExperimentPairs(proteins)
         .then(data => {
+
             // creating data series for highcharts
             let series = [];
             data.forEach(protein => {
@@ -164,9 +156,13 @@ function populateGlobalsGraphs(coloringType){
             // plot distances
             globalGraph = new MecuGraph({element: `#nodesGraph`});
             globalGraph.add(data);
+
+
+            return data;
         })
         .catch(error => {
             console.error(error);
+            return [];
         });
 }
 
@@ -342,5 +338,5 @@ $(document).ready(() => {
 
     Promise.resolve()
         .then(() => populateGlobalsGraphs(getColoringValue(), []))
-        .then(() => loadProteins());
+        .then(data => drawProteinsInCubes(data));
 });
