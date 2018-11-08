@@ -131,6 +131,7 @@ module.exports = function(context) {
         },
 
         findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs, requester) {
+
             if(uniprodIdExpIdPairs.length === 0) {
                 return Promise.resolve([]);
             }
@@ -158,7 +159,7 @@ module.exports = function(context) {
                     FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
                     WHERE
                         e.id = e_tr."experimentId" AND
-                        (e.private = :isPrivate or e.uploader = ':uploader') AND
+                        (e.private = :isPrivate or e.uploader = :uploader) AND
                         e_tr."temperatureReadId" = tr.id AND
                         p_tr."uniprotId" = p."uniprotId" AND
                         p_tr."temperatureReadId" = tr.id AND
@@ -167,11 +168,6 @@ module.exports = function(context) {
                 ) tmp
                 GROUP BY tmp."uniprotId";
             `;
-            /*
-            for the whole database
-            Planning time: 0.147 ms
-            Execution time: 1377.891 ms
-             */
 
             const start = new Date();
             return context.dbConnection.query(
@@ -185,7 +181,7 @@ module.exports = function(context) {
                 })
                 .then(r => r.length > 0 ? r[0] : [])
                 .catch(error => {
-                    console.error(`findAndAggregateTempsByIdAndExperiment`, uniprodIdExpIdPairs, requester);
+                    console.error(`findAndAggregateTempsByIdAndExperiment`, uniprodIdExpIdPairs, requester, error);
                     return [];
                 });
 
