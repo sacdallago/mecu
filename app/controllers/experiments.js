@@ -75,7 +75,8 @@ module.exports = function(context) {
                         let newExperiment = {
                             name: name,
                             metaData: {
-                                lysate: lysate
+                                lysate: lysate,
+                                description: ``
                             },
                             rawData: data,
                             uploader: extractUserGoogleId(request)
