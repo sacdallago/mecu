@@ -1,8 +1,9 @@
-const fs = require('fs');
-const FILE_TO_CREATE_NAME = 'COHESIONINDEX.sql';
+const fs = require(`fs`);
+const FILE_TO_CREATE_NAME = `2_COHESIONINDEX.sql`;
+const FILE_TO_CREATE_NAME2 = `3_COMPLEX_DISTANCES.sql`;
 
 fs.writeFileSync(
-    'scripts/'+FILE_TO_CREATE_NAME,
+    `scripts/`+FILE_TO_CREATE_NAME,
     `
     /*
     RUNTIME: 3h
@@ -75,35 +76,66 @@ fs.writeFileSync(
           inter1.interactor2 = inter2.interactor2 AND
           inter1.experiment = inter2.experiment;
 
-
-    DROP VIEW IF EXISTS pairwaise_complex_interactions;
-    CREATE OR REPLACE VIEW pairwaise_complex_interactions AS
-    SELECT protein_proteins.interactor1, protein_proteins.interactor2, complex_protein_pairs."complexId"
-    FROM protein_proteins
-           JOIN (
-                SELECT A."uniprotId" AS interactor1, B."uniprotId" AS interactor2, A."complexId"
-                FROM protein_complexes as A
-                       LEFT JOIN protein_complexes as B
-                         ON A."complexId" = B."complexId" AND A."uniprotId" != B."uniprotId"
-                ) AS complex_protein_pairs
-             ON protein_proteins.interactor1 = complex_protein_pairs.interactor1 AND
-                protein_proteins.interactor2 = complex_protein_pairs.interactor2;
-
-
-    DROP VIEW IF EXISTS average_complex_distance_per_experiment;
-    CREATE MATERIALIZED VIEW average_complex_distance_per_experiment AS
-    SELECT experiment, "complexId", AVG(distance)
-    FROM ppi_distances
-    JOIN pairwaise_complex_interactions
-        ON ppi_distances.interactor1 = pairwaise_complex_interactions.interactor1 AND
-           ppi_distances.interactor2 = pairwaise_complex_interactions.interactor2
-    GROUP BY experiment, "complexId";
-    --REFRESH MATERIALIZED VIEW average_complex_distance_per_experiment; -- 4h
+      DROP VIEW IF EXISTS pairwaise_complex_interactions;
+      CREATE OR REPLACE VIEW pairwaise_complex_interactions AS
+      SELECT protein_proteins.interactor1, protein_proteins.interactor2, complex_protein_pairs."complexId"
+      FROM protein_proteins
+             JOIN (
+                  SELECT A."uniprotId" AS interactor1, B."uniprotId" AS interactor2, A."complexId"
+                  FROM protein_complexes as A
+                         LEFT JOIN protein_complexes as B
+                           ON A."complexId" = B."complexId" AND A."uniprotId" != B."uniprotId"
+                  ) AS complex_protein_pairs
+               ON protein_proteins.interactor1 = complex_protein_pairs.interactor1 AND
+                  protein_proteins.interactor2 = complex_protein_pairs.interactor2;
     `,
-    {flag: 'w'},
+    {flag: `w`},
     function (err) {
         if (err) {
-            console.log('appending error', err)
+            console.log(`appending error`, err);
+        }
+    }
+);
+fs.writeFileSync(
+    `scripts/`+FILE_TO_CREATE_NAME2,
+    `
+    /*
+    RUNTIME: 3h
+     */
+
+     -- Average per experiment could be an indicator of how good an experiment is.
+     DROP VIEW IF EXISTS average_ppi_distance_per_experiment;
+     CREATE MATERIALIZED VIEW average_ppi_distance_per_experiment AS
+     SELECT experiment, SUM(distance)/COUNT(*) as "average_distance"
+     FROM ppi_distances
+     GROUP BY experiment;
+     -- REFRESH MATERIALIZED VIEW average_ppi_distance_per_experiment;
+
+
+     -- Average of interaction across experiments could be an indicator of how likely an interaction is.
+     DROP VIEW IF EXISTS average_ppi_distance_per_ppi;
+     CREATE MATERIALIZED VIEW average_ppi_distance_per_ppi AS
+     SELECT interactor1, interactor2, SUM(distance)/COUNT(*) as "average_distance", array_agg(experiment) as "experiments"
+     FROM ppi_distances
+     GROUP BY interactor1, interactor2;
+     -- REFRESH MATERIALIZED VIEW average_ppi_distance_per_ppi;
+
+
+     DROP VIEW IF EXISTS average_complex_distance_per_experiment;
+     CREATE MATERIALIZED VIEW average_complex_distance_per_experiment AS
+     SELECT experiment, "complexId", AVG(distance)
+     FROM ppi_distances
+     JOIN pairwaise_complex_interactions
+         ON ppi_distances.interactor1 = pairwaise_complex_interactions.interactor1 AND
+            ppi_distances.interactor2 = pairwaise_complex_interactions.interactor2
+     GROUP BY experiment, "complexId";
+     -- REFRESH MATERIALIZED VIEW average_complex_distance_per_experiment;
+
+    `,
+    {flag: `w`},
+    function (err) {
+        if (err) {
+            console.log(`appending error`, err);
         }
     }
 );
