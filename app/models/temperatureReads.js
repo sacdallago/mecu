@@ -9,12 +9,20 @@ module.exports = function(context) {
         experiment: {
             type: sequelize.INTEGER,
             unique: `_id`,
-            allowNull: false,
+            references: {
+                model: `experiments`,
+                key: `id`
+            },
+            onDelete: `CASCADE`,
+            onUpdate: `CASCADE`
         },
         uniprotId: {
             type: sequelize.STRING,
             unique: `_id`,
-            allowNull: false,
+            references: {
+                model: `proteins`,
+                key: `uniprotId`
+            }
         },
         temperature: {
             type: sequelize.INTEGER,

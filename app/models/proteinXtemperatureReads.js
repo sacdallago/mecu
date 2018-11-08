@@ -16,7 +16,9 @@ module.exports = function(context) {
             references: {
                 model: `temperatureReads`,
                 key: `id`
-            }
+            },
+            onDelete: `CASCADE`,
+            onUpdate: `CASCADE`
         }
     });
 

@@ -5,9 +5,19 @@ module.exports = function(context) {
     return context.dbConnection.define(`proteinRead`, {
         experiment: {
             type: sequelize.INTEGER,
+            references: {
+                model: `experiments`,
+                key: `id`
+            },
+            onDelete: `CASCADE`,
+            onUpdate: `CASCADE`
         },
         uniprotId: {
             type: sequelize.STRING,
+            references: {
+                model: `proteins`,
+                key: `uniprotId`
+            }
         },
 
         peptides: {
