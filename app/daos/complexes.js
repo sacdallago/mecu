@@ -1,5 +1,9 @@
 const sequelize = require(`sequelize`);
 
+const findComplexSQL = require(`./complexes/findComplex`);
+const getComplexWhichHasProteinSQL = require(`./complexes/getComplexWhichHasProtein`);
+const getAverageComplexDistancePerExperimentSQL = require(`./complexes/getAverageComplexDistancePerExperiment`);
+
 module.exports = (context) => {
     // Imports
     const complexesModel = context.component(`models`).module(`complexes`);
@@ -43,23 +47,7 @@ module.exports = (context) => {
                 });
             }
 
-            const query = `
-                select
-                    id,
-                    name,
-                    proteins,
-                    count(*) over() as total
-                from
-                    complexes c,
-                    (select "complexId", count(*) from protein_complexes ${proteinWhereQuery} group by "complexId") sub
-                where
-                    sub."complexId" = c.id and
-                    sub.count >= ${proteinList.length || 1}
-                    ${nameWhereQuery}
-                order by ${sortBy} ${order}
-                offset :offset
-                limit :limit;
-            `;
+            const query = findComplexSQL.query(nameWhereQuery, proteinWhereQuery, sortBy, order, proteinList.length || 1);
 
             return context.dbConnection.query(
                 query,
@@ -70,11 +58,9 @@ module.exports = (context) => {
         },
 
         getComplexWhichHasProtein: (uniprotId) => {
-            const query = `
-                select c.id, c.name, c.comment, c.proteins
-                from complexes c, proteins p, protein_complexes cp
-                where c.id = cp."complexId" and p."uniprotId" = cp."uniprotId" and p."uniprotId" = :uniprotId;
-            `;
+
+            const query = getComplexWhichHasProteinSQL.query();
+
             return context.dbConnection.query(
                 query,
                 {replacements: {uniprotId: uniprotId}},
@@ -84,14 +70,9 @@ module.exports = (context) => {
         },
 
         getAverageComplexDistancePerExperiment: (complexId, requester) => {
-            const query = `
-            select experiment, name, ac.avg
-            from average_complex_distance_per_experiment ac, experiments e
-            where ac."complexId" = :complexId and
-                  e.id = ac.experiment and
-                  (e.private = false or e.uploader = :uploader)
-            order by ac.avg;
-            `;
+
+            const query = getAverageComplexDistancePerExperimentSQL.query();
+
             return context.dbConnection.query(
                 query,
                 {

@@ -1,5 +1,8 @@
 const sequelize = require(`sequelize`);
 
+const getExperimentsWhichHaveProteinSQL = require(`./experiments/getExperimentsWhichHaveProtein`);
+const getExperimentsWhichHaveComplexSQL = require(`./experiments/getExperimentsWhichHaveComplex`);
+
 module.exports = function(context) {
 
     // Imports
@@ -114,14 +117,9 @@ module.exports = function(context) {
         },
 
         getExperimentsWhichHaveProtein: function(uniprotId, requester) {
-            const query = `
-                SELECT "experimentId", name
-                FROM protein_experiments pe, experiments e
-                WHERE
-                    pe."uniprotId" = :uniprotId and
-                    pe."experimentId" = e.id and
-                    (e.private = false or e.uploader = :uploader);
-            `;
+
+            const query = getExperimentsWhichHaveProteinSQL.query();
+
             return context.dbConnection.query(
                 query,
                 {
@@ -136,17 +134,9 @@ module.exports = function(context) {
         },
 
         getExperimentsWhichHaveComplex: (complexId, requester) => {
-            const query = `
-                SELECT DISTINCT e.id, e.name
-                FROM
-                    experiments e,
-                    protein_experiments pe,
-                    (SELECT "uniprotId" FROM protein_complexes pc WHERE pc."complexId" = :complexId) proteins
-                WHERE
-                    pe."uniprotId" = proteins."uniprotId" AND
-                    pe."experimentId" = e.id AND
-                    (e.private = false or e.uploader = :uploader);
-            `;
+
+            const query = getExperimentsWhichHaveComplexSQL.query();
+
             return context.dbConnection.query(
                 query,
                 {
