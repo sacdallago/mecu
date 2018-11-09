@@ -44,8 +44,8 @@ proteinCurvesGrid.on(`click`, `.grid-item`, function(){
                 }
             }
 
-            const data = populateGlobalsGraphs(getColoringValue());
-            drawProteinsInCubes(data);
+            populateGlobalsGraphs(getColoringValue())
+                .then(data => drawProteinsInCubes(data));
             populateDropdowns();
         }
     );
