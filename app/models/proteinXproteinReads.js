@@ -16,7 +16,9 @@ module.exports = function(context) {
             references: {
                 model: `proteinReads`,
                 key: `id`
-            }
+            },
+            onDelete: `CASCADE`,
+            onUpdate: `CASCADE`
         }
     });
 

@@ -13,7 +13,7 @@ StorageManager = {};
  *      {uniprotId: 123, experiment: [4,5]} => [{uniprotId:123, experiment:4},{uniprotId:123, experiment:5}]
  *      [{uniprotId: 1234, experiment:[4]},{uniprotId:5678, experiment:[5]}] =>
  *          [{uniprotId: 1234, experiment:4},{uniprotId:5678, experiment:5}]
- * @param   { ({uniprotId: string, experiment: [number]} | [{uniprotId: string, experiment: [number]}]) } protein - a protein or an array of proteins
+ * @param   { ({uniprotId: string, experiment: [number]} | {uniprotId: string, experiments: [number]}) } protein - a protein or an array of proteins
  * @return  { {uniprotId: string, experiment}[] } the protein(s) split up to be only arrays of protein/experiment pairs
  */
 StorageManager.splitUpProteinIntoExperiments = (protein) => {
@@ -48,12 +48,28 @@ StorageManager.splitUpProteins = (proteins) => {
     return tmp;
 };
 
-StorageManager.add = function(proteins, callback) {
+/**
+ * takes a proteins object:
+ * 1. if it's an array (it is of form: {uniprotId: string, (experiment: string| experiments: {experiment})}[] ):
+ *      apply function StorageManager.splitUpProteins onto it
+ * 2. if it's NOT an array, meaning one or the other protein object (it is of form: {uniprotId: string, experiment: [number]} or {uniprotId: string, experiments: [number]}  )
+ *      apply function StorageManager.splitUpProteinIntoExperiments onto it
+ *
+ * converts the input into the type which is used in the local storage
+ * @param  { }                                                      proteins proteins input
+ * @return { {uniprotId: string, experiment: string}[] }            proteins output as in localStorage
+ */
+StorageManager.standardizeProteins = (proteins) => {
     if (proteins.constructor !== Array) {
-        proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
+        return StorageManager.splitUpProteinIntoExperiments(proteins);
     } else {
-        StorageManager.splitUpProteins(proteins);
+        return StorageManager.splitUpProteins(proteins);
     }
+};
+
+StorageManager.add = function(proteins, callback) {
+
+    proteins = StorageManager.standardizeProteins(proteins);
 
     let current = store.get(`proteins`) || {};
     let removed = 0;
@@ -80,39 +96,15 @@ StorageManager.add = function(proteins, callback) {
     return current;
 };
 
-// StorageManager.remove = function(proteins, callback) {
-//     if (proteins.constructor !== Array) {
-//         proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
-//     } else {
-//         StorageManager.splitUpProteins(proteins);
-//     }
-//
-//     let current = store.get('proteins') || {};
-//
-//     proteins.forEach(protein => {
-//         // if id present and experiment in list, remove experiment
-//         if(current[protein.uniprotId] && current[protein.uniprotId].indexOf(protein.experiment) > -1) {
-//             current[protein.uniprotId].splice(current[protein.uniprotId].indexOf(protein.experiment), 1);
-//
-//             // remove id if list of experiments is empty
-//             if(current[protein.uniprotId] && current[protein.uniprotId].length === 0) {
-//                 delete current[protein.uniprotId];
-//             }
-//         }
-//     });
-//
-//     store.set('proteins', current);
-//
-//     callback(current);
-//     return current;
-// };
-
+/**
+ * toggle a protein/list of proteins
+ * if the protein is already in memory, it is removed, otherwise it is added
+ * @param  {[type]}   proteins same input as for all these functions in storage manager
+ * @param  {Function} callback callback which has (current, added, removed) as numbers parameters
+ * @return {[type]}            returns the current state of the storage
+ */
 StorageManager.toggle = function(proteins, callback) {
-    if (proteins.constructor !== Array) {
-        proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
-    } else {
-        StorageManager.splitUpProteins(proteins);
-    }
+    proteins = StorageManager.standardizeProteins(proteins);
 
     let current = store.get(`proteins`) || {};
     let removed = 0;
@@ -149,13 +141,15 @@ StorageManager.toggle = function(proteins, callback) {
     return current;
 };
 
+/**
+ * works the same as toggle, but does not add/remove any
+ * @param  {[type]}   proteins same input as for all of these functions
+ * @param  {Function} callback callback which has (current, added, removed) as numbers parameters
+ * @return {[type]}            current state of the storage
+ */
 StorageManager.has = function(proteins, callback) {
-    if (proteins.constructor !== Array) {
-        proteins = StorageManager.splitUpProteinIntoExperiments(proteins);
-    } else {
-        StorageManager.splitUpProteins(proteins);
-    }
 
+    proteins = StorageManager.standardizeProteins(proteins);
 
     let current = store.get(`proteins`) || {};
     let has = 0;
@@ -191,22 +185,6 @@ StorageManager.getProteins = function() {
 StorageManager.clear = function() {
     store.remove(`proteins`);
     return;
-};
-
-StorageManager.setMaxTemp = function(temp) {
-    return store.set(`maxTemp`, parseFloat(temp));
-};
-StorageManager.setMinTemp = function(temp) {
-    return store.setItem(`minTemp`, parseFloat(temp));
-};
-
-StorageManager.getMaxTemp = function() {
-    let t = store.get(`maxTemp`);
-    return (t != `NaN` ? t : undefined);
-};
-StorageManager.getMinTemp = function() {
-    let t = store.get(`minTemp`);
-    return (t != `NaN` ? t : undefined);
 };
 
 StorageManager.setFullScreenProteinsSettings = (proteins, experiments, coloring) => {

@@ -46,15 +46,12 @@ module.exports = function(context) {
         geneNamesynonyms: {
             type: sequelize.ARRAY(sequelize.STRING)
         },
-
-
         goId: {
             type: sequelize.ARRAY(sequelize.STRING)
         },
         goDescription: {
             type: sequelize.TEXT
         },
-
         entrezIds: {
             type: sequelize.ARRAY(sequelize.STRING)
         },
@@ -64,18 +61,15 @@ module.exports = function(context) {
         swissprotOrganism: {
             type: sequelize.ARRAY(sequelize.TEXT)
         },
-
         pubMedId: {
             type: sequelize.INTEGER
         },
-
         funCatId: {
             type: sequelize.ARRAY(sequelize.STRING)
         },
         funCatDescription: {
             type: sequelize.TEXT
         },
-
         createdAt: {
             type: sequelize.DATE(3),
             defaultValue: sequelize.literal(`CURRENT_TIMESTAMP(3)`),
@@ -91,7 +85,6 @@ module.exports = function(context) {
     }, {
         timestamps: false
     });
-
 
     return model;
 };

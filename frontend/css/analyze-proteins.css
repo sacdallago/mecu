@@ -93,7 +93,6 @@
 .distance-column, .graph-column {
     padding-bottom: 30px;
 }
-
 .curves-graph-container, .nodes-graph-container{
     height: 450px;
 }
@@ -105,7 +104,6 @@
     border: .2rem solid rgba(66, 66, 66, 0.57);
     transition: border-color 1000ms ease;
 }
-
 .default-text {
     display: flex;
     justify-content: center;
@@ -114,16 +112,9 @@
     height: 400px;
     font-size: 7em;
 }
-
 .table-container table {
     background-color: #fbfbfb !important;
 }
-/* #experiments-dropdown, #proteins-dropdown { //does not work as inteded =(; damn semnaticui
-    max-height: 65px;
-    overflow-x: hidden;
-    overflow-y: auto;
-} */
-
 .table-container {
     padding: 5px 0px;
     width: 100% !important;
@@ -143,8 +134,6 @@
     text-align: center;
 }
 .legend{
-    /* border: 0.5px solid silver;
-    background-color: lightgrey; */
     padding: 5px 0px;
 
     display: flex;
@@ -168,7 +157,6 @@
     width: 50px;
     background: linear-gradient(to right, white, rgba(52,152,219,1));
 }
-
 .grid-container {
     min-height: 70px;
 }

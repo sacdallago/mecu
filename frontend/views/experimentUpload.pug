@@ -2,7 +2,10 @@ extends base
 
 block content
     h1 Submit a new experiment
-    form.ui.form(method="post", action="/api/experiment", enctype="multipart/form-data")
+    
+    .upload-info(style="display: none;")#upload-info Uploading an experiment can take a long time, depeding on how much data you have.
+    
+    form.ui.form#experiment-upload-form
         .field
             label Name
             input(type="text", name="description")
@@ -17,8 +20,11 @@ block content
                 input(type="checkbox", tabindex="0", name="lysate", value=false).hidden
                 label Experiment on cell lysate? (Default: No)
         .ui.button.submit Upload
-
-    .space
+        
+        .ui.error.message
+            .header Error
+            p An error occured while updating the experiment. Try again or contact the administrator if it happens again.
+            p#error-message
 
 block settings
     .divider
@@ -28,4 +34,5 @@ block settings
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src="/public/js/requests.js")
     script(type="text/javascript", src="/public/js/experimentUpload.js")

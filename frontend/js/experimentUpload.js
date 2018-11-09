@@ -28,10 +28,48 @@ function readMultipleFiles(evt) {
 
 document.getElementById(`data`).addEventListener(`change`, readMultipleFiles, false);
 
-$(`.ui.form`).form({
+
+// multiple files: https://stackoverflow.com/questions/36067767/how-do-i-upload-a-file-with-the-js-fetch-api
+$(`#experiment-upload-form`).form({
     fields: {
-        description : `empty`,
-        data     : `empty`
+        description : `minLength[10]`,
+        data        : `empty`
+    },
+    inline: true,
+    on: `change`,
+    revalidate: true,
+    onSuccess: function(event, fields) {
+
+        const file = $(`#data`)[0];
+
+        const formData = new FormData();
+        formData.append(`description`, fields.description);
+        formData.append(`data`, file.files[0]);
+        formData.append(`lysate`, fields.lysate);
+
+        document.querySelector(`#experiment-upload-form`).classList.add(`loading`);
+        document.querySelector(`#upload-info`).style.display = `block`;
+        ExperimentService.uploadExperiment(formData)
+            .then(result => {
+                console.log(`result`, result);
+                if(result.error) {
+                    document.querySelector(`#experiment-upload-form`).classList.remove(`loading`);
+                    document.querySelector(`#experiment-upload-form`).classList.add(`error`);
+                    document.querySelector(`#error-message`).textContent = result.error;
+                } else {
+                    document.querySelector(`#experiment-upload-form`).classList.remove(`loading`);
+                    document.location.href = `/success`;
+                }
+            });
+
+        event.preventDefault();
+    },
+    onFailure: function(formErrors, fields) {
+        console.log(`onFailure fields`, fields);
+        return false;
+    },
+    onValid: function () {
+        document.querySelector(`#upload-info`).style.display = `none`;
     }
 });
 

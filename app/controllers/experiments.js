@@ -27,9 +27,11 @@ module.exports = function(context) {
 
     return {
         uploadExperiment: function(request, response) {
-            console.log(`uploading experiment`);
-            const uploadExperimentStartTime = new Date();
+
             if(request.is(`multipart/form-data`)) {
+
+                const uploadExperimentStartTime = new Date();
+
                 const form = new formidable.IncomingForm();
 
                 form.parse(request, function(error, fields, files) {
@@ -42,17 +44,19 @@ module.exports = function(context) {
                     }();
                     const name = fields.description;
 
+                    console.log(`uploading experiment`, name);
+
                     if(error || data === undefined || lysate === undefined || name === undefined){
-                        response.status(403).render(`error`, {
+                        response.status(403).send({
                             title: `Error`,
                             message: `Unable to post request`,
-                            error: error || `Some fields are missing!`
+                            error: `${error}` || `Some fields are missing!`
                         });
                         return;
                     }
 
                     if (data.type != `text/plain`) {
-                        response.status(500).render(`error`, {
+                        response.status(500).send({
                             title: `Error`,
                             message: `Unable to post request`,
                             error: `Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format`
@@ -62,7 +66,7 @@ module.exports = function(context) {
 
                     return fs.readFile(data.path, `utf8`, function (error, data) {
                         if(error){
-                            return response.status(500).render(`error`, {
+                            return response.status(500).send({
                                 title: `Error`,
                                 message: `Unable to read file`,
                                 error: error
@@ -75,23 +79,25 @@ module.exports = function(context) {
                         let newExperiment = {
                             name: name,
                             metaData: {
-                                lysate: lysate
+                                lysate: lysate,
+                                description: ``
                             },
                             rawData: data,
                             uploader: extractUserGoogleId(request)
                         };
 
                         return uploadExperimentDao.uploadExperiment(newExperiment)
-                            .then(() => {
+                            .then((resultExp) => {
                                 console.log(`DURATION TOTAL uploadExperiment`, (Date.now()-uploadExperimentStartTime)/1000);
-                                return response.status(201).render(`success`, {
+                                return response.status(201).send({
                                     title: `Success`,
-                                    message: `Your data has been added to the database!`
+                                    message: `Your data has been added to the database!`,
+                                    result: resultExp
                                 });
                             })
                             .catch(error => {
                                 console.error(`uploadExperiment`, error.message, error);
-                                return response.status(500).render(`error`, {
+                                return response.status(500).send({
                                     title: `Error`,
                                     message: `Unable to create experiment`,
                                     error: JSON.stringify(error)
@@ -100,7 +106,7 @@ module.exports = function(context) {
                     });
                 });
             } else {
-                response.status(403).render(`error`, {
+                response.status(403).send({
                     title: `Error`,
                     message: `Unable to post request`,
                     error: `Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format`

@@ -30,7 +30,7 @@ module.exports = function(context) {
                 protExpArray = [];
             }
 
-            temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray, extractUserGoogleId(request))
+            temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(protExpArray, extractUserGoogleId(request), `getProteinsFromExp`)
                 .then(r => response.status(200).send(r))
                 .catch(err => {
                     console.error(`getProteinsFromExp`, err);

@@ -2,8 +2,6 @@ body {
     overflow: scroll;
     background-color: #fbfbfb !important;
 }
-
-
 .legend{
     position: fixed;
     left: 28%;
@@ -32,8 +30,6 @@ body {
     width: 50px;
     background: linear-gradient(to right, white, rgba(52,152,219,1));
 }
-
-
 .table-container {
     margin-top: 30px;
 }
@@ -56,7 +52,6 @@ body {
     height: 100%;
     text-align: center;
 }
-
 td, th {
     white-space: nowrap;
 }

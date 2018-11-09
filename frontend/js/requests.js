@@ -33,6 +33,21 @@ TemperatureService.queryUniprotIdReceiveTemperatureReads = (query) => {
 };
 
 ExperimentService = {};
+ExperimentService.uploadExperiment = (formData) => {
+    return fetch( // edge and IE do not support https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams , consider polyfills?
+        `/api/experiment`,
+        {
+            method: `POST`,
+            // headers: {'Content-Type': `multipart/form-data`},
+            body: formData
+        }
+    )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error(`Request error for ExperimentService.uploadExperiment: `, error, formData);
+            return [];
+        });
+};
 ExperimentService.getExperiment = (id) => {
     return fetch(`/api/experiment/`+id) // edge and IE do not support https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams , consider polyfills?
         .then(resp => resp.json())
