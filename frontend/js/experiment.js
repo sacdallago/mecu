@@ -90,7 +90,7 @@ $(`#experiment-form`).form({
     },
     onFailure: function (formErrors, fields) {
         console.log(fields);
-        event.preventDefault();
+        return false;
     },
     onValid: function () {
         document.querySelector(`#experiment-form`).classList.remove(`error`, `success`);
