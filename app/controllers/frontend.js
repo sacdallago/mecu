@@ -96,6 +96,13 @@ module.exports = function(context) {
             return response.render(`ppi-fullscreen`, {
                 title: `Distances and Correlations amongst proteins`
             });
+        },
+
+        success: function(request, response) {
+            return response.render(`success`, {
+                title: `Experiment upload successful`,
+                message: `Your experiment has been uploaded successfully!`
+            });
         }
     };
 };
