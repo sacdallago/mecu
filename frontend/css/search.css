@@ -20,8 +20,6 @@
 .search-header .search .field:focus {
     outline: none;
 }
-
-
 .grid-container {
     min-height: 70px ;
 }
