@@ -1,5 +1,8 @@
 const sequelize = require(`sequelize`);
 
+const bulkCreateSQL = require(`./proteins/bulkCreate`);
+const findProteinExperimentCombinationsSQL = require(`./proteins/findProteinExperimentCombinations`);
+
 module.exports = function(context) {
 
     // Imports
@@ -15,7 +18,7 @@ module.exports = function(context) {
             let p = Promise.resolve();
             proteinList.forEach(protein => {
                 p = p.then(() => context.dbConnection.query(
-                    `INSERT INTO public.proteins("uniprotId", "createdAt", "updatedAt") VALUES (:uniprotId, :createdAt, :updatedAt) ON CONFLICT DO NOTHING;`,
+                    bulkCreateSQL.query(),
                     {
                         replacements: {
                             uniprotId: protein,
@@ -65,14 +68,18 @@ module.exports = function(context) {
             if(proteinExperimentPairs.length === 0) {
                 return Promise.resolve([]);
             }
+
             const replacements = {
                 uploader: requester,
                 isPrivate: false
             };
+
             let whereClause = ``;
             proteinExperimentPairs.forEach((v,i) => {
                 if(i != 0) {
                     whereClause += ` OR `;
+                } else {
+                    whereClause += ` AND (`;
                 }
                 let replStrExp = `Exp`+i;
                 let replStrPrt = `Prt`+i;
@@ -80,31 +87,11 @@ module.exports = function(context) {
                 replacements[replStrPrt] = v.uniprotId;
                 replacements[replStrExp] = v.experiment;
             });
+            if(proteinExperimentPairs.length > 0) {
+                whereClause += ` ) `;
+            }
 
-            const query = `
-            SELECT tmp."uniprotId", json_agg(tmp.experiment) AS experiments
-            FROM (
-                SELECT tr.experiment, tr."uniprotId"
-                FROM
-                    experiments e,
-                    "experiment_temperatureReads" e_tr,
-                    "temperatureReads" tr,
-                    proteins p,
-                    "protein_temperatureReads" p_tr,
-                    protein_experiments pe
-                WHERE
-                    p."uniprotId" = pe."uniprotId" AND
-                    pe."experimentId" = e.id AND
-                    e.id = e_tr."experimentId" AND
-                    (e.private = :isPrivate or e.uploader = :uploader) AND
-                    e_tr."temperatureReadId" = tr.id AND
-                    p_tr."uniprotId" = p."uniprotId" AND
-                    p_tr."temperatureReadId" = tr.id AND
-                    (${whereClause})
-                GROUP BY tr."experiment", tr."uniprotId"
-            ) tmp
-            GROUP BY tmp."uniprotId";
-            `;
+            const query = findProteinExperimentCombinationsSQL.query(whereClause);
 
             const start = new Date();
             return context.dbConnection.query(

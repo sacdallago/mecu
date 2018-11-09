@@ -1,10 +1,9 @@
-/**
- * temperatureReads DAO
- *
- * Created by Christian Dallago on 20170103 .
- */
-
 const sequelize = require(`sequelize`);
+
+const findByUniprotIdAndExperimentSQL = require(`./temperatureReads/findByUniprotIdAndExperiment`);
+const findAndAggregateTempsBySimilarUniprotIdSQL = require(`./temperatureReads/findAndAggregateTempsBySimilarUniprotId`);
+const findAndAggregateTempsByIdAndExperimentSQL = require(`./temperatureReads/findAndAggregateTempsByIdAndExperiment`);
+const getSingleProteinXExperimentSQL = require(`./temperatureReads/getSingleProteinXExperiment`);
 
 module.exports = function(context) {
 
@@ -16,30 +15,28 @@ module.exports = function(context) {
             return temperatureReadsModel.bulkCreate(items, options);
         },
 
+        // used for the raw download of the experiment data (TSV data melting curves and CSV data melting curves)
         findByUniprotIdAndExperiment: function(uniprotId, experimentId, requester) {
+
             const replacements = {
                 uploader: requester,
                 private: false
             };
-            let whereClause = `
-                where
-                (e.private = false or e.uploader = :uploader) and
-                tr."uniprotId" = p."uniprotId" and
-                tr.experiment = e.id
-            `;
+
+            let whereClause = findByUniprotIdAndExperimentSQL.constructWhereClause();
+
             if(uniprotId !== undefined){
-                whereClause += `p."uniprotId" = :uniprotId and`;
+                whereClause += ` and p."uniprotId" = :uniprotId `;
                 replacements.uniprotId = uniprotId;
             }
+
             if(experimentId !== undefined){
-                whereClause += `e.id = :experimentId`;
-                replacements.experiment = experimentId;
+                whereClause += ` and e.id = :experimentId`;
+                replacements.experimentId = experimentId;
             }
-            const query = `
-                SELECT e.id, p."uniprotId", temperature, ratio
-                FROM "temperatureReads" tr, proteins p, experiments e
-                ${whereClause};
-            `;
+
+            const query = findByUniprotIdAndExperimentSQL.query(whereClause);
+
             return context.dbConnection.query(
                 query,
                 {replacements: replacements},
@@ -48,20 +45,23 @@ module.exports = function(context) {
                 .then(r => r.length > 0 ? r[0] : []);
         },
 
+        // main way to retrieve temperature reads
         findAndAggregateTempsBySimilarUniprotId: function(query, requester) {
+
             let replacements = {
-                search: query.search+`%`,
                 offset: query.offset,
                 limit: query.limit,
                 isPrivate: false,
                 uploader: requester
             };
+
             let whereClause = ``;
+
             if(query.search.constructor === Array) {
-                whereClause += `AND (`;
-                query.search.forEach((v,i,a) => {
+                whereClause += ` AND (`;
+                query.search.forEach((v,i) => {
                     if(i != 0) {
-                        whereClause += ` or `;
+                        whereClause += ` OR `;
                     }
                     let replStr = `search`+i;
                     whereClause += `p."uniprotId" like :`+replStr;
@@ -69,55 +69,23 @@ module.exports = function(context) {
                 });
                 whereClause += `)`;
             } else {
-                whereClause = `and (p."uniprotId" like :search)`;
+                replacements.search = query.search + `%`;
+                whereClause = ` AND (p."uniprotId" like :search)`;
             }
-            const sqlQuery = `
-                SELECT tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) AS experiments
-                FROM (
-                    SELECT tr.experiment, tr."uniprotId", json_agg(json_build_object('t', tr.temperature, 'r', tr.ratio) ORDER BY temperature) AS reads
-                    FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
-                    WHERE
-                        e.id = e_tr."experimentId" AND
-                        (e.private = :isPrivate or e.uploader = :uploader) AND
-                        e_tr."temperatureReadId" = tr.id AND
-                        p_tr."uniprotId" = p."uniprotId" AND
-                        p_tr."temperatureReadId" = tr.id
-                        ${whereClause}
-                    GROUP BY tr."experiment", tr."uniprotId"
-                    ORDER BY "uniprotId" asc, experiment asc
-                    OFFSET :offset
-                    LIMIT :limit
-                ) tmp
-                group by tmp."uniprotId";
-            `;
-            const sqlQueryTotal = `
-                SELECT count(*) FROM (
-                    SELECT count(*)
-                    FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
-                    WHERE
-                        e.id = e_tr."experimentId" AND
-                        (e.private = :isPrivate or e.uploader = :uploader) AND
-                        e_tr."temperatureReadId" = tr.id AND
-                        p_tr."uniprotId" = p."uniprotId" AND
-                        p_tr."temperatureReadId" = tr.id
-                        ${whereClause}
-                    GROUP BY tr."experiment", tr."uniprotId"
-                ) t;
-            `;
+
+            const sqlQuery = findAndAggregateTempsBySimilarUniprotIdSQL.query(whereClause);
+            const sqlQueryTotal = findAndAggregateTempsBySimilarUniprotIdSQL.total(whereClause);
+
             const start = new Date();
             return Promise.all([
                 context.dbConnection.query(
                     sqlQuery,
-                    {
-                        replacements: replacements
-                    },
+                    {replacements: replacements},
                     {type: sequelize.QueryTypes.SELECT}
                 ),
                 context.dbConnection.query(
                     sqlQueryTotal,
-                    {
-                        replacements: replacements
-                    },
+                    {replacements: replacements},
                     {type: sequelize.QueryTypes.SELECT}
                 )
             ])
@@ -130,7 +98,7 @@ module.exports = function(context) {
                 });
         },
 
-        findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs, requester) {
+        findAndAggregateTempsByIdAndExperiment: function(uniprodIdExpIdPairs, requester, loginfo = `direct`) {
 
             if(uniprodIdExpIdPairs.length === 0) {
                 return Promise.resolve([]);
@@ -140,7 +108,7 @@ module.exports = function(context) {
                 isPrivate: false
             };
             let whereClause = `(`;
-            uniprodIdExpIdPairs.forEach((v,i,a) => {
+            uniprodIdExpIdPairs.forEach((v,i) => {
                 if(i != 0) {
                     whereClause += ` or `;
                 }
@@ -152,22 +120,7 @@ module.exports = function(context) {
             });
             whereClause += `) `;
 
-            const query = `
-                SELECT tmp."uniprotId", json_agg(json_build_object('experiment', tmp.experiment, 'reads', tmp.reads)) AS experiments
-                FROM (
-                    SELECT tr.experiment, tr."uniprotId", json_agg(json_build_object('t', tr.temperature, 'r', tr.ratio) ORDER BY temperature) AS reads
-                    FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
-                    WHERE
-                        e.id = e_tr."experimentId" AND
-                        (e.private = :isPrivate or e.uploader = :uploader) AND
-                        e_tr."temperatureReadId" = tr.id AND
-                        p_tr."uniprotId" = p."uniprotId" AND
-                        p_tr."temperatureReadId" = tr.id AND
-                        ${whereClause}
-                    GROUP BY tr."experiment", tr."uniprotId"
-                ) tmp
-                GROUP BY tmp."uniprotId";
-            `;
+            const query = findAndAggregateTempsByIdAndExperimentSQL.query(whereClause);
 
             const start = new Date();
             return context.dbConnection.query(
@@ -176,7 +129,7 @@ module.exports = function(context) {
                 {type: sequelize.QueryTypes.SELECT}
             )
                 .then(r => {
-                    console.log(`DURATION findAndAggregateTempsByIdAndExperiment  ${(Date.now()-start)/1000} ms`);
+                    console.log(`DURATION findAndAggregateTempsByIdAndExperiment ${loginfo || ``}  ${(Date.now()-start)/1000} ms`);
                     return r;
                 })
                 .then(r => r.length > 0 ? r[0] : [])
@@ -188,20 +141,11 @@ module.exports = function(context) {
         },
 
         getSingleProteinXExperiment: function(proteinName, experimentId, requester) {
-            const query = `
-                SELECT tr.experiment, tr."uniprotId", json_agg(json_build_object('t', tr.temperature, 'r', tr.ratio)) as reads
-                FROM experiments e, "experiment_temperatureReads" e_tr, "temperatureReads" tr, proteins p, "protein_temperatureReads" p_tr
-                where
-                    e.id = :experimentId and
-                    (e.private = :isPrivate or e.uploader = :uploader) AND
-                    e.id = e_tr."experimentId" and
-                    e_tr."temperatureReadId" = tr.id and
-                    p."uniprotId" = :proteinName and
-                    p_tr."uniprotId" = p."uniprotId" and
-                    p_tr."temperatureReadId" = tr.id
-                GROUP BY tr."experiment", tr."uniprotId";
-            `;
+
             const start = new Date();
+
+            const query = getSingleProteinXExperimentSQL.query();
+
             return context.dbConnection.query(
                 query,
                 {

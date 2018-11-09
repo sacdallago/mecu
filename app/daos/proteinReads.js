@@ -1,5 +1,7 @@
 const sequelize = require(`sequelize`);
 
+const findProteinExperimentSQL = require(`./proteinReads/findProteinExperiment`);
+
 module.exports = function(context) {
 
     // Imports
@@ -11,16 +13,9 @@ module.exports = function(context) {
         },
 
         findProteinExperiment: function(uniprotId, experiment, requester) {
-            const query = `
-            SELECT pr."uniprotId", pr.experiment, pr.peptides, pr.psms, pr."createdAt", pr."updatedAt"
-            FROM "proteinReads" pr, "experiment_proteinReads" e_pr, experiments e
-            WHERE
-                pr."uniprotId" = :uniprotId AND
-                pr.id = e_pr."proteinReadId" AND
-                e_pr."experimentId" = e.id AND
-                e.id = :experimentId AND
-                (e.private = false or e.uploader = :uploader);
-            `;
+
+            const query = findProteinExperimentSQL.query();
+
             return context.dbConnection.query(
                 query,
                 {

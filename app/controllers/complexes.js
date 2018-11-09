@@ -46,8 +46,9 @@ module.exports = function(context) {
         },
 
         hasProtein: function(request, response) {
+
             const start = new Date();
-            console.log(`request.params`, request.params);
+
             complexesDao.getComplexWhichHasProtein(request.params.uniprotId)
                 .then(result => {
                     let setOfProteins = new Set();
@@ -60,26 +61,26 @@ module.exports = function(context) {
 
                     return Promise.all([
                         Promise.resolve(result),
-                        Promise.all(
-                            setOfProteins.map(p =>
-                                temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(
-                                    [{
-                                        uniprotId: p,
-                                        experiment: request.params.expId
-                                    }],
-                                    extractUserGoogleId(request)
-                                )
-                                    .then(r => r.length > 0 ? r[0] : {})
-                            )
+                        temperatureReadsDao.findAndAggregateTempsByIdAndExperiment(
+                            setOfProteins.map(p => ({
+                                uniprotId: p,
+                                experiment: request.params.expId
+                            })),
+                            extractUserGoogleId(request),
+                            `hasProtein`
                         )
                     ]);
                 })
                 .then(result => {
+
                     const proteinToTemperatureMap = {};
-                    result[1].forEach(tempObj => proteinToTemperatureMap[tempObj.uniprotId] = {
-                        uniprotId: tempObj.uniprotId,
-                        experiments: tempObj.experiments}
+                    result[1].forEach(tempObj =>
+                        proteinToTemperatureMap[tempObj.uniprotId] = {
+                            uniprotId: tempObj.uniprotId,
+                            experiments: tempObj.experiments
+                        }
                     );
+
                     result[0].forEach(complex => {
                         complex.proteins.forEach((p,i) => {
                             if(proteinToTemperatureMap[p]) {
