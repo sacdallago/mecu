@@ -19,7 +19,6 @@ module.exports = function(context) {
                 key: `uniprotId`
             }
         },
-
         peptides: {
             type: sequelize.INTEGER,
             allowNull: false
