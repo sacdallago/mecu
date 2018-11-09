@@ -2,23 +2,18 @@ body {
     background-color: #fbfbfb;
     border-top: 1rem solid #E8E8E8;
 }
-
 #spacedText {
     min-height: 16rem;
 }
-
 .gigantic {
     font-size: 5rem;
 }
-
 .green {
     color: rgba(75, 208, 106, 0.66);
 }
-
 .blue {
     color: rgba(83, 162, 208, 0.66);
 }
-
 .red {
     color: rgba(208, 54, 64, 0.66);
 }

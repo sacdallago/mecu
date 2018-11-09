@@ -1,12 +1,9 @@
-
 .maxWidth {
     width: 100%
 }
-
 .step {
     margin-bottom: 3px !important;
 }
-
 .ui.table td {
     padding: 5px !important;
 }
@@ -16,7 +13,6 @@
 .table .uploader {
     min-width: 118px;
 }
-
 .ui.input.search {
     border: silver 1px solid;
 }
@@ -24,12 +20,10 @@
     height: 6em;
     border-radius: 3px;
 }
-
 .prompt.inline {
     font-size: 1.2rem !important;
     text-decoration: none !important;
 }
-
 .heatmap-container {
     display: flex;
     flex-direction: column;
@@ -68,13 +62,10 @@
     display: flex;
     align-items: center;
 }
-
-
 /* workaround so that the highcharts tooltip is not cut off*/
 .highcharts-container {
     overflow: visible !important;
 }
-
 .highcharts-container svg {
     overflow: visible !important;
 }
