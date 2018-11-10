@@ -50,7 +50,7 @@ module.exports = {
         try {
             req = require(__dirname+`/private/config`);
         } catch(e) {
-            console.error(`No private/config.js found... continuing with default config`);
+            console.warn(`No private/config.js found... continuing with default config`);
         }
         const config    = Object.assign({}, require(__dirname + `/config`), req );
 
