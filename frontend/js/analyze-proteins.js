@@ -120,7 +120,7 @@ function populateGlobalsGraphs(coloringType){
                         name: protein.uniprotId+` - `+experiment.experiment,
                         data: experiment.reads.map(r => [r.t, r.r]),
                         color: coloringType === 0 ?
-                            HelperFunctions.stringToColor(protein.uniprotId):
+                            HelperFunctions.stringToColor(protein.uniprotId+`-E`+experiment.experiment):
                             HelperFunctions.stringToColor(experiment.experiment*12+``),
                         marker: {symbol: `circle`}
                     });
