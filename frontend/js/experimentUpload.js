@@ -57,7 +57,6 @@ $(`#experiment-upload-form`).form({
                     document.querySelector(`#experiment-upload-form`).classList.add(`error`);
                     document.querySelector(`#error-message`).textContent = result.error;
                 } else {
-                    document.querySelector(`#experiment-upload-form`).classList.remove(`loading`);
                     document.location.href = `/success`;
                 }
             });
