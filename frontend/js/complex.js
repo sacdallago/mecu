@@ -1,4 +1,4 @@
-const lAExperimentNumber = new LoadingAnimation(`.experiment-number-loading-animation`);
+const lAExperimentNumber = new LoadingAnimation(`.experiment-number-loading-animation`, {size: 30});
 const lAComplexCurve = new LoadingAnimation(`#curvesGraph`);
 const lAMetaData = new LoadingAnimation(`.column-right-loading-animation`);
 const lAComplexCurves = new LoadingAnimation(`#curves-grid .grid`, {size: 50});

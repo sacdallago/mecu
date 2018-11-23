@@ -1,7 +1,7 @@
 
 class LoadingAnimation {
 
-    constructor(htmlId, {size = 120, subElementCreateFunction} = {}) {
+    constructor(htmlId, {size = 80, subElementCreateFunction} = {}) {
         this.htmlId = htmlId;
         this.htmlComponent = document.querySelector(htmlId);
         if(!htmlId || !this.htmlComponent) {
