@@ -10,6 +10,7 @@
                 name = name.length > 20 ? name.substr(0.15) + "..." : name;
             .item= name
             a(href="/upload").item Upload experiment
+            a(href="/upload-experiment-guide").item How to upload an experiment
             a(href="/auth/logout").item Logout
         else
             a(href="/auth/google").item Login

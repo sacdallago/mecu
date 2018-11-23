@@ -16,5 +16,7 @@ module.exports = function(context) {
         .get(`/storage-proteins-fullscreen`, frontendController.storageProteinsFullscreen)
         .get(`/ppi-fullscreen`, frontendController.ppiFullscreen)
         .get(`/success`, frontendController.success)
+        .get(`/upload-experiment-guide`, frontendController.uploadExperimentGuide)
+        .get(`/template-file-download`, frontendController.templateFileDowload)
     ;
 };

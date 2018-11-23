@@ -55,11 +55,11 @@ module.exports = function(context) {
                         return;
                     }
 
-                    if (data.type != `text/plain`) {
+                    if (data.type != `text/plain` && data.type != `text/csv`) {
                         response.status(500).send({
                             title: `Error`,
                             message: `Unable to post request`,
-                            error: `Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format`
+                            error: `Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format. found: ${data.type}`
                         });
                         return;
                     }
