@@ -90,19 +90,33 @@ const drawComplexMetadata = (complex) => {
             const pANText = $(`<div />`).addClass(`id-and-names-text`);
             proteinAndNamesList.append(
                 proteinAndNamesItem.clone().append([
-                    pANId.clone().text(`UniprotId`),
-                    pANText.clone().text(`Name`)
+                    pANId.clone().text(`UniprotId`)
+                    // ,pANText.clone().text(`Name`)
                 ])
             );
             complex.proteins.forEach((p,i) => {
                 proteinAndNamesList.append(
                     $(`<a />`).attr({'target':`_blank`, 'href':`https://www.uniprot.org/uniprot/${p}`}).append(
                         proteinAndNamesItem.clone().append([
-                            pANId.clone().text(p),
-                            pANText.clone().text(
-                                complex.proteinNames.length > i ? complex.proteinNames[i] : `-`
-                            )
+                            pANId.clone().text(p)
                         ])
+                            .attr(`data-html`,`
+                                <div class="tooltip">
+                                    <div class="tooltip-header"><b>Additional protein info</b></div>
+                                    <div class="tooltip-row">
+                                        <div class="text">Protein name: ${complex.proteinNames[i]}</div>
+                                    </div>
+                                    <div class="tooltip-row">
+                                        <div class="text">Gene name: ${complex.geneNames[i]}</div>
+                                    </div>
+                                    <div class="tooltip-row">
+                                        <div class="text">Gene synonym: ${complex.geneNamesynonyms[i]}</div>
+                                    </div>
+                                    <div class="tooltip-row">
+                                        <div class="text">Organism: ${complex.swissprotOrganism[i]}</div>
+                                    </div>
+                                </div>`)
+                            .popup({position: `bottom left`})
                     )
                 );
             });
@@ -174,16 +188,8 @@ const drawComplexMetadata = (complex) => {
                 value.clone().append(proteinAndNamesList)
             ]),
             itemContainer.clone().append([
-                text.clone().text(`Gene`),
-                value.clone().append(geneAndNamesList)
-            ]),
-            itemContainer.clone().append([
                 text.clone().text(`GO description`),
                 value.clone().append(complex.goDescription)
-            ]),
-            itemContainer.clone().append([
-                text.clone().text(`Swissprot Organism`),
-                value.clone().append(swissprotOrganismList)
             ]),
             itemContainer.clone().append([
                 text.clone().text(`Funcat Description`),
