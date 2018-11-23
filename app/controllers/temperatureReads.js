@@ -6,7 +6,7 @@ const extractUserGoogleId = require(`../helper.js`).retrieveUserGoogleId;
 const UPPER_QUERY_LIMIT = 100;
 const queryParams = (query) => {
     let s;
-    if(query.search && query.search.constructor === Array && query.search.length > 0) {
+    if(query.search && query.search.constructor === Array) {
         s = [];
         query.search.forEach(v => v && v.length > 0 ? s.push(v.toUpperCase()) : ``);
     } else {

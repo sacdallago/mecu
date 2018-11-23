@@ -72,7 +72,9 @@ searchInput.keydown(function() {
  */
 const handleInput = (page, resetOffset) => {
     if(resetOffset) proteinsQuery.offset = 0;
+
     const inputValue = searchInput.val().trim();
+    changeURIParams(inputValue);
 
     if(inputValue.length === 0) {
         console.log(`not searching for empty string, or listing all proteins...`);
@@ -104,7 +106,7 @@ const handleInput = (page, resetOffset) => {
                 proteinsQuery.search = list;
                 return proteinsQuery;
             })
-            .then(q => TemperatureService.queryUniprotIdReceiveTemperatureReads(q))
+            .then(q => q.search.length > 0 ? TemperatureService.queryUniprotIdReceiveTemperatureReads(q) : {data:[]})
             .then(response => {
                 console.log(`response`, response);
                 drawProteinCurves(response.data);
@@ -155,7 +157,10 @@ const drawProteinCurves = (data) => {
         ];
     };
 
+    loadingAnimation.stop();
+
     HelperFunctions.drawItemForEveryExperiment(`.grid-container`, proteinExperimentObject, toAppend);
+
 
 };
 
@@ -173,6 +178,19 @@ const drawPaginationComponent = (actualPage, totalPages) => {
     );
 };
 
+const changeURIParams = (searchTerm) => {
+    window.history.pushState({search: searchTerm}, `Search for proteins`, `/?search=${searchTerm}`);
+};
+
 (function(){
+
+    const currentUri = URI(window.location.href);
+    const query = currentUri.search(true);
+
+    if(query.search) {
+        document.querySelector(`#search-field`).value = query.search;
+        handleInput(0, true);
+    }
+
     searchInput.trigger(`focus`);
 })();
