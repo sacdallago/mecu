@@ -108,6 +108,9 @@
 .related-complexes .grid .grid-item svg{
     opacity: 0.6;
 }
+.related-proteins-container .buttons {
+    display:flex;
+}
 .related-proteins-container .grid .grid-item svg {
     opacity: 0.6;
 }
@@ -131,4 +134,7 @@
     right: 0;
     margin: 5px;
     border-radius: 10px;
+}
+.experiments-container .buttons {
+    display: flex;
 }

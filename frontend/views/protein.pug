@@ -75,6 +75,14 @@ block content
             
     .experiments-container#experiments-container
         h3 Experiments with this Protein
+        .buttons
+            .select-all-button
+                a.ui.button#select-all-experiments-button
+                    i.check.icon
+                    span Select All
+            a.ui.disabled.button.analyze-button(href='/analyze-proteins')
+                i.eye.icon
+                span Analyze
         .info Click to select
         .grid
     
@@ -86,10 +94,15 @@ block content
         h3 Protein Interactions
         .header
             .info Each cube shows the interaction of the protein of the page with the protein in the cube.
-            .select-all-button
-                a.ui.button#select-all-ppi-button
-                    i.check.icon
-                    span Select All
+            .buttons
+                .select-all-button
+                    a.ui.button#select-all-ppi-button
+                        i.check.icon
+                        span Select All
+                .analyze-button-container
+                    a.ui.disabled.button.analyze-button(href='/analyze-proteins')
+                        i.eye.icon
+                        span Analyze
         .grid
 
 block settings

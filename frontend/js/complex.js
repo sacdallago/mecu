@@ -9,7 +9,9 @@ const dropDownSelector = `#experiment-number .dropdown`;
 
 const modalIdentifier = `#add-protein-modal`;
 ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+
 const selectAllButtonSelector = `#select-all-button`;
+const analyzeButtonSelector = `.analyze-button`;
 
 // grid proteins from the complex
 const proteinCurvesGridIdentifier = `#curves-grid .grid`;
@@ -36,24 +38,35 @@ proteinCurvesGrid.on(`click`, gridItemIdentifier, function(){
                         {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
                         () => gridItemToggleDot(this)
                     );
+                    enableAnalyzeButton();
                 },
                 () => {
                     StorageManager.toggle(
                         {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
                         () => gridItemToggleDot(this)
                     );
+                    enableAnalyzeButton();
                 }
             );
         } else {
-            showModal = true;
             StorageManager.toggle(
                 {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
                 () => gridItemToggleDot(this)
             );
+            showModal = true;
+            enableAnalyzeButton();
         }
     }
 
 });
+
+const enableAnalyzeButton = () => {
+    const l = document.querySelectorAll(analyzeButtonSelector);
+    l.forEach(b => {
+        b.classList.remove(`disabled`);
+        b.classList.add(`green`);
+    });
+};
 
 const drawComplexMetadata = (complex) => {
     return new Promise((resolve) => {
@@ -313,7 +326,7 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
 
         const alreadyInStorage = StorageManager.getProteins();
 
-        const toAppend = (obj, exp) => {
+        const toAppend = (obj) => {
             const ret = [
                 $(`<p />`)
                     .addClass(`grid-item-text`)
@@ -365,10 +378,11 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
                             StorageManager.clear();
                             StorageManager.add(
                                 proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
-                                (c,a) => {
+                                () => {
                                     document.querySelector(selectAllButtonSelector).classList.add(`green`);
                                     document.querySelector(selectAllButtonSelector).classList.add(`disabled`);
                                     gridItemToggleDotAll(true);
+                                    enableAnalyzeButton();
                                 }
                             );
                         },
@@ -379,6 +393,7 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
                                     document.querySelector(selectAllButtonSelector).classList.add(`green`);
                                     document.querySelector(selectAllButtonSelector).classList.add(`disabled`);
                                     gridItemToggleDotAll(true);
+                                    enableAnalyzeButton();
                                 }
                             );
                         }
@@ -391,6 +406,7 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
                             document.querySelector(selectAllButtonSelector).classList.add(`green`);
                             document.querySelector(selectAllButtonSelector).classList.add(`disabled`);
                             gridItemToggleDotAll(true);
+                            enableAnalyzeButton();
                         }
                     );
                 }

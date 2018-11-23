@@ -24,10 +24,15 @@ block content
     
     .curves-grid#curves-grid
         h3.title Contained Proteins
-        .select-all-button
-            a.ui.button#select-all-button
-                i.check.icon
-                span Select All
+        .buttons
+            .select-all-button
+                a.ui.button#select-all-button
+                    i.check.icon
+                    span Select All
+            .analyze-button-container
+                a.ui.disabled.button.analyze-button(href='/analyze-proteins')
+                    i.eye.icon
+                    span Analyze
         .grid
     
 block settings

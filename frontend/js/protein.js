@@ -7,8 +7,12 @@ const lARelProteinsCurves = new LoadingAnimation(`#related-proteins-container .g
 let showModal = !(StorageManager.getProteins().length === 0);
 const modalIdentifier = `#add-protein-modal`;
 ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+
+const selectAllExperimentsButtonSelector = `#select-all-experiments-button`;
 const selectAllPPIButtonSelector = `#select-all-ppi-button`;
 const dropDownSelector = `#experiment-number .dropdown`;
+const analyzeButtonSelector = `.analyze-button`;
+
 const AMOUNT_OF_PPI_TO_DRAW = 20;
 
 // grid for experiments which use this protein as well
@@ -34,6 +38,7 @@ expWithProteinGrid.on(`click`, `.grid-item`, function(){
                     () => gridItemToggleDot(this)
                 );
                 showModal = true;
+                enableAnalyzeButton();
             },
             () => {
                 StorageManager.toggle(
@@ -41,16 +46,28 @@ expWithProteinGrid.on(`click`, `.grid-item`, function(){
                     () => gridItemToggleDot(this)
                 );
                 showModal = true;
+                enableAnalyzeButton();
             }
         );
     } else {
-        showModal = true;
         StorageManager.toggle(
             {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
             () => gridItemToggleDot(this)
         );
+        showModal = true;
+        enableAnalyzeButton();
     }
+
 });
+
+const enableAnalyzeButton = () => {
+    const l = document.querySelectorAll(analyzeButtonSelector);
+    l.forEach(b => {
+        b.classList.remove(`disabled`);
+        b.classList.add(`green`);
+    });
+};
+
 const gridItemToggleDot = (gridItem, show) => {
     let dot = $(gridItem).children(`.dot-div`);
     if(show === true) {
@@ -62,12 +79,9 @@ const gridItemToggleDot = (gridItem, show) => {
     }
 };
 const gridItemToggleDotAll = (show) => {
-    if(show === true) {
-        document.querySelectorAll(expWithProteinGridIdentifier).forEach(item => gridItemToggleDot(item, true));
-    } else if(show === false) {
-        document.querySelectorAll(expWithProteinGridIdentifier).forEach(item => gridItemToggleDot(item, false));
-    } else {
-        document.querySelectorAll(expWithProteinGridIdentifier).forEach(item => gridItemToggleDot(item));
+    const targetItemList = document.querySelector(expWithProteinGridIdentifier).children;
+    for(let i = 0; i < targetItemList.length; i++) {
+        gridItemToggleDot(targetItemList[i], show);
     }
 };
 
@@ -264,6 +278,52 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
 
         HelperFunctions.drawItemForEveryExperiment(expWithProteinGridIdentifier, proteinExperimentObject, toAppend);
 
+        // add functionality to select all button
+        document.querySelector(selectAllExperimentsButtonSelector).addEventListener(
+            `click`,
+            () => {
+                if(showModal) {
+                    ModalService.openModalAndDoAction(
+                        () => {},
+                        () => {
+                            StorageManager.clear();
+                            StorageManager.add(
+                                arr[0].experiments.map(e => ({uniprotId: arr[0].uniprotId, experiment: e.experiment})),
+                                () => {
+                                    document.querySelector(selectAllExperimentsButtonSelector).classList.add(`green`);
+                                    document.querySelector(selectAllExperimentsButtonSelector).classList.add(`disabled`);
+                                    gridItemToggleDotAll(true);
+                                    enableAnalyzeButton();
+                                }
+                            );
+                        },
+                        () => {
+                            StorageManager.add(
+                                arr[0].experiments.map(e => ({uniprotId: arr[0].uniprotId, experiment: e.experiment})),
+                                () => {
+                                    document.querySelector(selectAllExperimentsButtonSelector).classList.add(`green`);
+                                    document.querySelector(selectAllExperimentsButtonSelector).classList.add(`disabled`);
+                                    gridItemToggleDotAll(true);
+                                    enableAnalyzeButton();
+                                }
+                            );
+                        }
+                    );
+                } else {
+                    showModal = true;
+                    StorageManager.add(
+                        arr[0].experiments.map(e => ({uniprotId: arr[0].uniprotId, experiment: e.experiment})),
+                        () => {
+                            document.querySelector(selectAllExperimentsButtonSelector).classList.add(`green`);
+                            document.querySelector(selectAllExperimentsButtonSelector).classList.add(`disabled`);
+                            gridItemToggleDotAll(true);
+                            enableAnalyzeButton();
+                        }
+                    );
+                }
+            }
+        );
+
         resolve(true);
     });
 
@@ -434,6 +494,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
                                 document.querySelector(selectAllPPIButtonSelector).classList.add(`green`);
                                 document.querySelector(selectAllPPIButtonSelector).classList.add(`disabled`);
                                 // gridItemToggleDotAll(true);
+                                enableAnalyzeButton();
                             }
                         );
                     },
@@ -444,6 +505,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
                                 document.querySelector(selectAllPPIButtonSelector).classList.add(`green`);
                                 document.querySelector(selectAllPPIButtonSelector).classList.add(`disabled`);
                                 // gridItemToggleDotAll(true);
+                                enableAnalyzeButton();
                             }
                         );
                     }
