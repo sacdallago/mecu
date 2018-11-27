@@ -1,0 +1,59 @@
+extends base
+
+block postStyles
+    link(rel='stylesheet', href='/public/css/upload-experiment-guide.css')
+
+block content
+    h1 How to upload an experiment
+    .guide
+        .step 1. Download this file: #[a(href='/template-file-download') template-file.xls]
+        .space
+
+        .step 2. Fill out the columns (this can be copy/pasted from any other excel program as long as the columns match). Pay attention that the columns are in the same order!
+        img.image1(src="/public/images/g1_scaled.png")
+        .space
+
+        .step 3. Save as: Text CSV (.csv)
+        img.image1(src="/public/images/g2.png")
+        .space
+
+        .step 4. Tick the box 'Edit filter settings'
+        img.image1(src="/public/images/g3.png")
+        .space
+        
+        .step 5. Save
+        .space
+        
+        .step 6. Click <b>'Use Text CSV Format'</b> if asked to confirm file format
+        .space
+        
+        .step 7. Set the <b>Field delimiter</b> to <b>{Tab}</b>
+        img.image1(src="/public/images/g4.png")
+        .space
+        
+        .step 8. Ok
+        .space
+
+        .step 9. #[a(href='/upload') Upload experiment!]
+        .space
+    
+    .space
+    .space
+    .space
+    .space
+    .space
+    .space
+    .space
+    .space
+
+block settings
+    .divider
+    a(href='/').item Search protein
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
+    a(href='/experiments').item Search Experiments
+    a(href='/analyze-proteins').item Analyze
+
+block scripts
+    - var delta = 50
+    //- /* script(type="text/javascript", src="/public/js/search.js") */

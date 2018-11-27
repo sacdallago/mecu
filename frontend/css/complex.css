@@ -54,6 +54,7 @@
 .column-right > * {
     display: flex;
     align-items: flex-end;
+    justify-content: space-between;
     border-bottom: 0.5px solid silver;
     padding: 5px;
 }
@@ -83,9 +84,21 @@
 .column-right .id-and-names-text {
     word-wrap: break-word;
 }
+.column-right .item-container .value {
+    text-align: right;
+}
+.tooltip {
+    width: 300px
+}
+.tooltip .tooltip-row {
+}
 
-.curves-grid .grid {
+
+.curves-grid {
     padding: 10px;
+}
+.curves-grid .grid {
+    padding: 10px 0px;
 }
 .selected-curve-dot {
     width: 20px;
@@ -154,6 +167,9 @@
     top: 42%;
     left: 9px;
     font-size: 13pt;
+}
+.curves-grid .buttons {
+    display:flex;
 }
 
 #curvesGraph {

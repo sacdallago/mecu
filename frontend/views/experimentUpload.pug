@@ -12,6 +12,7 @@ block content
         .field
             label Source
             input(type="file", name="data", id="data")
+            a(href='/upload-experiment-guide') Guide: how to create an experiment that can be uploaded here?
         .field
             div(style= "background-color: #1B1C1D; color: #0ea432;")
                 code#preview
@@ -28,6 +29,7 @@ block content
 
 block settings
     .divider
+    a(href='/').item Search protein
     a(href='/search').item Search list of proteins
     a(href='/complexes').item Search Complex
     a(href='/experiments').item Search Experiments

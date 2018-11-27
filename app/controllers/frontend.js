@@ -103,6 +103,16 @@ module.exports = function(context) {
                 title: `Experiment upload successful`,
                 message: `Your experiment has been uploaded successfully!`
             });
+        },
+
+        uploadExperimentGuide: function(request, response) {
+            return response.render(`upload-experiment-guide`, {
+                title: `How to upload an experiment`
+            });
+        },
+
+        templateFileDowload: function(request, response) {
+            return response.download(`./frontend/public/files/template-file.xls`);
         }
     };
 };
