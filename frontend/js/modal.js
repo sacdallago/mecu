@@ -41,17 +41,17 @@ ModalService.create = (htmlIdentifier, title, content, buttons, settings = {}) =
 };
 
 ModalService.listenForDecision = (identifier, arrayOfActions, handler) => {
-    ModalService.show(modalIdentifier);
+    ModalService.show(identifier);
 
     const newHandler = (e) => {
         handler(e);
         arrayOfActions.forEach(action =>
-            document.querySelector(modalIdentifier).removeEventListener(action, newHandler)
+            document.querySelector(identifier).removeEventListener(action, newHandler)
         );
     };
 
     arrayOfActions.forEach(action =>
-        document.querySelector(modalIdentifier).addEventListener(action, newHandler)
+        document.querySelector(identifier).addEventListener(action, newHandler)
     );
 };
 
@@ -59,7 +59,8 @@ ModalService.listenForDecision = (identifier, arrayOfActions, handler) => {
 // -----------------------------------------------------------------------------------------
 // custom usages
 // -----------------------------------------------------------------------------------------
-ModalService.openModalAndDoAction = (
+ModalService.openProteinAddModalAndWaitForAction = (
+    modalIdentifier,
     action1,
     action2,
     action3

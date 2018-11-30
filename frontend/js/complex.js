@@ -29,7 +29,8 @@ proteinCurvesGrid.on(`click`, gridItemIdentifier, function(){
     // disable selection of proteins without curves
     if(data.obj.present > 1) {
         if(showModal && !gridItemHasDot(this)) {
-            ModalService.openModalAndDoAction(
+            ModalService.openProteinAddModalAndWaitForAction(
+                addProteinModalIdentifier,
                 () => {},
                 () => {
                     StorageManager.clear();
@@ -378,7 +379,8 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
             `click`,
             () => {
                 if(showModal) {
-                    ModalService.openModalAndDoAction(
+                    ModalService.openProteinAddModalAndWaitForAction(
+                        addProteinModalIdentifier,
                         () => {},
                         () => {
                             StorageManager.clear();

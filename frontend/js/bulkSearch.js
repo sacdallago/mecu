@@ -346,7 +346,8 @@ const drawProteinXExperimentHeatmap = (experiments, proteins, data) => {
                     let tmpList = [];
                     tableData.forEach(protein => protein.values[e.point.x] >= 1 ? tmpList.push(protein.name) : ``);
 
-                    ModalService.openModalAndDoAction(
+                    ModalService.openProteinAddModalAndWaitForAction(
+                        modalIdentifier,
                         () => {},
                         () => {
                             StorageManager.clear();
