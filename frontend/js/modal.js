@@ -115,3 +115,29 @@ ModalService.createButtonsNoYesAdd = () => {
         }
     ];
 };
+
+ModalService.openInfoModal = (modalIdentifier) => {
+    ModalService.listenForDecision(
+        modalIdentifier,
+        [`custom-modal-event-close`],
+        () => {$(modalIdentifier).empty();}
+    );
+};
+ModalService.createInfoModal = (identifier, title, htmlContent) => {
+    return ModalService.create(
+        identifier,
+        title,
+        htmlContent,
+        ModalService.createCloseButton(),
+        {closable: true}
+    );
+};
+ModalService.createCloseButton = () => {
+    return [
+        {
+            id: `modal-close-button`,
+            text: `Close`,
+            action: `close`
+        }
+    ];
+};
