@@ -88,18 +88,9 @@ const drawComplexMetadata = (complex) => {
         // proteins items (+modals)
         const proteinAndNamesList = $(`<div />`).addClass(`id-and-names-list-container`);
         if(complex.proteins && complex.proteins.length > 0) {
-            const proteinAndNamesItem = $(`<div />`).addClass(`id-and-names-list-item`);
-            const pANId = $(`<div />`).addClass(`id-and-names-id`);
             proteinAndNamesList.append(
-                proteinAndNamesItem.clone().append([
-                    pANId.clone().text(`UniprotId`)
-                ])
-            );
-            complex.proteins.forEach((p,i) => {
-                proteinAndNamesList.append(
-                    proteinAndNamesItem.clone().append(
-                        pANId.clone().text(p)
-                    ).on(`click`, () => {
+                complex.proteins.map((p,i) =>
+                    $(`<a />`).addClass(`protein-text`).text(` `+p+`, `).on(`click`, () => {
                         ModalService.createInfoModal(infoModalIdentifier,
                             `Protein info: `+p,
                             `<div>Name: ${complex.proteinNames[i]}</div>
@@ -110,8 +101,8 @@ const drawComplexMetadata = (complex) => {
                         );
                         ModalService.openInfoModal(infoModalIdentifier);
                     })
-                );
-            });
+                )
+            );
         }
 
         // gene + names list
