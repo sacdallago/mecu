@@ -7,8 +7,10 @@ const lAComplexCurves = new LoadingAnimation(`#curves-grid .grid`, {size: 50});
 let showModal = !(StorageManager.getProteins().length === 0);
 const dropDownSelector = `#experiment-number .dropdown`;
 
-const modalIdentifier = `#add-protein-modal`;
-ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
+const addProteinModalIdentifier = `#add-protein-modal`;
+ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(addProteinModalIdentifier);
+
+const infoModalIdentifier = `#protein-info-modal`;
 
 const selectAllButtonSelector = `#select-all-button`;
 const analyzeButtonSelector = `.analyze-button`;
@@ -29,7 +31,8 @@ proteinCurvesGrid.on(`click`, gridItemIdentifier, function(){
     // disable selection of proteins without curves
     if(data.obj.present > 1) {
         if(showModal && !gridItemHasDot(this)) {
-            ModalService.openModalAndDoAction(
+            ModalService.openProteinAddModalAndWaitForAction(
+                addProteinModalIdentifier,
                 () => {},
                 () => {
                     StorageManager.clear();
@@ -82,44 +85,24 @@ const drawComplexMetadata = (complex) => {
         const list = $(`<div />`).addClass(`list`);
         const listItem = $(`<div />`).addClass(`list-item`);
 
-        // protein + names list
+        // proteins items (+modals)
         const proteinAndNamesList = $(`<div />`).addClass(`id-and-names-list-container`);
         if(complex.proteins && complex.proteins.length > 0) {
-            const proteinAndNamesItem = $(`<div />`).addClass(`id-and-names-list-item`);
-            const pANId = $(`<div />`).addClass(`id-and-names-id`);
-            const pANText = $(`<div />`).addClass(`id-and-names-text`);
             proteinAndNamesList.append(
-                proteinAndNamesItem.clone().append([
-                    pANId.clone().text(`UniprotId`)
-                    // ,pANText.clone().text(`Name`)
-                ])
+                complex.proteins.map((p,i) =>
+                    $(`<a />`).addClass(`protein-text`).text(` `+p+`, `).on(`click`, () => {
+                        ModalService.createInfoModal(infoModalIdentifier,
+                            `Protein info: `+p,
+                            `<div>Name: ${complex.proteinNames[i]}</div>
+                            <div>Gene: ${complex.geneNames[i]}</div>
+                            <div>Synonym: ${complex.geneNamesynonyms[i]}</div>
+                            <div>Organism: ${complex.swissprotOrganism[i]}</div>
+                            <div><a href="https://www.uniprot.org/uniprot/${p}" target="_blank">Uniprot Link</a></div>`
+                        );
+                        ModalService.openInfoModal(infoModalIdentifier);
+                    })
+                )
             );
-            complex.proteins.forEach((p,i) => {
-                proteinAndNamesList.append(
-                    $(`<a />`).attr({'target':`_blank`, 'href':`https://www.uniprot.org/uniprot/${p}`}).append(
-                        proteinAndNamesItem.clone().append([
-                            pANId.clone().text(p)
-                        ])
-                            .attr(`data-html`,`
-                                <div class="tooltip">
-                                    <div class="tooltip-header"><b>Additional protein info</b></div>
-                                    <div class="tooltip-row">
-                                        <div class="text">Protein name: ${complex.proteinNames[i]}</div>
-                                    </div>
-                                    <div class="tooltip-row">
-                                        <div class="text">Gene name: ${complex.geneNames[i]}</div>
-                                    </div>
-                                    <div class="tooltip-row">
-                                        <div class="text">Gene synonym: ${complex.geneNamesynonyms[i]}</div>
-                                    </div>
-                                    <div class="tooltip-row">
-                                        <div class="text">Organism: ${complex.swissprotOrganism[i]}</div>
-                                    </div>
-                                </div>`)
-                            .popup({position: `bottom left`})
-                    )
-                );
-            });
         }
 
         // gene + names list
@@ -378,7 +361,8 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
             `click`,
             () => {
                 if(showModal) {
-                    ModalService.openModalAndDoAction(
+                    ModalService.openProteinAddModalAndWaitForAction(
+                        addProteinModalIdentifier,
                         () => {},
                         () => {
                             StorageManager.clear();

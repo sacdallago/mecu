@@ -28,7 +28,8 @@ expWithProteinGrid.on(`click`, `.grid-item`, function(){
     const data = $(this).data(`grid-item-contents`);
 
     if(showModal) {
-        ModalService.openModalAndDoAction(
+        ModalService.openProteinAddModalAndWaitForAction(
+            modalIdentifier,
             () => {},
             () => {
                 StorageManager.clear();
@@ -283,7 +284,8 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
             `click`,
             () => {
                 if(showModal) {
-                    ModalService.openModalAndDoAction(
+                    ModalService.openProteinAddModalAndWaitForAction(
+                        modalIdentifier,
                         () => {},
                         () => {
                             StorageManager.clear();
@@ -484,7 +486,8 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
         document.querySelector(selectAllPPIButtonSelector).addEventListener(
             `click`,
             () => {
-                ModalService.openModalAndDoAction(
+                ModalService.openProteinAddModalAndWaitForAction(
+                    modalIdentifier,
                     () => {},
                     () => {
                         StorageManager.clear();

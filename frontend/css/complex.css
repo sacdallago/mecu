@@ -79,7 +79,11 @@
     border-bottom: 0.5px dashed silver;
 }
 .column-right .id-and-names-id {
-    min-width: 80px;
+    min-width: 120px;
+    cursor: pointer;
+}
+.column-right .id-and-names-id:not(:first-child):hover {
+    background-color: lightgrey;
 }
 .column-right .id-and-names-text {
     word-wrap: break-word;
