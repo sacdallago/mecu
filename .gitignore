@@ -38,7 +38,7 @@ data/*
 !data/proteinMapping.json
 !data/hippie.json
 
-private/*
+private
 !private/README
 cache/*
 
