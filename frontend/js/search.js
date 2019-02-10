@@ -33,7 +33,7 @@ const proteinsQuery = {
 };
 
 // search input field
-const searchInput = $(`.search-header .search .field`);
+const searchInput = $(`#search-field`);
 
 const grid = $(`.grid-container`).isotope({
     // main isotope options
@@ -193,4 +193,80 @@ const changeURIParams = (searchTerm) => {
     }
 
     searchInput.trigger(`focus`);
+
+    if (StorageManager.isPageTourEnabled(pageNames.search)) {
+        const myTour = Object.assign({}, tourSettings, {
+            disableInteraction: true,
+            steps: [
+                {
+                    target: '#menu-button',
+                    content: 'Main menu of the page.',
+                    placement: ['bottom']
+                },
+                {
+                    before: () => {
+                        $('#menu-button').click();
+                        return new Promise((res, rej) => res());
+                    },
+                    placement: ['bottom', 'left', 'right', 'top'],
+                    target: '#menu-content',
+                    content: 'With this you can navigate anywhere in this page.'
+                },
+                {
+                    before: () => {
+                        searchInput.val('P1');
+                        handleInput(0, true);
+                        return new Promise((a, b) => a());
+                    },
+                    target: '.search-header .search',
+                    content: 'Search here for specific proteins with an UniProt identifier (eg. P12004) or the full name of a protein.',
+                    placement: ['bottom']
+                },
+                {
+                    target: '.grid-container',
+                    content: 'This is where your search results show up.',
+                    placement: [ 'top'],
+                },
+                {
+                    target: '.grid-container .grid-item:nth-child(1)',
+                    content: 'Each of these items is clickable, and redirects you to the respective protein page.',
+                    placement: ['right']
+                },
+                {
+                    target: '.grid-container .grid-item:nth-child(3)',
+                    content: 'Each of these items is clickable, and redirects you to the respective protein page.',
+                    placement: ['left']
+                },
+                {
+                    target: '.grid-container .grid-item:nth-child(7)',
+                    content: 'Each of these items is clickable, and redirects you to the respective protein page.',
+                    placement: ['top'],
+                    after: () => {
+                        searchInput.val('');
+                        return new Promise((a, b) => a());
+                    }
+                },
+                {
+                    before: () => {
+                        $('#menu-button').click();
+                        return new Promise((res, rej) => {
+                            setTimeout(() => {res();}, 200);
+                        });
+                    },
+                    target: '#menu-content .about',
+                    content: 'Closing the tour results in the tour not showing up again. You can reset this setting in the About page.'
+                }
+            ]
+        });
+        const Tour = window.Tour.default
+
+        Tour.start(myTour)
+            .then(() => {
+                console.log('Tour Finished!');
+            })
+            .catch(() => {
+                StorageManager.setPageTourStatus(pageNames.search, false);
+                console.log('Tour Interrupted!')
+            });
+    }
 })();

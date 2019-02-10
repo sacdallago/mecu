@@ -1,9 +1,9 @@
 //
    Created by chdallago on 1/6/17.
 
-.ui.dropdown.icon.button(style="position: relative; top: -13em;")
+.ui.dropdown.icon.button(style="position: relative; top: -13em;")#menu-button
     i.angle.down.icon
-    .menu
+    .menu#menu-content
         if user
             -
                 var name = user.get('displayName');
@@ -17,4 +17,4 @@
         block settings
         .divider
         a(href="/downloads").item Downloads
-        a(href="/about").item About
+        a(href="/about").item.about About

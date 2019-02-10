@@ -210,6 +210,23 @@ StorageManager.getFullScreenPPISettings = () => {
     return store.get(`fullscreenPPISettings`) || ret;
 };
 
+StorageManager.setTotalTourStatus = (state) => {
+    return store.set(`totalTourState`, {state: state});
+}
+StorageManager.setPageTourStatus = (pageString, state) => {
+    return store.set(pageString, {state: state});
+}
+StorageManager.isTotalTourEnabled = () => {
+    return (store.get(`totalTourState`) || {state: true}).state === true;
+}
+StorageManager.isPageTourEnabled = (pageString) => {
+    if (StorageManager.isTotalTourEnabled() ) {
+        return (store.get(pageString) || {state: false}).state === true;
+    }
+    return false;
+}
+
+
 // check structure of 'proteins' in local storage
 (function (s) {
     let proteins = s.getProteins();
