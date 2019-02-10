@@ -53,7 +53,7 @@ const loadFileAndParseAttributes = function(filePath) {
             'PubMed ID': pubMedId,
             'FunCat ID': funCatId
         }) => ({
-            name: ComplexName,
+            name: (ComplexName || ``),
             purificationMethod: (purifMethod || ``),
             comment: (complexComment || ``),
             cellLine: (cellLine || ``),
@@ -114,6 +114,7 @@ const createProteinSql = (proteins) => {
 const createComplexesAndMtoNSQL = (complexes) => {
     let complexes_string = ``;
     let m_to_n_string = ``;
+    let index = 0;
 
     complexes.forEach(complex => {
         complexes_string += `INSERT INTO public.complexes`+
@@ -146,6 +147,8 @@ const createComplexesAndMtoNSQL = (complexes) => {
             `'${complex.createdAt.toUTCString()}',`+
             `'${complex.updatedAt.toUTCString()}'`+
             `) ON CONFLICT DO NOTHING;\n`;
+
+        index++;
 
         complex.proteins.forEach(protein => {
             m_to_n_string += `INSERT INTO public.protein_complexes`+
