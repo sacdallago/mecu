@@ -43,9 +43,8 @@ ExperimentService.uploadExperiment = (formData) => {
         }
     )
         .then(resp => resp.json())
-        .catch(error => {
-            console.error(`Request error for ExperimentService.uploadExperiment: `, error, formData);
-            return [];
+        .catch(err => {
+            console.log(err);
         });
 };
 ExperimentService.getExperiment = (id) => {

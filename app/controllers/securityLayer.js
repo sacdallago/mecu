@@ -4,9 +4,9 @@ module.exports = function() {
             if(request.user.get(`allowPost`) == true){
                 next();
             } else {
-                response.status(403).render(`error`, {
-                    title: `Not allowed to send post requests`,
-                    message: `Sorry, you don't have the right to send POST requests to the server.`
+                response.status(403).send({
+                    error: `Not allowed to upload experiments`,
+                    message: `Sorry, you don't have the right to upload experiments.`
                 });
             }
         },

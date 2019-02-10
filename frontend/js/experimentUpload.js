@@ -55,6 +55,7 @@ $(`#experiment-upload-form`).form({
                 if(result.error) {
                     document.querySelector(`#experiment-upload-form`).classList.remove(`loading`);
                     document.querySelector(`#experiment-upload-form`).classList.add(`error`);
+                    document.querySelector(`#upload-info`).style.display = `none`;
                     document.querySelector(`#error-message`).textContent = result.error;
                 } else {
                     document.location.href = `/success`;
