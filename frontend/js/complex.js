@@ -512,3 +512,59 @@ $(document).ready(() => {
             });
     }
 });
+
+
+TourHelper.attachTour('#help-menu-item', [
+    {
+        target: '#spacedText',
+        content: 'This page shows you all about a specific complex.',
+        placement: ['bottom']
+    },
+    {
+        target: '#experiment-number',
+        content: 'Here you can switch between the SAME complex, found in different experiments. The experiment is listed here, if it contains at least one protein of this complex.',
+        placement: ['left', 'right', 'top', 'bottom']
+    },
+    {
+        before: () => {
+            $('#experiment-number input.search').focus();
+            return new Promise((res, rej) => {
+                setTimeout(() => {res();}, 200);
+            });
+        },
+        target: '#experiment-number > div > .menu',
+        content: 'This is a list of all the experiments, in which this complex is used.',
+        placement: ['bottom'],
+        after: () => {
+            $('#experiment-number input.search').focus();
+            return Promise.resolve();
+        }
+    },
+
+    // combined curves
+    {
+        target: '#curvesGraph',
+        content: 'Here you can see the curves for all the proteins we have data for combined. As usual, hovering over specific points allows you to get detailed information.',
+        placement: ['top', 'right', 'bottom', 'left']
+    },
+    {
+        target: '.column-right',
+        content: 'The right hand side list all the information we have on this complex.',
+        placement: ['top', 'right', 'bottom', 'left']
+    },
+    {
+        target: '.column-right > .item-container:nth-child(9)',
+        content: 'The protein names itself are clickable and show some more information about themselfs.',
+        placement: ['left', 'top', 'right', 'bottom']
+    },
+    {
+        target: '#curves-grid',
+        content: 'Listed here are all the proteins you can find in this complex. Sometimes there are empty cubes, which means, that in this experiment for this complex, we have no data for this specific protein.',
+        placement: ['top', 'right', 'bottom', 'left']
+    },
+    {
+        target: '#curves-grid > .grid-item:nth-child(1)',
+        content: 'Of course each protein can be selected for later review and analytics in the Analyze page.',
+        placement: ['top', 'right', 'bottom', 'left']
+    }
+]);

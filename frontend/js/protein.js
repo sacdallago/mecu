@@ -603,3 +603,111 @@ $(document).ready(() => {
 
     }
 });
+
+TourHelper.attachTour('#help-menu-item', [
+    {
+        target: '#spacedText',
+        content: 'This page shows you all about a specific protein.',
+        placement: ['bottom']
+    },
+    {
+        target: '#experiment-number',
+        content: 'Here you can switch between the SAME protein, used in different experiments.',
+        placement: ['left', 'right', 'top', 'bottom']
+    },
+    {
+        before: () => {
+            $('#experiment-number input.search').focus();
+            return new Promise((res, rej) => {
+                setTimeout(() => {res();}, 200);
+            });
+        },
+        target: '#experiment-number > div > .menu',
+        content: 'This is a list of all the experiments, in which this protein is used.',
+        placement: ['bottom'],
+        after: () => {
+            $('#experiment-number input.search').focus();
+            return Promise.resolve();
+        }
+    },
+    {
+        // before: () => { // doesnt work
+        //     $('path.highcharts-point:nth-child(3)').trigger('mouseenter');
+        //     return Promise.resolve();
+        // },
+        target: '#protein-curve',
+        content: 'The proteins melting curve from 37° to 64°. Hovering over it gives you the discrete values for the specific degree.',
+        placement: ['right', 'top', 'bottom', 'left']
+    },
+    {
+        target: '.meta-data-container',
+        content: 'Protein metadata as combined with the experiment it is found in.',
+        placement: ['right', 'top', 'bottom', 'left']
+    },
+
+    // experiments with this protein
+    {
+        target: '#experiments-container',
+        content: 'This section shows you the same protein, but found in other experiments.',
+        placement: ['bottom', 'left', 'right', 'top']
+    },
+    {
+        target: '#experiments-container .grid',
+        content: 'Clicking onto one of these allows you to select it for further inspection in the Analyze page.',
+        placement: ['bottom', 'left', 'right', 'top']
+    },
+    {
+        target: '.buttons .select-all-button',
+        content: 'If you want to select all of the proteins listed here, click here!',
+        placement: ['top', 'bottom', 'left', 'right']
+    },
+    {
+        target: '.buttons .analyze-button',
+        content: 'If you select some of these proteins, this button allows you to transition right into the Analyze page. It\'s the same as in the menu.',
+        placement: ['top', 'bottom', 'left', 'right']
+    },
+
+    // related complexes
+    {
+        target: '#related-complexes-container',
+        content: 'This section shows the complexes, which contain this protein',
+        placement: ['bottom', 'left', 'right', 'top']
+    },
+    {
+        target: '#related-complexes-container .grid .grid-item:nth-child(1)',
+        content: 'Each of the items is clickable and redirects you to the respective complex page. There you can find more information about the complex.',
+        placement: ['bottom', 'left', 'right', 'top']
+    },
+    {
+        target: '#related-complexes-container .grid .grid-item:nth-child(1) .grid-item-text',
+        content: 'The top displays the complex name.',
+        placement: ['top', 'bottom', 'left', 'right']
+    },
+    {
+        target: '#related-complexes-container .grid .grid-item:nth-child(1) .experimentNumber.grid-item-text',
+        content: 'The bottom right shows, how many of the necessary proteins, to build this complex, are found in this experiment. Remember that you can switch experiment anytime in the top right!',
+        placement: ['top', 'bottom', 'left', 'right']
+    },
+
+    // protein interactions
+    {
+        target: '#related-proteins-container',
+        content: 'This section shows the interactions of this protein with other proteins (lists only interactions we have gathered).',
+        placement: ['top', 'bottom', 'left', 'right']
+    },
+    {
+        target: '#related-proteins-container .grid .grid-item:nth-child(1)',
+        content: 'Each of the items is clickable and redirects you to the respective protein page.',
+        placement: ['bottom', 'left', 'right', 'top']
+    },
+    {
+        target: '#related-proteins-container .grid .grid-item:nth-child(1) .grid-item-text',
+        content: 'The top displays the name of the protein, with whom the interaction is shown.',
+        placement: ['top', 'bottom', 'left', 'right']
+    },
+    {
+        target: '#related-proteins-container .grid .grid-item:nth-child(1) .correlation.grid-item-text',
+        content: 'The bottom right shows how likely the protein is to interact with.',
+        placement: ['top', 'bottom', 'left', 'right']
+    },
+]);
