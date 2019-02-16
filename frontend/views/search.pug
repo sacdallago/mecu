@@ -3,6 +3,7 @@ extends base
 block postStyles
     link(rel='stylesheet', href='/public/css/search.css')
     link(rel='stylesheet', href='/public/css/pagination.css')
+    link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
 
 block content
     .search-header
@@ -32,6 +33,7 @@ block settings
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/pagination.js")
