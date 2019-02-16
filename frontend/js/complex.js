@@ -563,7 +563,7 @@ TourHelper.attachTour('#help-menu-item', [
         placement: ['top', 'right', 'bottom', 'left']
     },
     {
-        target: '#curves-grid > .grid-item:nth-child(1)',
+        target: '#curves-grid .grid-item:nth-child(1)',
         content: 'Of course each protein can be selected for later review and analytics in the Analyze page.',
         placement: ['top', 'right', 'bottom', 'left']
     }
