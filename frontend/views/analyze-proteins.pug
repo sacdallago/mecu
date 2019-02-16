@@ -1,12 +1,15 @@
 extends base
 
 block postStyles
+    link(rel='stylesheet', href='/public/css/search.css')
     link(rel='stylesheet', href='/public/css/analyze-proteins.css')
+    link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
 
 block content
     .settings 
         h3.settings-title 1. Selection
-        .text-coloring Select how the curves should be colored:
+        .text-coloring
+            .div Select how the curves should be colored:
         .ui.selection.dropdown#coloring-dropdown
             i.dropdown.icon
             input(type="hidden" name="coloring" value="0").value
@@ -14,13 +17,15 @@ block content
             .menu
                 .item(data-value="0") Color by Protein
                 .item(data-value="1") Color by Experiment
-        .text-experiments Select which experiments to draw:
+        .text-experiments
+            .div Select which experiments to draw:
         .ui.selection.fluid.multiple.dropdown#experiments-dropdown
             input(type="hidden" name="experiments").value
             .text
             .menu
             i.dropdown.icon
-        .text-proteins Select which proteins to draw:
+        .text-proteins
+            .div Select which proteins to draw:
         .ui.selection.fluid.multiple.dropdown#proteins-dropdown
             input(type="hidden" name="proteins").value
             .text
@@ -40,16 +45,17 @@ block content
         .nodes-graph-container
             .chart#nodesGraph
             .space
-            .ui.button.manhattan(data-content="The distance between two points measured along axes at right angles. In a plane with p1 at (x1, y1) and p2 at (x2, y2), it is |x1 - x2| + |y1 - y2|.") Manhattan
-            .ui.button.euclidian(data-content="Euclidean distance or simply 'distance' examines the root of square differences between coordinates of a pair of objects.") Euclidian
-            .ui.button.supremum(data-content="This is the maximum difference between any component of the vectors.") Supremum
-            .ui.top.right.search.pointing.dropdown.button.minkowski(data-content="The Minkowski distance between two variabes X and Y is defined as (∑i=1n|Xi−Yi|p)1/p . The case where p = 1 is equivalent to the Manhattan distance and the case where p = 2 is equivalent to the Euclidean distance.") Minkowski
-                .menu
-                    .item
-                        .ui.input
-                            input(type="number", name="rank", placeholder="3")#rank
-                    .item
-                        .ui.attached.button.submit Save
+            div#distance-buttons
+                .ui.button.manhattan(data-content="The distance between two points measured along axes at right angles. In a plane with p1 at (x1, y1) and p2 at (x2, y2), it is |x1 - x2| + |y1 - y2|.") Manhattan
+                .ui.button.euclidian(data-content="Euclidean distance or simply 'distance' examines the root of square differences between coordinates of a pair of objects.") Euclidian
+                .ui.button.supremum(data-content="This is the maximum difference between any component of the vectors.") Supremum
+                .ui.top.right.search.pointing.dropdown.button.minkowski(data-content="The Minkowski distance between two variabes X and Y is defined as (∑i=1n|Xi−Yi|p)1/p . The case where p = 1 is equivalent to the Manhattan distance and the case where p = 2 is equivalent to the Euclidean distance.") Minkowski
+                    .menu
+                        .item
+                            .ui.input
+                                input(type="number", name="rank", placeholder="3")#rank
+                        .item
+                            .ui.attached.button.submit Save
 
     .ppi-table
         h3 4. Distances and Correlations amongst proteins
@@ -81,8 +87,12 @@ block settings
     a(href='/complexes').item Search Complex
     a(href='/experiments').item Search Experiments
 
+block help-button
+    a.item#help-menu-item Help
+
 block scripts
     - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
     script(type="text/javascript", src="/public/modules/disi/build/disi.js")
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")

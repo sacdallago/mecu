@@ -210,6 +210,7 @@ StorageManager.getFullScreenPPISettings = () => {
     return store.get(`fullscreenPPISettings`) || ret;
 };
 
+
 // check structure of 'proteins' in local storage
 (function (s) {
     let proteins = s.getProteins();

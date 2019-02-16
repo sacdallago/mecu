@@ -2,6 +2,7 @@ extends base
 
 block postStyles
         link(rel='stylesheet', href='/public/css/complex.css')
+        link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
 
 block content
     .modal#add-protein-modal
@@ -44,8 +45,12 @@ block settings
     a(href='/experiments').item Search Experiments
     a(href='/analyze-proteins').item Analyze
 
+block help-button
+    a.item#help-menu-item Help
+    
 block scripts
     - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
