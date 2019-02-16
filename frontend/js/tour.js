@@ -8,8 +8,8 @@ TourHelper.attachTour = (identifier, steps) => {
                 $(identifier).removeClass(`active`);
                 $(identifier).removeClass(`selected`);
             })
-            .catch(() => {
-                console.log('Tour Interrupted!');
+            .catch((e) => {
+                console.log('Tour Interrupted!', e);
                 $(identifier).removeClass(`active`);
                 $(identifier).removeClass(`selected`);
             });

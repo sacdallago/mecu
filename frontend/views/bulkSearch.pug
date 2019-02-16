@@ -3,12 +3,13 @@ extends base
 block postStyles
     link(rel='stylesheet', href='/public/css/bulkSearch.css')
     link(rel='stylesheet', href='/public/css/pagination.css')
+    link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
 
 block content
     .modal#add-protein-modal
     h3.step 1. Select experiments
     .step-description Select experiments of which the contents you want to inspect.
-    table.ui.celled.small.table
+    table.ui.celled.small.table#experiment-list
         thead
             tr
                 th Select
@@ -22,7 +23,7 @@ block content
             
     h3.step 2. Input proteins
     .step-description Input UniProt identifier of proteins. Saved proteins are automatically added.
-    .text-center
+    .text-center#protein-input
         .ui.input.search.maxWidth
             textarea(name="prot", placeholder="eg. P12004 P12023").inline.prompt.maxWidth.textarea.protein-list
     .stats
@@ -38,11 +39,6 @@ block content
         .step-description Heatmap of which protein is contained in which experiment. Clicking selects/deselects all proteins of the experiment.
         .heatmap#heatmap Here you will see a which experiment has which protein.
         
-        .show-button
-            a.ui.disabled.button#analyze-button(href='/analyze-proteins')
-                i.eye.icon
-                span Analyze
-        
         .legend
             .l-item.c1 
                 .sample
@@ -53,6 +49,11 @@ block content
             .l-item.c3 
                 .sample
                 .text Protein is saved for visualization
+                
+        .show-button
+            a.ui.disabled.button#analyze-button(href='/analyze-proteins')
+                i.eye.icon
+                span Analyze
 
 block settings
     .divider
@@ -63,6 +64,7 @@ block settings
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")

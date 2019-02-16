@@ -441,3 +441,40 @@ $(document)
         .then(result => drawPaginationComponent(1, result.count))
         .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
     );
+
+
+
+
+TourHelper.attachTour('#help-menu-item', [
+    {
+        target: '#spacedText',
+        content: 'This page is an advanced search page.',
+        placement: ['bottom']
+    },
+    {
+        target: '#experiment-list',
+        content: 'First select which experiments you want to inspect further.',
+        placement: ['bottom']
+    },
+    {
+        target: '#protein-input',
+        content: 'Then enter UniProdId\'s which interest you.',
+        placement: ['bottom']
+    },
+    {
+        target: '#heatmap',
+        content: 'Here you are shown a kind of \'heatmap\' for the selected experiments and proteins.',
+        placement: ['bottom']
+    },
+    {
+        target: '#heatmap',
+        content: 'Clicking a column selects all the proteins listed here, for the experiment you selected.',
+        placement: ['bottom']
+    },
+    {
+        target: '#analyze-button',
+        content: 'With this button you directly jump to the \'Analyze protein\' page.',
+        placement: ['bottom']
+    }
+
+]);
