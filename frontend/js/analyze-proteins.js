@@ -340,3 +340,94 @@ $(document).ready(() => {
         .then(() => populateGlobalsGraphs(getColoringValue(), []))
         .then(data => drawProteinsInCubes(data));
 });
+
+TourHelper.attachTour('#help-menu-item', [
+    {
+        target: '#spacedText',
+        content: 'This page allows you to analyze your selected proteins. Showing you this works best when you have already a few proteins selected, but I can show you anyway. This page is separated into 4 big sections.',
+        placement: ['bottom']
+    },
+    // 1.selection
+    {
+        target: '.settings',
+        content: 'This part lets you configure WHAT and HOW you see your memorized proteins.',
+        placement: ['bottom', 'top']
+    },
+    {
+        before: () => new Promise((resolve, reject) => {
+            $('#coloring-dropdown').click();
+            setTimeout(() => resolve(), 200);
+        }),
+        target: '#coloring-dropdown .menu.transition',
+        content: 'Here you can choose how your proteins are colored. Either by protein: each protein has it\'s own color and same proteins have the same color. Or by experiment: all proteins of the same experiment have the same color, good for comparing different experiemtns.',
+        placement: ['bottom', 'top'],
+        after: () => new Promise((resolve, reject) => {
+            $('.text-experiments').click();
+            setTimeout(() => resolve(), 100);
+        })
+    },
+    {
+        target: '#experiments-dropdown',
+        content: 'This lets you filter, which experiments you want to select. Removing and adding can be done however one pleases.',
+        placement: ['top', 'bottom', 'left']
+    },
+    {
+        target: '#proteins-dropdown',
+        content: 'Same with the proteins: removing and adding changes what you see below',
+        placement: ['top', 'bottom', 'left']
+    },
+
+    // curves
+    {
+        target: '.curves-graph-container',
+        content: 'Here you can see what you configured above. All selected experiments and proteins on the same graph! The graph is interactive and can be hovered over for further details. Each protein curve can be toggled (show/hide).',
+        placement: ['right', 'top', 'bottom']
+    },
+    {
+        target: '#fullscreen-button-chart',
+        content: 'Clicking here will show you the same graph in a new window in view',
+        placement: ['right', 'top', 'left']
+    },
+    {
+        target: '.distances-column',
+        content: 'This is a distance graph. Each protein is drawn according to the interaction probability to each other protein. Each protein can be dragged. After releasing it it will try to converge to it\'s correct position. The graph can also be zoomed!',
+        placement: ['left', 'top', 'bottom']
+    },
+    {
+        target: '#distance-buttons',
+        content: 'Here you can switch, which distance measurement should be used to draw the above graph.',
+        placement: ['bottom', 'left', 'top']
+    },
+
+    // distance and correlation
+    {
+        target: '.ppi-table',
+        content: 'This table compares each protein to each other. Compared are the distance and the correlation.',
+        placement: ['top', 'bottom', 'right']
+    },
+    {
+        target: '.ppi-table',
+        content: 'The left (green - white) part of each cell is the distance. Bright green stands for close distance. White a high distance.',
+        placement: ['top', 'bottom', 'right']
+    },
+    {
+        target: '.ppi-table',
+        content: 'The right (blue - white) part of each cell is the correlation. Blue stands for high correlation. White a low correlation.',
+        placement: ['top', 'bottom', 'right']
+    },
+    {
+        target: '#fullscreen-button-ppi',
+        content: 'This table can also be viewed in full size, which displays all the proteins (if there are some not displayed here).',
+        placement: ['top', 'right', 'bottom']
+    },
+    {
+        target: '#relative-absolute-corr-button',
+        content: 'This button toggles, if the correlation should be relative to the now shown proteins, or absolute.',
+        placement: ['top', 'right', 'bottom']
+    },
+    {
+        target: '.protein-list',
+        content: 'Here you can deselect any protein which you do not want to memorize anymore.',
+        placement: ['top', 'right', 'left']
+    }
+]);

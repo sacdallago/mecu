@@ -44,16 +44,17 @@ block content
         .nodes-graph-container
             .chart#nodesGraph
             .space
-            .ui.button.manhattan(data-content="The distance between two points measured along axes at right angles. In a plane with p1 at (x1, y1) and p2 at (x2, y2), it is |x1 - x2| + |y1 - y2|.") Manhattan
-            .ui.button.euclidian(data-content="Euclidean distance or simply 'distance' examines the root of square differences between coordinates of a pair of objects.") Euclidian
-            .ui.button.supremum(data-content="This is the maximum difference between any component of the vectors.") Supremum
-            .ui.top.right.search.pointing.dropdown.button.minkowski(data-content="The Minkowski distance between two variabes X and Y is defined as (∑i=1n|Xi−Yi|p)1/p . The case where p = 1 is equivalent to the Manhattan distance and the case where p = 2 is equivalent to the Euclidean distance.") Minkowski
-                .menu
-                    .item
-                        .ui.input
-                            input(type="number", name="rank", placeholder="3")#rank
-                    .item
-                        .ui.attached.button.submit Save
+            div#distance-buttons
+                .ui.button.manhattan(data-content="The distance between two points measured along axes at right angles. In a plane with p1 at (x1, y1) and p2 at (x2, y2), it is |x1 - x2| + |y1 - y2|.") Manhattan
+                .ui.button.euclidian(data-content="Euclidean distance or simply 'distance' examines the root of square differences between coordinates of a pair of objects.") Euclidian
+                .ui.button.supremum(data-content="This is the maximum difference between any component of the vectors.") Supremum
+                .ui.top.right.search.pointing.dropdown.button.minkowski(data-content="The Minkowski distance between two variabes X and Y is defined as (∑i=1n|Xi−Yi|p)1/p . The case where p = 1 is equivalent to the Manhattan distance and the case where p = 2 is equivalent to the Euclidean distance.") Minkowski
+                    .menu
+                        .item
+                            .ui.input
+                                input(type="number", name="rank", placeholder="3")#rank
+                        .item
+                            .ui.attached.button.submit Save
 
     .ppi-table
         h3 4. Distances and Correlations amongst proteins
@@ -87,6 +88,7 @@ block settings
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
     script(type="text/javascript", src="/public/modules/disi/build/disi.js")
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")

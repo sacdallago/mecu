@@ -4,7 +4,7 @@ tourSettings = {
     canExit: true,
     padding: 5,
     maxHeight: 150,
-    maxWidth: 500,
+    maxWidth: 700,
     maskVisible: true,
     maskClickThrough: false,
     maskScrollThrough: true, // Allows the user to scroll the scrollbox or window through the mask
