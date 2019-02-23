@@ -22,33 +22,8 @@ const proteinCurvesGrid = $(proteinCurvesGridIdentifier).isotope({
 });
 
 proteinCurvesGrid.on(`click`, `.grid-item`, function(){
-    let self = this;
-    const content = $(this).data(`grid-item-contents`);
-    if(!content) return;
-    return StorageManager.toggle(
-        [{
-            uniprotId: content.obj.uniprotId,
-            experiment: content.experiment.experiment
-        }],
-        function(inStorage, added, removed) {
-            if(added === 0){
-                $(self).removeClass(`inStore`);
-            } else if(removed === 0) {
-                $(self).addClass(`inStore`);
-            } else {
-                if ($(self).hasClass(`inStore`)){
-                    $(self).removeClass(`inStore`);
-                }
-                if (!$(self).hasClass(`partiallyInStore`)){
-                    $(self).addClass(`partiallyInStore`);
-                }
-            }
-
-            populateGlobalsGraphs(getColoringValue())
-                .then(data => drawProteinsInCubes(data));
-            populateDropdowns();
-        }
-    );
+    const data = $(this).data(`grid-item-contents`);
+    document.location.href = `/protein?protein=${data.obj.uniprotId}&experiment=${data.experiment.experiment}`;
 });
 
 function drawProteinsInCubes(proteinsData) {
