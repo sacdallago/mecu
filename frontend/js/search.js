@@ -185,7 +185,7 @@ const changeURIParams = (searchTerm) => {
 TourHelper.attachTour('#help-menu-item', [
     {
         target: '#menu-button',
-        content: 'Main menu of the page.',
+        content: 'Click this button to open up the menu of the application.',
         placement: ['bottom']
     },
     {
@@ -195,7 +195,7 @@ TourHelper.attachTour('#help-menu-item', [
         },
         placement: ['bottom', 'left', 'right', 'top'],
         target: '#menu-content',
-        content: 'With this you can navigate anywhere in this page.'
+        content: 'Select an item to navigate to a different page.'
     },
     {
         before: () => {
@@ -204,7 +204,7 @@ TourHelper.attachTour('#help-menu-item', [
             return new Promise((a, b) => a());
         },
         target: '.search-header .search',
-        content: 'Search here for specific proteins with an UniProt identifier (eg. P12004) or the full name of a protein.',
+        content: 'Type a UniProt identifier (eg. P12004) or free text to search for proteins in the database.',
         placement: ['bottom']
     },
     {
@@ -214,17 +214,17 @@ TourHelper.attachTour('#help-menu-item', [
     },
     {
         target: '.grid-container .grid-item:nth-child(1)',
-        content: 'Each of these items is clickable, and redirects you to the respective protein page.',
+        content: 'Each box represents a protein (top, UniProt Accession) in an experiment (bottom left).',
         placement: ['right']
     },
     {
-        target: '.grid-container .grid-item:nth-child(3)',
-        content: 'The top middle displays the protein name.',
+        target: '.grid-container .grid-item:nth-child(2)',
+        content: 'The lines represent the TPCA curve, the color is particular to a protein and an experiment.',
         placement: ['left']
     },
     {
         target: '.grid-container .grid-item:nth-child(7)',
-        content: 'The bottom right shows you the experiment this protein melting curve is found in.',
+        content: 'The same protein has very similar colors in different experiments, whereas different proteins (UniProt accessions) have different colors.',
         placement: ['top'],
         after: () => {
             searchInput.val('');
@@ -238,8 +238,8 @@ TourHelper.attachTour('#help-menu-item', [
                 setTimeout(() => {res();}, 200);
             });
         },
-        target: '#menu-content .about',
-        content: 'Closing the tour results in the tour not showing up again. You can reset this setting in the About page.'
+        target: '#menu-content #help-menu-item',
+        content: 'You can open up page-specific help from the menu at any time.'
     }
 ]);
 
