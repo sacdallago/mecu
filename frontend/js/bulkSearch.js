@@ -419,62 +419,81 @@ $(`textarea.inline.prompt.maxWidth.textarea`)
         );
     });
 
-$(document)
-    .ready(() => Promise.resolve()
-        .then(() => {
-            // populate selectedProteins and selectedExperiments with the data from localStorage
-            const storageData = StorageManager.getProteins();
+const startLoading = () => Promise.resolve()
+    .then(() => {
+        selectedExperiments = new Set();
+        selectedProteins = new Set();
+        
+        // populate selectedProteins and selectedExperiments with the data from localStorage
+        const storageData = StorageManager.getProteins();
 
-            storageData.forEach(proteinWithExperimentsList => {
-                selectedProteins.add(proteinWithExperimentsList.uniprotId);
-                proteinWithExperimentsList.experiment.forEach(experiment => selectedExperiments.add(experiment));
-            });
+        storageData.forEach(proteinWithExperimentsList => {
+            selectedProteins.add(proteinWithExperimentsList.uniprotId);
+            proteinWithExperimentsList.experiment.forEach(experiment => selectedExperiments.add(experiment));
+        });
 
-            if(storageData.length > 0) {
-                enableShowButton();
-            }
+        if(storageData.length > 0) {
+            enableShowButton();
+        }
 
-            lAExperimentsList.start();
-        })
-        .then(() => populateProteinSearch())
-        .then(() => pullPaginatedExperiments(experimentsQuery))
-        .then(result => drawPaginationComponent(1, result.count))
-        .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
-    );
-
+        lAExperimentsList.start();
+    })
+    .then(() => populateProteinSearch())
+    .then(() => pullPaginatedExperiments(experimentsQuery))
+    .then(result => drawPaginationComponent(1, result.count))
+    .then(() => fetchMeltingCurves(Array.from(selectedExperiments), Array.from(selectedProteins)))
 
 
+$(document).ready(() => startLoading());
 
-TourHelper.attachTour('#help-menu-item', [
-    {
-        target: '#spacedText',
-        content: 'This page is an advanced search page.',
-        placement: ['bottom']
+
+
+let proteinsToSaveWhileInTour;
+TourHelper.attachTour(
+    '#help-menu-item',
+    [
+        {
+            target: '#spacedText',
+            content: 'This page is an advanced search page.',
+            placement: ['bottom']
+        },
+        {
+            before: () => {
+                proteinsToSaveWhileInTour = StorageManager.getProteinsRaw();
+                StorageManager.setProteinsRaw({"P12004":[4,5,6,7,8],"P00374":[4,5,6,7,8],"P00015":[9],"P00403":[4,5,6,7,8],"P00493":[9],"P00750":[4,7],"P01036":[5,7],"P01583":[4]});
+                return startLoading();
+            },
+            target: '#experiment-list',
+            content: 'First select which experiments you are interested in by checking the box to the left.',
+            placement: ['bottom']
+        },
+        {
+            target: '#protein-input',
+            content: 'Then enter a list of UniProt Accession numbers of interest (tab, comma or space separated).',
+            placement: ['bottom']
+        },
+        {
+            target: '#heatmap',
+            content: 'Here you can see which proteins from your list have been studied in an experiment.',
+            placement: ['bottom']
+        },
+        {
+            target: '#heatmap',
+            content: 'Clicking on an item in the matrix will add the corresponding experiment (column) for later visualization.',
+            placement: ['bottom']
+        },
+        {
+            target: '#analyze-button',
+            content: 'Clicking this button, you can proceed to the visualization tools.',
+            placement: ['bottom']
+        }
+    ],
+    () => {
+        StorageManager.setProteinsRaw(proteinsToSaveWhileInTour);
+        return startLoading();
     },
-    {
-        target: '#experiment-list',
-        content: 'First select which experiments you want to inspect further.',
-        placement: ['bottom']
-    },
-    {
-        target: '#protein-input',
-        content: 'Then enter UniProdId\'s which interest you.',
-        placement: ['bottom']
-    },
-    {
-        target: '#heatmap',
-        content: 'Here you are shown a kind of \'heatmap\' for the selected experiments and proteins.',
-        placement: ['bottom']
-    },
-    {
-        target: '#heatmap',
-        content: 'Clicking a column selects all the proteins listed here, for the experiment you selected.',
-        placement: ['bottom']
-    },
-    {
-        target: '#analyze-button',
-        content: 'With this button you directly jump to the \'Analyze protein\' page.',
-        placement: ['bottom']
+    () => {
+        StorageManager.setProteinsRaw(proteinsToSaveWhileInTour);
+        return startLoading();
     }
-
-]);
+);

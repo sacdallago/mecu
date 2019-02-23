@@ -187,6 +187,9 @@ StorageManager.clear = function() {
     return;
 };
 
+StorageManager.getProteinsRaw = () => store.get(`proteins`) || {};
+StorageManager.setProteinsRaw = (raw) => store.set(`proteins`, raw); 
+
 StorageManager.setFullScreenProteinsSettings = (proteins, experiments, coloring) => {
     return store.set(
         `fullscreenProteinSettings`,
