@@ -607,12 +607,12 @@ $(document).ready(() => {
 TourHelper.attachTour('#help-menu-item', [
     {
         target: '#spacedText',
-        content: 'This page shows you all about a specific protein.',
+        content: 'This page shows you protein-centric information.',
         placement: ['bottom']
     },
     {
         target: '#experiment-number',
-        content: 'Here you can switch between the SAME protein, used in different experiments.',
+        content: 'Here you can select which experiment to use for the given protein (this is useful for the sections below).',
         placement: ['left', 'right', 'top', 'bottom']
     },
     {
@@ -623,7 +623,7 @@ TourHelper.attachTour('#help-menu-item', [
             });
         },
         target: '#experiment-number > div > .menu',
-        content: 'This is a list of all the experiments, in which this protein is used.',
+        content: 'These are the experiments in which this protein was measured.',
         placement: ['bottom'],
         after: () => {
             $('#experiment-number input.search').focus();
@@ -636,24 +636,24 @@ TourHelper.attachTour('#help-menu-item', [
         //     return Promise.resolve();
         // },
         target: '#protein-curve',
-        content: 'The proteins melting curve from 37° to 64°. Hovering over it gives you the discrete values for the specific degree.',
+        content: 'The proteins melting curve. Hovering over it gives you the discrete values for the specific degree.',
         placement: ['right', 'top', 'bottom', 'left']
     },
     {
         target: '.meta-data-container',
-        content: 'Protein metadata as combined with the experiment it is found in.',
+        content: 'This table displays additional data for the selected protein in the given experiment.',
         placement: ['right', 'top', 'bottom', 'left']
     },
 
     // experiments with this protein
     {
         target: '#experiments-container',
-        content: 'This section shows you the same protein, but found in other experiments.',
+        content: 'This section shows you the TPCA curves for the given protein in other experiments.',
         placement: ['bottom', 'left', 'right', 'top']
     },
     {
         target: '#experiments-container .grid',
-        content: 'Clicking onto one of these allows you to select it for further inspection in the Analyze page.',
+        content: 'Clicking a box will add the protein to the visualization tools in the Analyze page.',
         placement: ['bottom', 'left', 'right', 'top']
     },
     {
@@ -663,7 +663,7 @@ TourHelper.attachTour('#help-menu-item', [
     },
     {
         target: '.buttons .analyze-button',
-        content: 'If you select some of these proteins, this button allows you to transition right into the Analyze page. It\'s the same as in the menu.',
+        content: 'If you select some of these proteins, this button allows you to transition right into the Analyze page.',
         placement: ['top', 'bottom', 'left', 'right']
     },
 
@@ -685,14 +685,14 @@ TourHelper.attachTour('#help-menu-item', [
     },
     {
         target: '#related-complexes-container .grid .grid-item:nth-child(1) .experimentNumber.grid-item-text',
-        content: 'The bottom right shows, how many of the necessary proteins, to build this complex, are found in this experiment. Remember that you can switch experiment anytime in the top right!',
+        content: 'The bottom right shows how many of the proteins in the complex are found in the selected experiment. Remember: you can switch experiment anytime in the top right of this page!',
         placement: ['top', 'bottom', 'left', 'right']
     },
 
     // protein interactions
     {
         target: '#related-proteins-container',
-        content: 'This section shows the interactions of this protein with other proteins (lists only interactions we have gathered).',
+        content: 'This section shows the interactions of this protein with other proteins as from HIPPIE data.',
         placement: ['top', 'bottom', 'left', 'right']
     },
     {
@@ -702,12 +702,12 @@ TourHelper.attachTour('#help-menu-item', [
     },
     {
         target: '#related-proteins-container .grid .grid-item:nth-child(1) .grid-item-text',
-        content: 'The top displays the name of the protein, with whom the interaction is shown.',
+        content: 'The top displays the name of the interacting protein.',
         placement: ['top', 'bottom', 'left', 'right']
     },
     {
         target: '#related-proteins-container .grid .grid-item:nth-child(1) .correlation.grid-item-text',
-        content: 'The bottom right shows how likely the protein is to interact with.',
+        content: 'The bottom right shows the HIPPIE score.',
         placement: ['top', 'bottom', 'left', 'right']
     },
 ]);

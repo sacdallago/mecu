@@ -319,13 +319,13 @@ $(document).ready(() => {
 TourHelper.attachTour('#help-menu-item', [
     {
         target: '#spacedText',
-        content: 'This page allows you to analyze your selected proteins. Showing you this works best when you have already a few proteins selected, but I can show you anyway. This page is separated into 4 big sections.',
+        content: 'This page contains a few visualization tools to analyze your selected proteins. You can select proteins via the search pages (in the menu).',
         placement: ['bottom']
     },
     // 1.selection
     {
         target: '.settings',
-        content: 'This part lets you configure WHAT and HOW you see your memorized proteins.',
+        content: 'This section allows you to define global visualization parameters for the graphs below.',
         placement: ['bottom', 'top']
     },
     {
@@ -334,7 +334,7 @@ TourHelper.attachTour('#help-menu-item', [
             setTimeout(() => resolve(), 200);
         }),
         target: '#coloring-dropdown .menu.transition',
-        content: 'Here you can choose how your proteins are colored. Either by protein: each protein has it\'s own color and same proteins have the same color. Or by experiment: all proteins of the same experiment have the same color, good for comparing different experiemtns.',
+        content: 'Here you can select how proteins are colored in the graphs. Either by protein (each protein has it\'s own color and same proteins have the same color), or by experiment (all proteins of the same experiment have the same color, e.g. you compare different experiments).',
         placement: ['bottom', 'top'],
         after: () => new Promise((resolve, reject) => {
             $('.text-experiments').click();
@@ -343,66 +343,61 @@ TourHelper.attachTour('#help-menu-item', [
     },
     {
         target: '#experiments-dropdown',
-        content: 'This lets you filter, which experiments you want to select. Removing and adding can be done however one pleases.',
+        content: 'This selection allows you to hide or show experiments on the fly from the graphs.',
         placement: ['top', 'bottom', 'left']
     },
     {
         target: '#proteins-dropdown',
-        content: 'Same with the proteins: removing and adding changes what you see below',
+        content: 'Similarly, you can hide proteins from the graphs by deselecting them.',
         placement: ['top', 'bottom', 'left']
     },
 
     // curves
     {
         target: '.curves-graph-container',
-        content: 'Here you can see what you configured above. All selected experiments and proteins on the same graph! The graph is interactive and can be hovered over for further details. Each protein curve can be toggled (show/hide).',
+        content: 'This graph jointly shows all the selected proteins for all the selected experiments. The graph can be made full screen and is interactive.',
         placement: ['right', 'top', 'bottom']
     },
     {
         target: '#fullscreen-button-chart',
-        content: 'Clicking here will show you the same graph in a new window in view',
+        content: 'By clicking this button you can access a separate, full screen view of this graph.',
         placement: ['right', 'top', 'left']
     },
     {
         target: '.distances-column',
-        content: 'This is a distance graph. Each protein is drawn according to the interaction probability to each other protein. Each protein can be dragged. After releasing it it will try to converge to it\'s correct position. The graph can also be zoomed!',
+        content: 'This graph shows proteins in a simulated physical space, where distance is assigned based on the similarity of the protein\'s TPCA profiles.',
         placement: ['left', 'top', 'bottom']
     },
     {
         target: '#distance-buttons',
-        content: 'Here you can switch, which distance measurement should be used to draw the above graph.',
+        content: 'The distance metric to calculate similarity between proteins can be adjusted here. The default is the Euclidean distance.',
         placement: ['bottom', 'left', 'top']
     },
 
     // distance and correlation
     {
         target: '.ppi-table',
-        content: 'This table compares each protein to each other. Compared are the distance and the correlation.',
+        content: 'This matrix displays protein-protein interaction likelihoods based on Euclidean distance of TPCA curves (green) and HIPPIE scores (blue).',
         placement: ['top', 'bottom', 'right']
     },
     {
         target: '.ppi-table',
-        content: 'The left (green - white) part of each cell is the distance. Bright green stands for close distance. White a high distance.',
+        content: 'The left (green - white) part of each cell represents the Euclidean distance between the two curves. Bright green stands for small distance, white for big distance.',
         placement: ['top', 'bottom', 'right']
     },
     {
         target: '.ppi-table',
-        content: 'The right (blue - white) part of each cell is the correlation. Blue stands for high correlation. White a low correlation.',
+        content: 'The right (blue - white) part of each cell is the HIPPIE score for protein-protein interaction. Blue stands for high probability of interaction, while white for a low probability. If no HIPPIE data is available, a minus sign (-) will be shown.',
         placement: ['top', 'bottom', 'right']
     },
     {
         target: '#fullscreen-button-ppi',
-        content: 'This table can also be viewed in full size, which displays all the proteins (if there are some not displayed here).',
+        content: 'The table can be viewed in a separate page, which is particularly useful when many proteins are selected.',
         placement: ['top', 'right', 'bottom']
     },
     {
         target: '#relative-absolute-corr-button',
-        content: 'This button toggles, if the correlation should be relative to the now shown proteins, or absolute.',
+        content: 'This button changes the coloring of the HIPPIE scores to absolute (0 lowest, 1 highest) or relative to the maximum and minimum in the current selection.',
         placement: ['top', 'right', 'bottom']
-    },
-    {
-        target: '.protein-list',
-        content: 'Here you can deselect any protein which you do not want to memorize anymore.',
-        placement: ['top', 'right', 'left']
     }
 ]);

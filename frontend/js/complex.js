@@ -434,137 +434,133 @@ const gridItemToggleDotAll = (show) => {
     }
 };
 
+const startLoading = (id, experiment) => {
+    const complexData = ComplexService.getComplexById(id);
+    const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(id);
+    const averageDistanceToOtherExperimentsComplex = ComplexService.getAverageDistancesToOtherExperiments(id);
 
-$(document).ready(() => {
+    lAExperimentNumber.start();
+    lAComplexCurve.start();
+    lAMetaData.start();
+    lAComplexCurves.start();
+
+    return experimentsWhichHaveComplex
+        .then(exps => {
+            console.log(`experiments which have complex`, exps);
+            drawOtherExperimentsSelect(exps, id, experiment);
+            return exps;
+        })
+        .then(() => Promise.all([
+            complexData,
+            averageDistanceToOtherExperimentsComplex
+        ])
+        )
+        .then(([complex, avgDist]) => {
+            console.log(`complex`, complex);
+            console.log(`avgDist`, avgDist);
+            return [complex, avgDist];
+        })
+        .then(([complex, avgDist]) => {
+            drawComplexMetadata(complex);
+            return Promise.all([
+                avgDist,
+                complex
+            ]);
+        })
+        .then(([avgDist, complex]) => {
+            if(experiment) {
+                return TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                    complex.proteins.map(protein => ({ uniprotId: protein, experiment: experiment }))
+                )
+                    .then(proteinData => {
+                        console.log(`proteinCurves`, proteinData);
+                        drawRanking(avgDist, proteinData.length, experiment);
+                        drawCombinedProteinCurves(proteinData);
+                        drawCurvesItems(proteinData, complex.proteins, experiment);
+                    });
+            } else {
+                lAComplexCurve.stop();
+                const complexCurvesContainer = document.querySelector(`#curvesGraph`);
+                const defaultText = document.createTextNode(`Select experiment (upper right) to view corresponding curves.`);
+                complexCurvesContainer.append(defaultText);
+
+                lAComplexCurves.stop();
+                const complexCurvesGridContainer = document.querySelector(`#curves-grid .grid`);
+                const defaultText2 = document.createTextNode(`Select experiment (upper right) to view corresponding curves.`);
+                complexCurvesGridContainer.append(defaultText2);
+
+                return Promise.resolve();
+            }
+        })
+        .then(done => {
+            $(dropDownSelector).dropdown({
+                match: `both`,
+                fullTextSearch: true,
+                glyphWidth: 3.0,
+                placeholder: `default`
+            });
+            console.log(`done`, done);
+        })
+        .catch(error => {
+            console.error(`loading error`, error);
+        });
+}
+
+const loadQuery = () => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     console.log(`query`, query);
     if(query.id) {
-
-        const complexData = ComplexService.getComplexById(query.id);
-        const experimentsWhichHaveComplex = ExperimentService.experimentsWhichHaveComplex(query.id);
-        const averageDistanceToOtherExperimentsComplex = ComplexService.getAverageDistancesToOtherExperiments(query.id);
-
-        lAExperimentNumber.start();
-        lAComplexCurve.start();
-        lAMetaData.start();
-        lAComplexCurves.start();
-
-        experimentsWhichHaveComplex
-            .then(exps => {
-                console.log(`experiments which have complex`, exps);
-                drawOtherExperimentsSelect(exps, query.id, query.experiment);
-                return exps;
-            })
-            .then(() => Promise.all([
-                complexData,
-                averageDistanceToOtherExperimentsComplex
-            ])
-            )
-            .then(([complex, avgDist]) => {
-                console.log(`complex`, complex);
-                console.log(`avgDist`, avgDist);
-                return [complex, avgDist];
-            })
-            .then(([complex, avgDist]) => {
-                drawComplexMetadata(complex);
-                return Promise.all([
-                    avgDist,
-                    complex
-                ]);
-            })
-            .then(([avgDist, complex]) => {
-                if(query.experiment) {
-                    return TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                        complex.proteins.map(protein => ({ uniprotId: protein, experiment: query.experiment }))
-                    )
-                        .then(proteinData => {
-                            console.log(`proteinCurves`, proteinData);
-                            drawRanking(avgDist, proteinData.length, query.experiment);
-                            drawCombinedProteinCurves(proteinData);
-                            drawCurvesItems(proteinData, complex.proteins, query.experiment);
-                        });
-                } else {
-                    lAComplexCurve.stop();
-                    const complexCurvesContainer = document.querySelector(`#curvesGraph`);
-                    const defaultText = document.createTextNode(`Select experiment (upper right) to view corresponding curves.`);
-                    complexCurvesContainer.append(defaultText);
-
-                    lAComplexCurves.stop();
-                    const complexCurvesGridContainer = document.querySelector(`#curves-grid .grid`);
-                    const defaultText2 = document.createTextNode(`Select experiment (upper right) to view corresponding curves.`);
-                    complexCurvesGridContainer.append(defaultText2);
-
-                    return Promise.resolve();
-                }
-            })
-            .then(done => {
-                $(dropDownSelector).dropdown({
-                    match: `both`,
-                    fullTextSearch: true,
-                    glyphWidth: 3.0,
-                    placeholder: `default`
-                });
-                console.log(`done`, done);
-            })
-            .catch(error => {
-                console.error(`loading error`, error);
-            });
+        return startLoading(query.id, query.experiment);
     }
-});
+}
 
 
-TourHelper.attachTour('#help-menu-item', [
-    {
-        target: '#spacedText',
-        content: 'This page shows you all about a specific complex.',
-        placement: ['bottom']
-    },
-    {
-        target: '#experiment-number',
-        content: 'Here you can switch between the SAME complex, found in different experiments. The experiment is listed here, if it contains at least one protein of this complex.',
-        placement: ['left', 'right', 'top', 'bottom']
-    },
-    {
-        before: () => {
-            $('#experiment-number input.search').focus();
-            return new Promise((res, rej) => {
-                setTimeout(() => {res();}, 200);
-            });
+$(document).ready(() => loadQuery());
+
+
+TourHelper.attachTour(
+    '#help-menu-item',
+    [
+        {
+            after: () => startLoading(21, 4),
+            target: '#spacedText',
+            content: 'This page shows you complex-centric information.',
+            placement: ['bottom']
         },
-        target: '#experiment-number > div > .menu',
-        content: 'This is a list of all the experiments, in which this complex is used.',
-        placement: ['bottom'],
-        after: () => {
-            $('#experiment-number input.search').focus();
-            return Promise.resolve();
-        }
-    },
+        {
+            target: '#experiment-number',
+            content: 'Here you can switch between different experiments containing at least one of the proteins in the complex.',
+            placement: ['left', 'right', 'top', 'bottom']
+        },
 
-    // combined curves
-    {
-        target: '#curvesGraph',
-        content: 'Here you can see the curves for all the proteins we have data for combined. As usual, hovering over specific points allows you to get detailed information.',
-        placement: ['top', 'right', 'bottom', 'left']
-    },
-    {
-        target: '.column-right',
-        content: 'The right hand side list all the information we have on this complex.',
-        placement: ['top', 'right', 'bottom', 'left']
-    },
-    {
-        target: '.column-right > .item-container:nth-child(9)',
-        content: 'The protein names itself are clickable and show some more information about themselfs.',
-        placement: ['left', 'top', 'right', 'bottom']
-    },
-    {
-        target: '#curves-grid',
-        content: 'Listed here are all the proteins you can find in this complex. Sometimes there are empty cubes, which means, that in this experiment for this complex, we have no data for this specific protein.',
-        placement: ['top', 'right', 'bottom', 'left']
-    },
-    {
-        target: '#curves-grid .grid-item:nth-child(1)',
-        content: 'Of course each protein can be selected for later review and analytics in the Analyze page.',
-        placement: ['top', 'right', 'bottom', 'left']
-    }
-]);
+        // combined curves
+        {
+            target: '#curvesGraph',
+            content: 'This graph shows all TPCA curves for the proteins in the given complex for the selected experiment. The graph is interactive.',
+            placement: ['top', 'right', 'bottom', 'left']
+        },
+        {
+            target: '.column-right',
+            content: 'This panel shows data about the complex (from CORUM).',
+            placement: ['top', 'right', 'bottom', 'left']
+        },
+        {
+            target: '.column-right > .item-container:nth-child(9)',
+            content: 'The protein UniProt Accession numbers are clickable and will open up more information about the protein obtained from CORUM.',
+            placement: ['left', 'top', 'right', 'bottom']
+        },
+        {
+            target: '#curves-grid',
+            content: 'Here you can find the proteins belonging to the complex in the selected experiment. Proteins that are in the complex but are not in the experiment are grayed out.',
+            placement: ['top', 'right', 'bottom', 'left']
+        },
+        {
+            target: '#curves-grid .grid-item:nth-child(1)',
+            content: 'Proteins in this section can be selected for visualization in the Analyze page, which is accessible from the menu or the button in the top-left of this area.',
+            placement: ['top', 'right', 'bottom', 'left']
+        }
+    ],
+    () => loadQuery(),
+    () => loadQuery()
+);
