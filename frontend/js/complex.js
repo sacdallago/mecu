@@ -131,7 +131,7 @@ const drawComplexMetadata = (complex) => {
 
         // swissprotOrganism
         const swissprotOrganismList = list.clone().addClass(`swissprot-organism-list`);
-        complex.swissprotOrganism.forEach(p => swissprotOrganismList.append(listItem.clone().text(p)));
+        (complex.swissprotOrganism || []).forEach(p => swissprotOrganismList.append(listItem.clone().text(p)));
 
         dataContainer.append([
             itemContainer.clone().append([
