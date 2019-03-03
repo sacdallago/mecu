@@ -60,14 +60,16 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
     data.forEach(obj => {
 
         obj.experiments.forEach((expRead, index) => {
+
+            const { min, max } = minMaxExpReads(expRead.reads);
+
             let curve = new MecuLine({
                 element: `#`+[itemIdentifierPrefix, index, obj.uniprotId, expRead.experiment].join(`-`).toLowerCase(),
                 width:`200`,
                 height:`200`,
-                limit: 5,
-                minTemp: 41,
-                maxTemp: 64,
-                minRatio: 0.1
+                minTemp: min,
+                maxTemp: max,
+                minRatio: 0.0
             });
 
             if(expRead.reads) {
@@ -150,14 +152,16 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
 
     data.forEach((obj,index) => {
 
+        const { min, max } = minMaxObjExpReads(obj);
+
         let curve = new MecuLine({
             element: `#`+[itemIdentifierPrefix, index, obj.id].join(`-`).toLowerCase(),
             width:`200`,
             height:`200`,
             limit: 5,
-            minTemp: 41,
-            maxTemp: 64,
-            minRatio: 0.1
+            minTemp: min,
+            maxTemp: max,
+            minRatio: 0.0
         });
 
         obj.experiments.forEach(expRead => {
@@ -217,3 +221,43 @@ HelperFunctions.delay = (function(){
         timer = setTimeout(callback, ms);
     };
 })();
+
+const minMaxExpReads = (reads) => {
+    let min = Number.MAX_SAFE_INTEGER;
+    let max = Number.MIN_SAFE_INTEGER;
+
+    reads.forEach(r => {
+        if (r.t < min) {
+            min = r.t;
+        }
+        if (r.t > max) {
+            max = r.t;
+        }
+    });
+
+    min -= 1;
+    max += 2;
+
+    return {min, max};
+}
+
+const minMaxObjExpReads = (obj) => {
+    let min = Number.MAX_SAFE_INTEGER;
+    let max = Number.MIN_SAFE_INTEGER;
+
+    obj.experiments.forEach(exp => {
+        exp.reads.forEach(r => {
+            if (r.t < min) {
+                min = r.t;
+            }
+            if (r.t > max) {
+                max = r.t;
+            }
+        });
+    });
+
+    min -= 1;
+    max += 2;
+
+    return {min, max};
+}

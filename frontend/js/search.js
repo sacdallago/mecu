@@ -161,7 +161,6 @@ const drawProteinCurves = (data) => {
 
     HelperFunctions.drawItemForEveryExperiment(`.grid-container`, proteinExperimentObject, toAppend);
 
-
 };
 
 const drawPaginationComponent = (actualPage, totalPages) => {

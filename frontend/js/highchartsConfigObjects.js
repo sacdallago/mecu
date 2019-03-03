@@ -12,9 +12,7 @@ highChartsCurvesConfigObject = {
             text: ``
         },
         startOnTick: true,
-        tickInterval: 1,
-        min: 37,
-        max: 64
+        tickInterval: 1
     },
     yAxis: {
         title: {
