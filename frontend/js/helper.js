@@ -248,14 +248,16 @@ const minMaxObjExpReads = (obj) => {
     let max = Number.MIN_SAFE_INTEGER;
 
     obj.experiments.forEach(exp => {
-        exp.reads.forEach(r => {
-            if (r.t < min) {
-                min = r.t;
-            }
-            if (r.t > max) {
-                max = r.t;
-            }
-        });
+        if (exp.reads) {
+            exp.reads.forEach(r => {
+                if (r.t < min) {
+                    min = r.t;
+                }
+                if (r.t > max) {
+                    max = r.t;
+                }
+            });
+        }
     });
 
     min -= 1;
