@@ -91,7 +91,8 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
             limit: 5,
             minTemp: 41,
             maxTemp: 64,
-            minRatio: 0.1
+            minRatio: 0.2,
+            maxRatio: 1.2
         });
     }
 };
@@ -161,7 +162,8 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
             limit: 5,
             minTemp: min,
             maxTemp: max,
-            minRatio: 0.0
+            minRatio: 0.2,
+            maxRatio: 1.2
         });
 
         obj.experiments.forEach(expRead => {
