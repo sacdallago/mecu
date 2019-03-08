@@ -91,7 +91,8 @@ HelperFunctions.drawItemForEveryExperiment = (gridIdentifierString, data, gridIt
             limit: 5,
             minTemp: 41,
             maxTemp: 64,
-            minRatio: 0.1
+            minRatio: 0.2,
+            maxRatio: 1.2
         });
     }
 };
@@ -161,7 +162,8 @@ HelperFunctions.drawItemsAllExperimentsInOneItem = (gridIdentifierString, data, 
             limit: 5,
             minTemp: min,
             maxTemp: max,
-            minRatio: 0.0
+            minRatio: 0.2,
+            maxRatio: 1.2
         });
 
         obj.experiments.forEach(expRead => {
@@ -246,14 +248,16 @@ const minMaxObjExpReads = (obj) => {
     let max = Number.MIN_SAFE_INTEGER;
 
     obj.experiments.forEach(exp => {
-        exp.reads.forEach(r => {
-            if (r.t < min) {
-                min = r.t;
-            }
-            if (r.t > max) {
-                max = r.t;
-            }
-        });
+        if (exp.reads) {
+            exp.reads.forEach(r => {
+                if (r.t < min) {
+                    min = r.t;
+                }
+                if (r.t > max) {
+                    max = r.t;
+                }
+            });
+        }
     });
 
     min -= 1;
