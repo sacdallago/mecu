@@ -1,72 +1,109 @@
-/**
- * proteins DAO
- *
- * Created by Christian Dallago on 20160611 .
- */
+const sequelize = require(`sequelize`);
+
+const bulkCreateSQL = require(`./proteins/bulkCreate`);
+const findProteinExperimentCombinationsSQL = require(`./proteins/findProteinExperimentCombinations`);
 
 module.exports = function(context) {
 
     // Imports
-    var proteinsModel = context.component('models').module('proteins');
+    const proteinsModel = context.component(`models`).module(`proteins`);
 
     return {
         create: function(item) {
             return proteinsModel.create(item);
         },
-        
-        bulkCreate: function(items) {
-            return proteinsModel.bulkCreate(items, {ignoreDuplicates: true});
+
+        bulkCreate: function(proteinList) {
+            // return proteinsModel.bulkCreate(items, {ignoreDuplicates: true}); // DOES NOT WORK
+            let p = Promise.resolve();
+            proteinList.forEach(protein => {
+                p = p.then(() => context.dbConnection.query(
+                    bulkCreateSQL.query(),
+                    {
+                        replacements: {
+                            uniprotId: protein,
+                            createdAt: new Date(),
+                            updatedAt: new Date()
+                        }
+                    },
+                    {
+                        type: sequelize.QueryTypes.INSERT
+                    }
+                ));
+            });
+            return p;
         },
-        
+
         update: function(item) {
-            var deferred = context.promises.defer();
-            
             item.updatedAt = Date.now();
 
-            proteinsModel.update({ "uniprotId": item.uniprotId }, item, {
+            return proteinsModel.update({ "uniprotId": item.uniprotId }, item, {
                 upsert: true,
                 setDefaultsOnInsert : true
-            }, function(error, insertedItem) {
-                if (error) {
-                    console.error(error);
-                    deferred.reject(error);
-                }
-                deferred.resolve(insertedItem);
-            });
-
-            return deferred.promise;
+            })
+                .catch(err => {
+                    console.error(err);
+                    return Promise.reject(err);
+                });
         },
-        
+
         findByUniprotId: function(identifier) {
-            var deferred = context.promises.defer();
-
-            proteinsModel.findOne({uniprotId:  identifier})
-                .exec(function(error, result) {
-                if (error) {
+            return proteinsModel.findOne({uniprotId:  identifier})
+                .catch(error => {
                     console.error(error);
-                    deferred.reject(error);
-                } else {
-                    deferred.resolve(result);
-                }
-            });
-
-            return deferred.promise;
+                    return Promise.reject(error);
+                });
         },
 
         findByUniprotIds: function(uniProtIds) {
-            var deferred = context.promises.defer();
-
-            proteinsModel.find({uniprotId:  uniProtIds})
-                .exec(function(error, result) {
-                    if (error) {
-                        console.error(error);
-                        deferred.reject(error);
-                    } else {
-                        deferred.resolve(result);
-                    }
+            return proteinsModel.find({uniprotId:  uniProtIds})
+                .catch(error => {
+                    console.error(error);
+                    return Promise.reject(error);
                 });
-
-            return deferred.promise;
         },
+
+        findProteinExperimentCombinations: function(proteinExperimentPairs, requester) {
+
+            if(proteinExperimentPairs.length === 0) {
+                return Promise.resolve([]);
+            }
+
+            const replacements = {
+                uploader: requester,
+                isPrivate: false
+            };
+
+            let whereClause = ``;
+            proteinExperimentPairs.forEach((v,i) => {
+                if(i != 0) {
+                    whereClause += ` OR `;
+                } else {
+                    whereClause += ` AND (`;
+                }
+                let replStrExp = `Exp`+i;
+                let replStrPrt = `Prt`+i;
+                whereClause += `(pe."uniprotId" = :${replStrPrt} AND pe."experimentId" = :${replStrExp})`;
+                replacements[replStrPrt] = v.uniprotId;
+                replacements[replStrExp] = v.experiment;
+            });
+            if(proteinExperimentPairs.length > 0) {
+                whereClause += ` ) `;
+            }
+
+            const query = findProteinExperimentCombinationsSQL.query(whereClause);
+
+            const start = new Date();
+            return context.dbConnection.query(
+                query,
+                {replacements: replacements},
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(r => {
+                    console.log(`DURATION findProteinExperimentCombinations  ${(Date.now()-start)/1000} ms`);
+                    return r;
+                })
+                .then(r => r.length > 0 ? r[0] : []);
+        }
     };
 };

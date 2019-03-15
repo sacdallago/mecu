@@ -2,13 +2,17 @@ extends base
 
 block content
     h1 Submit a new experiment
-    form.ui.form(method="post", action="/api/experiment", enctype="multipart/form-data")
+    
+    .upload-info(style="display: none;")#upload-info Uploading an experiment can take a long time, depeding on how much data you have.
+    
+    form.ui.form#experiment-upload-form
         .field
-            label Description
+            label Name
             input(type="text", name="description")
         .field
             label Source
             input(type="file", name="data", id="data")
+            a(href='/upload-experiment-guide') Guide: how to create an experiment that can be uploaded here?
         .field
             div(style= "background-color: #1B1C1D; color: #0ea432;")
                 code#preview
@@ -17,10 +21,20 @@ block content
                 input(type="checkbox", tabindex="0", name="lysate", value=false).hidden
                 label Experiment on cell lysate? (Default: No)
         .ui.button.submit Upload
+        
+        .ui.error.message
+            .header Error
+            p An error occured while updating the experiment. Try again or contact the administrator if it happens again.
+            p#error-message
 
-    .space
+block settings
+    .divider
+    a(href='/').item Search protein
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
+    a(href='/experiments').item Search Experiments
 
 block scripts
     - var delta = 50
-    script(type="text/javascript", src="/public/libs/mecu-utils")
+    script(type="text/javascript", src="/public/js/requests.js")
     script(type="text/javascript", src="/public/js/experimentUpload.js")

@@ -1,0 +1,25 @@
+.search-header {
+    display: flex;
+    justify-content: space-around;
+}
+.search-header .search {
+    width: 700px;
+    height: 40px;
+    border: 0.5px solid silver;
+    z-index: 0;
+    opacity: 0.8;
+}
+.search-header .search .field {
+    margin: 0 1 0 1px;
+    width: 99.5%;
+    height: 99%;
+    font-size: 1.7em !important;
+    border: 0;
+    padding: 0 0 0 0px !important;
+}
+.search-header .search .field:focus {
+    outline: none;
+}
+.grid-container {
+    min-height: 70px ;
+}

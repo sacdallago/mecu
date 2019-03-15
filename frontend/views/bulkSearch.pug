@@ -2,56 +2,79 @@ extends base
 
 block postStyles
     link(rel='stylesheet', href='/public/css/bulkSearch.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
+    link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
 
 block content
-    h3 1. Select experiments
-    table.ui.celled.table
+    .modal#add-protein-modal
+    h3.step 1. Select experiments
+    .step-description Select experiments of which the contents you want to inspect.
+    table.ui.celled.small.table#experiment-list
         thead
             tr
                 th Select
                 th ID
+                th Name
                 th Description
-                th Lysate
                 th Uploader
-        tbody
-            each experiment in experiments
-                tr
-                    td
-                        .ui.checkbox
-                            label
-                            input(type="checkbox", tabindex="0", class="hidden", data-id= experiment.id)
-                    td= experiment.id
-                    td= experiment.description
-                    td= experiment.lysate
-                    td
-                        a(target="_blank", href="https://plus.google.com/" + experiment.uploader) Google Plus Profile
-    h3 2. Input proteins
-    .text-center
+        tbody#experiments-list-container
+    
+    .pagination#pagination-component
+            
+    h3.step 2. Input proteins
+    .step-description Input UniProt identifier of proteins. Saved proteins are automatically added.
+    .text-center#protein-input
         .ui.input.search.maxWidth
-            textarea(name="prot", placeholder="P1234, P43244").inline.prompt.maxWidth.textarea
+            textarea(name="prot", placeholder="eg. P12004 P12023").inline.prompt.maxWidth.textarea.protein-list
     .stats
         span
             strong 0
         |  Protein identifiers matched by your input
     .space
-    h3 3. Check statistics
-    .space
-    p Input at least one protein and select at least one experiment to get started.
-    pre.statistics
-    .space
-    .grid
-    .space
 
+    h3.step 3. Check statistics
+    .step-description
+    
+    .heatmap-container
+        .step-description Heatmap of which protein is contained in which experiment. Clicking selects/deselects all proteins of the experiment.
+        .heatmap#heatmap Here you will see a which experiment has which protein.
+        
+        .legend
+            .l-item.c1 
+                .sample
+                .text Protein is not contained in the experiment
+            .l-item.c2 
+                .sample
+                .text Protein is contained in the experiment
+            .l-item.c3 
+                .sample
+                .text Protein is saved for visualization
+                
+        .show-button
+            a.ui.disabled.button#analyze-button(href='/analyze-proteins')
+                i.eye.icon
+                span Analyze
 
 block settings
     .divider
-    .item.filterExperiments Filter experiments
-    .item.showMean Toggle means
-    a(href='/curves').item Selected Curves
+    a(href='/').item Search protein
+    a(href='/complexes').item Search Complex
+    a(href='/experiments').item Search Experiments
+    a(href='/analyze-proteins').item Analyze
+    
+block help-button
+    a.item#help-menu-item Help
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/libs/mecu-line")
+    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
+    script(type="text/javascript", src="/public/libs/highcharts-heatmap.js")
+    script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
+    script(type="text/javascript", src="/public/js/modal.js")
+    script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
+    script(type="text/javascript", src="/public/js/pagination.js")
     script(type="text/javascript", src="/public/js/bulkSearch.js")

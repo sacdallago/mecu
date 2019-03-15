@@ -1,26 +1,45 @@
 extends base
 
+block postStyles
+    link(rel='stylesheet', href='/public/css/search.css')
+    link(rel='stylesheet', href='/public/css/pagination.css')
+    link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
+
 block content
-    .text-center
-        .ui.input.search
-            input(type="text", name="prot", placeholder="Search protein").prompt.inline
+    .search-header
+        .search
+            input(type="text", name="prot", placeholder="e.g. P12004" value="")#search-field.field
     .space
-    .selectors
-        // .ui.label.clearButton clear
+
+    .descriptive-info This page allows you to search for specific proteins with an UniProt identifier (eg. P12004) or the full name of a protein. 
+        | In the menu (top right) you can also search for a specific list of proteins, complexes or experiments.
+        | Once you have selected some protein (indicated by a green dot), you can view all selected proteins and have them analyzed together on the 'Analyze' page.
+
     .space
-    .grid
+        
+    .grid-container
+
     .space
+
+    .pagination#pagination-component
 
 
 block settings
     .divider
-    .item.filterExperiments Filter experiments
-    .item.showMean Toggle means
-    a(href='/curves').item Selected Curves
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
+    a(href='/experiments').item Search Experiments
+    a(href='/analyze-proteins').item Analyze
+
+block help-button
+    a.item#help-menu-item Help
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
-    script(type="text/javascript", src="/public/libs/mecu-line")
+    script(type="text/javascript", src="/public/js/pagination.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
+    script(type="text/javascript", src="/public/js/helper.js")
     script(type="text/javascript", src="/public/js/search.js")

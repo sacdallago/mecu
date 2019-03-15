@@ -1,0 +1,61 @@
+input{
+    width: 100%;
+    border: 0.5px solid silver;
+    z-index: 0;
+    opacity: 0.8;
+    font-size: 1.3em !important;
+
+    padding: 3px;
+}
+.field:focus {
+    outline: none;
+}
+/* if not supported, the divs will just be arranged as rows */
+@supports (display: grid) {
+    .search-header {
+        display: grid;
+        grid-template-rows: repeat(5, 1fr);
+        grid-row-gap: .5em;
+        grid-column-gap: 1.5em;
+        grid-template-areas:
+            "complex-text"
+            "complex-search"
+            "separator"
+            "protein-list-text"
+            "protein-list-search"
+    }
+    @media (min-width:700px) {
+        .search-header {
+            display: grid;
+            grid-template-rows: 1fr 0.1fr 1fr;
+            grid-template-columns: 1.5fr 4fr;
+            grid-row-gap: 0.5em;
+            grid-column-gap: 1.5em;
+            grid-template-areas:
+                "complex-text complex-search"
+                "separator . "
+                "protein-list-text protein-list-search"
+        }
+    }
+    .complex-search-text{
+        grid-area: complex-text;
+    }
+    .search-complex-name{
+        grid-area: complex-search;
+    }
+    .protein-list-search-text{
+        grid-area: protein-list-text;
+    }
+    .search-protein-list{
+        grid-area: protein-list-search;
+    }
+    .separator {
+        grid-area: separator;
+    }
+}
+tbody tr {
+    cursor: pointer;
+}
+tbody tr:hover {
+    background-color: lightgrey;
+}
