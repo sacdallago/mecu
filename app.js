@@ -1,7 +1,7 @@
 'use strict';
 
 // Parallelize
-const numCPUs           = 1; //require(`os`).cpus().length;
+const numCPUs           = require(`os`).cpus().length;
 const cluster           = require(`cluster`);
 const consoleStamp      = require(`console-stamp`);
 const path              = require(`path`);
