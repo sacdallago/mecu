@@ -2,16 +2,18 @@ version: '2'
 services:
     web-app:
         container_name: mecu_webservice
-        image: sacdallago/mecu:unstable
+        build:
+            context: .
+            dockerfile: Dockerfile
         ports:
             - 80:3000
         depends_on:
             - database
         env_file:
-            - variables.env
+            - app-variables.env
 
     database:
         container_name: mecu_postgresdb
         image: sacdallago/mecu-postgres
         ports:
-            - 5432:5432
+            - 54322:5432
