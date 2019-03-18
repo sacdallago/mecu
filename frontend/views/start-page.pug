@@ -1,10 +1,13 @@
 extends base
 
+block postStyles
+    link(rel='stylesheet', href='/public/css/search.css')
+
 block content
-    h1.ui.header= title
-    p= message
-    p For the geek in you, the error returned from the server is:
-    code= error
+    .start-header TITLE
+    
+    .space
+
 
 block settings
     .divider
@@ -16,3 +19,5 @@ block settings
 
 block scripts
     - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")

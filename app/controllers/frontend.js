@@ -5,8 +5,9 @@ module.exports = function(context) {
     const experimentsDao = context.component(`daos`).module(`experiments`);
 
     return {
+
         index: function(request, response) {
-            return response.render(`index`, {
+            return response.render(`start-page`, {
                 title: `Home`
             });
         },
