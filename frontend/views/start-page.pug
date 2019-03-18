@@ -2,11 +2,36 @@ extends base
 
 block postStyles
     link(rel='stylesheet', href='/public/css/search.css')
+    link(rel='stylesheet', href='/public/css/start-page.css')
 
 block content
-    .start-header TITLE
     
     .space
+    
+    #four-option-holder
+        a(href='/search')#first-option.option-cube
+            .top
+                .content P12004
+            .bottom
+                .content Search by UniProt accessor number or protein name.
+        
+        a(href='/bulkSearch')#second-option.option-cube
+            .top
+                .content P12005, Q23478, O01012
+            .bottom
+                .content Search by UniProt accessors in bulk.
+        
+        a(href='/complexes')#third-option.option-cube
+            .top
+                .content CASK-LIN7C-APBA1 complex
+            .bottom
+                .content View list of complexes.
+        
+        a(href='/experiments')#fourth-option.option-cube
+            .top
+                .content Exp. 1, Exp. 2, Exp. 3
+            .bottom
+                .content View list of experiments.
 
 
 block settings
