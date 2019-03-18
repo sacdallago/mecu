@@ -131,3 +131,7 @@ a > .image {
 .text-center {
     text-align: center;
 }
+
+#end-of-page-spacing {
+    height: 150px;
+}
