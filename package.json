@@ -49,9 +49,7 @@
         "universal-analytics": "latest",
         "webpack": "^4.1.0"
     },
-    "devDependencies": {
-        
-    },
+    "devDependencies": {},
     "scripts": {
         "start": "node app.js",
         "create-complex-sql": "node scripts/createComplexesSQL.js",
