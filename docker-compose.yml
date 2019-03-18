@@ -17,3 +17,19 @@ services:
         image: sacdallago/mecu-postgres
         ports:
             - 54322:5432
+
+    nginx-proxy:
+      image: jwilder/nginx-proxy
+      container_name: nginx-proxy
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+        - /usr/share/nginx/html
+        - /etc/nginx/vhost.d
+        - certs-volume:/etc/nginx/certs:ro
+
+
+volumes:
+  certs-volume:
