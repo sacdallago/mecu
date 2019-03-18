@@ -38,12 +38,18 @@ data/*
 !data/proteinMapping.json
 !data/hippie.json
 
-private/*
+private
 !private/README
 cache/*
 
 config.json
-config.js
 
 .idea/
 .DS_Store
+
+
+# scripts
+scripts/*.json
+scripts/*.sql
+
+docker-compose.yml

@@ -1,0 +1,104 @@
+extends base
+
+block postStyles
+    link(rel='stylesheet', href='/public/css/search.css')
+    link(rel='stylesheet', href='/public/css/analyze-proteins.css')
+    link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
+
+block content
+    .settings 
+        h3.settings-title 1. Selection
+        .text-coloring
+            .div Select how the curves should be colored:
+        .ui.selection.dropdown#coloring-dropdown
+            i.dropdown.icon
+            input(type="hidden" name="coloring" value="0").value
+            .text
+            .menu
+                .item(data-value="0") Color by Protein
+                .item(data-value="1") Color by Experiment
+        .text-experiments
+            .div Select which experiments to draw:
+        .ui.selection.fluid.multiple.dropdown#experiments-dropdown
+            input(type="hidden" name="experiments").value
+            .text
+            .menu
+            i.dropdown.icon
+        .text-proteins
+            .div Select which proteins to draw:
+        .ui.selection.fluid.multiple.dropdown#proteins-dropdown
+            input(type="hidden" name="proteins").value
+            .text
+            .menu
+            i.dropdown.icon
+    
+    .graph-column
+        h3.graph-title 2. Selected Curves
+        .graph-description All selected curves are displayed here
+        .curves-graph-container
+            .chart#curves-chart
+            .space
+            .ui.button#fullscreen-button-chart View in fullscreen
+    .distances-column
+        h3.distances-title 3. Distance chart
+        .distances-description Visualization of the selected proteins and their distances
+        .nodes-graph-container
+            .chart#nodesGraph
+            .space
+            div#distance-buttons
+                .ui.button.manhattan(data-content="The distance between two points measured along axes at right angles. In a plane with p1 at (x1, y1) and p2 at (x2, y2), it is |x1 - x2| + |y1 - y2|.") Manhattan
+                .ui.button.euclidian(data-content="Euclidean distance or simply 'distance' examines the root of square differences between coordinates of a pair of objects.") Euclidian
+                .ui.button.supremum(data-content="This is the maximum difference between any component of the vectors.") Supremum
+                .ui.top.right.search.pointing.dropdown.button.minkowski(data-content="The Minkowski distance between two variabes X and Y is defined as (∑i=1n|Xi−Yi|p)1/p . The case where p = 1 is equivalent to the Manhattan distance and the case where p = 2 is equivalent to the Euclidean distance.") Minkowski
+                    .menu
+                        .item
+                            .ui.input
+                                input(type="number", name="rank", placeholder="3")#rank
+                        .item
+                            .ui.attached.button.submit Save
+
+    .ppi-table
+        h3 4. Distances and Correlations amongst proteins
+        .ppi-table-description The first few selected proteins and their distances as well as correlations with each other. To view all of them click 'View in fullscreen'.
+        .table-container
+            .ppi-table-loading-animation
+            table.ui.definition.collapsing.celled.single.line.table
+                thead#ppi-thead
+                tbody#ppi-tbody
+        .legend
+            .distance
+                .color-distance
+                .text-distance Distance(euclidian) of 2 proteins (white: close; green: distant)
+            .correlation
+                .color-correlation
+                .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
+        .ui.button#fullscreen-button-ppi(data-content="Limited to 20 experiments x 100 proteins") View in fullscreen
+        .ui.button#relative-absolute-corr-button Relative correlation
+
+    .protein-list
+        h3 Proteins
+        .text Click to view details
+        .grid-container
+
+block settings
+    .divider
+    a(href='/').item Search protein
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
+    a(href='/experiments').item Search Experiments
+
+block help-button
+    a.item#help-menu-item Help
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src='/public/modules/tour/dist/tour.js')
+    script(type="text/javascript", src="/public/modules/disi/build/disi.js")
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
+    script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
+    script(type="text/javascript", src="/public/js/fullscreen-helper.js")
+    script(type="text/javascript", src="/public/js/loading-animation.js")
+    script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/analyze-proteins.js")

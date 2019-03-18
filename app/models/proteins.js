@@ -1,21 +1,10 @@
-/**
- * protein model
- *
- * Created by Christian Dallago on 20161226 .
- */
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
-    return context.sequelize.define('protein', {
+    return context.dbConnection.define(`protein`, {
         uniprotId: {
-            type: context.Sequelize.STRING,
-            // allowNull: false,
-            // unique: true,
+            type: sequelize.STRING,
             primaryKey: true
-        },
-        primaryGene: {
-            type: context.Sequelize.STRING,
-            allowNull: false,
-            unique: 'primaryGene'
         }
     });
 };

@@ -1,19 +1,21 @@
 //
    Created by chdallago on 1/6/17.
 
-.ui.dropdown.icon.button(style="position: relative; top: -13em;")
+.ui.dropdown.icon.button(style="position: relative; top: -13em;")#menu-button
     i.angle.down.icon
-    .menu
+    .menu#menu-content
         if user
             -
                 var name = user.get('displayName');
                 name = name.length > 20 ? name.substr(0.15) + "..." : name;
             .item= name
             a(href="/upload").item Upload experiment
+            a(href="/upload-experiment-guide").item How to upload an experiment
             a(href="/auth/logout").item Logout
         else
             a(href="/auth/google").item Login
         block settings
         .divider
         a(href="/downloads").item Downloads
-        a(href="/about").item About
+        block help-button
+        a(href="/about").item.about About

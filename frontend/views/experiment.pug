@@ -1,0 +1,59 @@
+extends base
+
+block postStyles
+    link(rel='stylesheet', href='/public/css/pagination.css')
+
+block content
+    h3.header
+        span Experiment 
+        span#experiment-id 
+            
+    form.ui.form#experiment-form
+        .field.experiment-name
+            label Name
+            input(type="text" name="experiment-name" placeholder="Name of the experiment")#experiment-name
+        .field.nine.wide.uploader
+            label Uploader
+            a#uploader
+        .inline.field.is-private
+            .ui.checkbox
+                input(type="checkbox" tabindex="0" class="hidden" name="cb-private")#cb-private
+                label Private
+            
+        .field.description
+            label Description
+            textarea(rows="5" name="description")#description
+        .lysate
+            .ui.slider.checkbox
+                input(type="checkbox" tabindex="0" class="hidden" name="cb-lysate")#cb-lysate
+                label Lysate
+        
+        .space
+        input(type="submit" value="Submit").ui.button#submit-button
+        
+        .ui.success.message
+            .header Success
+            p Updating experiment was successful!
+        .ui.error.message
+            .header Error
+            p An error occured while updating the experiment. Try again or contact the administrator if it happens again.
+    
+    form.ui.form#not-allowed-form(style="dispaly:none")
+        .ui.error.message
+            .header Error
+            p You are not allowed to view this experiment.
+
+block settings
+    .divider
+    a(href='/').item Search protein
+    a(href='/search').item Search list of proteins
+    a(href='/complexes').item Search Complex
+    a(href='/experiments').item Search Experiments
+    a(href='/analyze-proteins').item Analyze
+
+block scripts
+    - var delta = 50
+    script(type="text/javascript", src="/public/libs/isotope/isotope.js")
+    script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/js/experiment.js")
+    script(type="text/javascript", src="/public/js/pagination.js")

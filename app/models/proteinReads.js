@@ -1,58 +1,34 @@
-/**
- * meltingRead model
- *
- * Created by Christian Dallago on 20161226 .
- */
+const sequelize = require(`sequelize`);
 
 module.exports = function(context) {
-    
-    const experimentsModel = context.component('models').module('experiments');
-    const proteinsModel = context.component('models').module('proteins');
-    
-    return context.sequelize.define('proteinRead', {
-        // don't delete database entries but set the newly added attribute deletedAt
-        // to the current date (when deletion was done). paranoid will only work if
-        // timestamps are enabled
+
+    return context.dbConnection.define(`proteinRead`, {
         experiment: {
-            type: context.Sequelize.INTEGER,
-            unique: '_id',
-            allowNull: false,
-            onDelete: "CASCADE",
-            onUpdate: "CASCADE",
+            type: sequelize.INTEGER,
             references: {
-                // This is a reference to another model
-                model: experimentsModel,
-
-                // This is the column name of the referenced model
-                key: 'id',
-
-                // This declares when to check the foreign key constraint. PostgreSQL only.
-                deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE
-            }
+                model: `experiments`,
+                key: `id`
+            },
+            onDelete: `CASCADE`,
+            onUpdate: `CASCADE`
         },
         uniprotId: {
-            type: context.Sequelize.STRING,
-            unique: '_id',
-            allowNull: false,
-//            TODO - Reference can be used when postgres ignore duplicate will be implemented, follow https://github.com/sequelize/sequelize/pull/6325
-//            references: {
-//                model: proteinsModel,
-//                key: 'uniprotId',
-//                deferrable: context.Sequelize.Deferrable.INITIALLY_IMMEDIATE,
-//                onDelete: "CASCADE"
-//            }
+            type: sequelize.STRING,
+            references: {
+                model: `proteins`,
+                key: `uniprotId`
+            }
         },
-
         peptides: {
-            type: context.Sequelize.INTEGER,
+            type: sequelize.INTEGER,
             allowNull: false
         },
         psms: {
-            type: context.Sequelize.STRING,
+            type: sequelize.STRING,
             allowNull: false
         },
         totalExpt: {
-            type: context.Sequelize.INTEGER,
+            type: sequelize.INTEGER,
             allowNull: true
         }
     });

@@ -1,6 +1,6 @@
 {
     "name": "mecu",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "Mecu framework",
     "main": "app.js",
     "author": "Christian Dallago",
@@ -15,12 +15,12 @@
         "url": "https://github.com/sacdallago/mecu.git"
     },
     "engines": {
-        "node": ">= 0.10.0"
+        "node": "8.11.1"
     },
     "dependencies": {
         "body-parser": "^1.18.2",
         "compression": "latest",
-        "connect-session-sequelize": "^5.2.1",
+        "connect-session-sequelize": "^5.2.2",
         "console-stamp": "latest",
         "cookie-parser": "latest",
         "disi": "latest",
@@ -28,8 +28,10 @@
         "express-session": "latest",
         "formidable": "latest",
         "gridfs-stream": "latest",
-        "json2csv": "^4.0.1",
-        "mecu-graph": "latest",
+        "highcharts": "^6.2.0",
+        "jquery": "^3.3.1",
+        "json2csv": "^4.3.5",
+        "mecu-graph": "^0.1.7",
         "mecu-line": "latest",
         "mecu-utils": "^0.1.1",
         "node-uuid": "latest",
@@ -39,14 +41,17 @@
         "pg": "latest",
         "pg-hstore": "latest",
         "pug": "^2.0.0",
-        "q": "latest",
-        "sequelize": "^4.35.2",
+        "semantic-ui-css": "^2.4.1",
+        "sequelize": "^4.43.0",
         "serve-favicon": "latest",
-        "universal-analytics": "latest",
-        "webpack": "^4.1.0"
+        "store": "^2.0.12",
+        "tour": "^2.0.3",
+        "universal-analytics": "latest"
     },
     "devDependencies": {},
     "scripts": {
-        "start": "node app.js"
+        "start": "node app.js",
+        "create-complex-sql": "node scripts/createComplexesSQL.js",
+        "create-protein-sql": "node scripts/createProteinXProteinSQL.js"
     }
 }

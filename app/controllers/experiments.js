@@ -1,53 +1,74 @@
+// External imports
+const json2csv = require(`json2csv`).parse;
+const mecuUtils = require(`mecu-utils`);
+const fs = require(`fs`);
+const formidable = require(`formidable`);
+
+const extractUserGoogleId = require(`../helper.js`).retrieveUserGoogleId;
+
+const UPPER_QUERY_LIMIT = 10;
+const queryParams = (query) => {
+    let ret = {
+        limit: query.limit ? (query.limit > UPPER_QUERY_LIMIT ? 10 : query.limit) : UPPER_QUERY_LIMIT,
+        offset: query.offset || 0,
+        sortBy: query.sortBy || `id`,
+        order: query.order ? (isNaN(parseInt(query.order)) ? 1 : parseInt(query.order)) : 1
+    };
+    return Object.assign(ret, query);
+};
+
 module.exports = function(context) {
 
     // Imports
-    const experimentsDao = context.component('daos').module('experiments');
-    const temperatureReadsDao = context.component('daos').module('temperatureReads');
-    const proteinReadsDao = context.component('daos').module('proteinReads');
+    const experimentsDao = context.component(`daos`).module(`experiments`);
+    const temperatureReadsDao = context.component(`daos`).module(`temperatureReads`);
+    const uploadExperimentDao = context.component(`daos`).module(`experimentUpload`);
 
-    // External imports
-    const json2csv = require('json2csv').parse;
-    const mecuUtils = require('mecu-utils');
 
     return {
         uploadExperiment: function(request, response) {
-            if(request.is('multipart/form-data')) {
-                const formidable = context.formidable;
+
+            if(request.is(`multipart/form-data`)) {
+
+                const uploadExperimentStartTime = new Date();
+
                 const form = new formidable.IncomingForm();
 
                 form.parse(request, function(error, fields, files) {
-                    var data = files.data;
+                    let data = files.data;
                     const lysate = function(){
                         if(fields.lysate !== undefined){
-                            return fields.lysate == "on";
+                            return fields.lysate == `on`;
                         }
-                        return false
+                        return false;
                     }();
-                    const description = fields.description;
+                    const name = fields.description;
 
-                    if(error || data === undefined || lysate === undefined || description === undefined){
-                        response.status(403).render('error', {
-                            title: 'Error',
-                            message: "Unable to post request",
-                            error: error || "Some fields are missing!"
+                    console.log(`uploading experiment`, name);
+
+                    if(error || data === undefined || lysate === undefined || name === undefined){
+                        response.status(403).send({
+                            title: `Error`,
+                            message: `Unable to post request`,
+                            error: `${error}` || `Some fields are missing!`
                         });
                         return;
                     }
 
-                    if (data.type != 'text/plain') {
-                        response.status(500).render('error', {
-                            title: 'Error',
-                            message: "Unable to post request",
-                            error: "Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format"
+                    if (data.type != `text/plain` && data.type != `text/csv`) {
+                        response.status(500).send({
+                            title: `Error`,
+                            message: `Unable to post request`,
+                            error: `Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format. found: ${data.type}`
                         });
                         return;
                     }
 
-                    return context.fs.readFile(data.path, 'utf8', function (error, data) {
+                    return fs.readFile(data.path, `utf8`, function (error, data) {
                         if(error){
-                            return response.status(500).render('error', {
-                                title: 'Error',
-                                message: "Unable to read file",
+                            return response.status(500).send({
+                                title: `Error`,
+                                message: `Unable to read file`,
                                 error: error
                             });
                         }
@@ -56,86 +77,100 @@ module.exports = function(context) {
                         data = mecuUtils.parse(data);
 
                         let newExperiment = {
-                            lysate: lysate,
-                            description: description,
+                            name: name,
+                            metaData: {
+                                lysate: lysate,
+                                description: ``
+                            },
                             rawData: data,
-                            uploader: request.user.get('googleId')
+                            uploader: extractUserGoogleId(request)
                         };
 
-                        return context.sequelize.transaction(function(transaction){
-                            return experimentsDao.create(newExperiment, {transaction: transaction}).then(function(experiment){
-
-                                // TODO - this can be implemented as a view if sequelize ever supports this, or once the Postgres equivalent of ON DUPLICATE IGNORE will be approved in sequelize https://github.com/sequelize/sequelize/pull/6325
-//                                let proteins = data.map(function(element){
-//                                    return {
-//                                        uniprotId: element.uniprotId,
-//                                        primaryGene: element.primaryGene
-//                                    }
-//                                });
-
-                                let proteinReads = data.map(function(element){
-                                     result = {
-                                        uniprotId: element.uniprotId,
-                                        experiment: experiment.id,
-                                        peptides: element.peptides,
-                                        psms: element.psms,
-                                    };
-
-                                    result.totalExpt = isNaN(element.totalExpt) ? undefined : element.totalExpt;
-
-                                    return result;
-                                });
-
-                                return proteinReadsDao.bulkCreate(proteinReads, {transaction: transaction}).then(function(){
-                                    let meltingReads = data
-                                        .map(function(element){
-                                            return element.reads.map(function(tempRead){
-                                                tempRead.uniprotId= element.uniprotId;
-                                                tempRead.experiment= experiment.id;
-                                                return tempRead;
-                                            });
-                                        })
-                                        .reduce(function(elements,element){
-                                            return elements.concat(element);
-                                        });
-
-                                    return temperatureReadsDao.bulkCreate(meltingReads, {transaction: transaction}).then(function(){
-                                        return true;
-                                    });
-                                });
-                            });
-                        })
-                            .then(function(result){
-                                return response.status(201).render('success', {
-                                    title: 'Success',
-                                    message: "Your data has been added to the database!"
+                        return uploadExperimentDao.uploadExperiment(newExperiment)
+                            .then((resultExp) => {
+                                console.log(`DURATION TOTAL uploadExperiment`, (Date.now()-uploadExperimentStartTime)/1000);
+                                return response.status(201).send({
+                                    title: `Success`,
+                                    message: `Your data has been added to the database!`,
+                                    result: resultExp
                                 });
                             })
-                            .catch(function(error){
-                                return response.status(500).render('error', {
-                                    title: 'Error',
-                                    message: "Unable to create experiment",
-                                    error: error
+                            .catch(error => {
+                                console.error(`uploadExperiment`, error.message, error);
+                                return response.status(500).send({
+                                    title: `Error`,
+                                    message: `Unable to create experiment`,
+                                    error: JSON.stringify(error)
                                 });
                             });
                     });
                 });
             } else {
-                response.status(403).render('error', {
-                    title: 'Error',
-                    message: "Unable to post request",
-                    error: "Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format"
+                response.status(403).send({
+                    title: `Error`,
+                    message: `Unable to post request`,
+                    error: `Allowed calls include:\n- multipart/form-data \n With attributes 'data' in text/plain format`
                 });
             }
         },
 
-        getExperiments: function(request, response) {
-            experimentsDao.getExperiments()
-                .then(function(experiments){
-                    return response.status(200).send(experiments);
+        getProteinsInExperiment: function(request, response) {
+            temperatureReadsDao.getDistinctProteinsInExperiment(request.params.id)
+                .then(result => response.status(200).send(result))
+                .catch(error => {
+                    console.error(`getExperiment`, error);
+                    return response.status(500).send(error);
+                });
+        },
+
+        getExperiment: function(request, response) {
+
+            const requester = extractUserGoogleId(request);
+
+            experimentsDao.findExperimentWithoutCheck(request.params.id)
+                .then(toSend => {
+                    if(toSend.private === true && toSend.uploader !== requester){
+                        console.error(`${requester} not the owner of the experiment ${request.params.id}`);
+                        toSend = {error: `You are not the owner of the experiment and the experiment is not open to be viewed by others`};
+                    }
+
+                    if(toSend.uploader === requester){
+                        toSend.isUploader = true;
+                    }
+
+                    return toSend;
                 })
-                .catch(function(error){
-                    console.error(error);
+                .then(toSend => response.status(200).send(toSend))
+                .catch(error => {
+                    console.error(`getExperiment`, error);
+                    return response.status(500).send(error);
+                });
+        },
+
+        updateExperiment: function(request, response) {
+            console.log(`request.params`, request.params);
+            console.log(`request.body`, request.body);
+            if(request.params.id && request.body) {
+                let experimentToUpdate = request.body;
+                delete experimentToUpdate.id;
+                experimentsDao.update(request.params.id, experimentToUpdate)
+                    .then(result => result[1][0])
+                    .then(({id, name, metaData, description}) => {
+                        response.status(200).send({id, name, metaData, description});
+                    })
+                    .catch(error => {
+                        console.error(`updateExperiment`, error);
+                        return response.status(500).send(error);
+                    });
+
+            }
+        },
+
+        getExperiments: function(request, response) {
+            experimentsDao.getExperimentsPaged(queryParams(request.query), extractUserGoogleId(request))
+                .then(result => response.status(200).send(result))
+                .catch(error => {
+                    console.error(`getExperiments`, error);
                     return response.status(500).send(error);
                 });
         },
@@ -151,15 +186,15 @@ module.exports = function(context) {
                 return response.status(400).send(error);
             }
 
-            experimentsDao.getRawData(identifier)
+            experimentsDao.getRawData(identifier, extractUserGoogleId(request))
                 .then(function(rawData){
                     if (rawData.constructor !== Array) {
                         rawData = [rawData];
                     }
                     rawData = rawData
                         .map(function(experiment){
-                            return experiment.get('rawData').map(function(proteinData) {
-                                proteinData.experiment = experiment.get('id');
+                            return experiment.get(`rawData`).map(function(proteinData) {
+                                proteinData.experiment = experiment.get(`id`);
                                 return proteinData;
                             });
                         })
@@ -169,34 +204,56 @@ module.exports = function(context) {
 
                     let fields = Object.keys(rawData[0]);
 
-                    fields.splice(fields.indexOf("reads"), 1);
+                    fields.splice(fields.indexOf(`reads`), 1);
 
                     switch(format){
-                        case "csv":
-                            rawData = json2csv(rawData, {
-                                quotes: '',
-                                fields: fields
-                            });
-                            break;
-                        case "tsv":
-                            rawData = json2csv(rawData, {
-                                quotes: '',
-                                del: '\t',
-                                fields: fields
-                            });
-                            break;
-                        default:
-                            rawData = JSON.stringify(rawData);
-                            break;
+                    case `csv`:
+                        rawData = json2csv(rawData, {
+                            quotes: ``,
+                            fields: fields
+                        });
+                        break;
+                    case `tsv`:
+                        rawData = json2csv(rawData, {
+                            quotes: ``,
+                            del: `\t`,
+                            fields: fields
+                        });
+                        break;
+                    default:
+                        rawData = JSON.stringify(rawData);
+                        break;
                     }
 
-                    response.set('Content-Type', 'text/plain');
+                    response.set(`Content-Type`, `text/plain`);
                     return response.status(200).send(new Buffer(rawData));
                 })
                 .catch(function(error){
                     console.error(error);
                     return response.status(500).send(error);
                 });
+        },
+
+        getExperimentsWhichHaveProtein: function(request, response) {
+            experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId, extractUserGoogleId(request))
+                .then(result => response.status(200).send(result))
+                .catch(error => {
+                    console.error(`getExperiments`, error);
+                    return response.status(500).send(error);
+                });
+        },
+
+        getExperimentsWhichHaveComplex: function(request, response) {
+            const start = new Date();
+            experimentsDao.getExperimentsWhichHaveComplex(request.params.complexId, extractUserGoogleId(request))
+                .then(result => {
+                    console.log(`DURATION getExperimentsWhichHaveComplex`, (Date.now()-start)/1000);
+                    response.status(200).send(result);
+                })
+                .catch(error => {
+                    console.error(`getExperimentsWhichHaveComplex`, error);
+                    return response.status(500).send([]);
+                });
         }
-    }
+    };
 };

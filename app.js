@@ -1,75 +1,77 @@
 'use strict';
 
 // Parallelize
-const numCPUs           = require('os').cpus().length;
-const cluster           = require('cluster');
-const consoleStamp      = require('console-stamp');
-const path              = require('path');
+const numCPUs           = require(`os`).cpus().length;
+const cluster           = require(`cluster`);
+const consoleStamp      = require(`console-stamp`);
+const path              = require(`path`);
+
+// const seedComplexes =  require('./app/seeds/loadComplexes');
 
 if (cluster.isMaster) {
     // Setup timestamps for logging
     consoleStamp(console,{
         metadata: function () {
-            return ("[MASTER]");
+            return (`[MASTER]`);
         },
         colors: {
-            stamp: "yellow",
-            label: "white",
-            metadata: "red"
+            stamp: `yellow`,
+            label: `white`,
+            metadata: `red`
         }
     } );
 
     // Fork workers.
     for (var i = 0; i < numCPUs; i++) {
         var worker = cluster.fork();
-        console.log("Spwaning worker " + worker.id);
+        console.log(`Spwaning worker ` + worker.id);
     }
 
-    cluster.on('exit', function(worker, code, signal) {
-        console.log("worker " + worker.process.pid + " died");
+    cluster.on(`exit`, function(worker, code, signal) {
+        console.log(`worker ` + worker.process.pid + ` died`);
         var newWorker = cluster.fork();
-        console.log("Spwaning worker " + newWorker.id);
+        console.log(`Spwaning worker ` + newWorker.id);
     });
 } else {
     // Spawn various workers to listen and answer requests
-    const express           = require('express');
-    const cookieParser      = require('cookie-parser');
-    const bodyParser        = require('body-parser');
-    const compression       = require('compression');
-    const watch             = require('node-watch');
-    const passport          = require('passport');
-    const googleStrategy    = require('passport-google-oauth2').Strategy;
-    const universalAnalytics= require('universal-analytics');
-    const session           = require('express-session');
-    const SequelizeStore    = require('connect-session-sequelize')(session.Store);
-    const favicon           = require('serve-favicon');
+    const express           = require(`express`);
+    const cookieParser      = require(`cookie-parser`);
+    const bodyParser        = require(`body-parser`);
+    const compression       = require(`compression`);
+    const watch             = require(`node-watch`);
+    const passport          = require(`passport`);
+    const googleStrategy    = require(`passport-google-oauth2`).Strategy;
+    const universalAnalytics= require(`universal-analytics`);
+    const session           = require(`express-session`);
+    const SequelizeStore    = require(`connect-session-sequelize`)(session.Store);
+    const favicon           = require(`serve-favicon`);
 
     consoleStamp(console, {
         metadata: function () {
-            return ("[Worker " + cluster.worker.id + "]");
+            return (`[Worker ` + cluster.worker.id + `]`);
         },
         colors: {
-            stamp: "yellow",
-            label: "white",
-            metadata: "green"
+            stamp: `yellow`,
+            label: `white`,
+            metadata: `green`
         }
     } );
 
     // Make each worker connect to mongoose and startup the controllers
-    require(path.join(__dirname, "index.js")).connect(function(context){
+    require(path.join(__dirname, `index.js`)).connect(function(context){
 
         // Define application address
         const address = function(config){
-            var address = "";
+            var address = ``;
 
             if(config.application){
-                address    += config.application.protocol || "http";
-                address    += "://";
-                address    += config.application.hostname || "localhost";
-                address    += config.application.port !== undefined ? ":" : "";
-                address    += config.application.port || "";
+                address    += config.application.protocol || `http`;
+                address    += `://`;
+                address    += config.application.hostname || `localhost`;
+                address    += config.application.port !== undefined ? `:` : ``;
+                address    += config.application.port || ``;
             } else {
-                address    += "http://localhost:3000";
+                address    += `http://localhost:3000`;
             }
 
             return address;
@@ -79,25 +81,25 @@ if (cluster.isMaster) {
         const app = express();
 
         // Express configuration
-        app.set('port', process.env.PORT || 3000);
-        app.set('views', path.join(__dirname, "frontend", "views"));
-        app.set('view engine', 'pug');
+        app.set(`port`, process.env.PORT || 3000);
+        app.set(`views`, path.join(__dirname, `frontend`, `views`));
+        app.set(`view engine`, `pug`);
 
         // Use
         app.use(compression());
 
         // Export static folders
-        app.use("/public/js", express.static(path.join(__dirname, "frontend", "js")));
-        app.use("/public/css", express.static(path.join(__dirname, "frontend", "css")));
+        // custom js scripts
+        app.use(`/public/js`, express.static(path.join(__dirname, `frontend`, `js`)));
+        // custom css scripts
+        app.use(`/public/css`, express.static(path.join(__dirname, `frontend`, `css`)));
+        // the old libs (TODO should be removed completely)
+        app.use(`/public/libs`, express.static(path.join(__dirname, `frontend`, `libs`)));
+        // new libs should all be loaded from the node_modules
+        app.use(`/public/modules`, express.static(path.join(__dirname, `node_modules`)));
 
-        app.use("/public/libs/mecu-graph", express.static(require.resolve("mecu-graph")));
-        app.use("/public/libs/mecu-utils", express.static(require.resolve("mecu-utils")));
-        app.use("/public/libs/mecu-line", express.static(require.resolve("mecu-line")));
-        app.use("/public/libs/disi", express.static(require.resolve("disi")));
-
-        app.use("/public/libs", express.static(path.join(__dirname, "frontend", "libs")));
-        app.use("/public", express.static(path.join(__dirname, "frontend", "public")));
-        app.use(favicon(path.join(__dirname, "frontend", "public", "images", "mecu.ico")));
+        app.use(`/public`, express.static(path.join(__dirname, `frontend`, `public`)));
+        app.use(favicon(path.join(__dirname, `frontend`, `public`, `images`, `mecu.ico`)));
 
         app.use(cookieParser());
 
@@ -105,9 +107,9 @@ if (cluster.isMaster) {
 
         // TODO - session and user management
         app.use(session({
-            secret: context.config.sessionSecret || 'mecuSecret',
+            secret: context.config.sessionSecret || `mecuSecret`,
             store: new SequelizeStore({
-                db: context.sequelize
+                db: context.dbConnection
             }),
             resave: true,
             saveUninitialized: true,
@@ -116,18 +118,18 @@ if (cluster.isMaster) {
         }));
         // Append google analytics user id. Will track both page visits as well as API calls.
         if(context.config.analytics && context.config.analytics.google && context.config.analytics.google.trackingId){
-            app.use(universalAnalytics.middleware(context.config.analytics.google.trackingId, {cookieName: 'gauid'}));
+            app.use(universalAnalytics.middleware(context.config.analytics.google.trackingId, {cookieName: `gauid`}));
         }
         app.use(passport.initialize());
         app.use(passport.session());
 
         // Configure passport
-        const usersDao = context.component('daos').module('users');
+        const usersDao = context.component(`daos`).module(`users`);
 
         const google = new googleStrategy({
             clientID            : context.config.passport.google.clientId,
             clientSecret        : context.config.passport.google.clientSecret,
-            callbackURL         : address + "/auth/google/callback",
+            callbackURL         : address + `/auth/google/callback`,
             passReqToCallback   : true
         }, function(request, accessToken, refreshToken, profile, done) {
             usersDao.findOrCreate({ googleId: profile.id, displayName: profile.displayName })
@@ -142,14 +144,14 @@ if (cluster.isMaster) {
 
         passport.use(google);
 
-        app.get('/auth/logout', function(request, response){
+        app.get(`/auth/logout`, function(request, response){
             request.session.destroy(function (err) {
-                response.redirect('/'); //Inside a callback… bulletproof!
+                response.redirect(`/`); //Inside a callback… bulletproof!
             });
         });
 
         passport.serializeUser(function(user, done) {
-            done(null, user.get("googleId"));
+            done(null, user.get(`googleId`));
         });
 
         passport.deserializeUser(function(googleId, done) {
@@ -162,11 +164,11 @@ if (cluster.isMaster) {
                 });
         });
 
-        app.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+        app.get(`/auth/google`, passport.authenticate(`google`, { scope: [`profile`] }));
 
-        app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), function(request, response) {
+        app.get(`/auth/google/callback`, passport.authenticate(`google`, { failureRedirect: `/error` }), function(request, response) {
             // Successful authentication, redirect home.
-            response.redirect('/');
+            response.redirect(`/`);
         });
 
         // Create routers
@@ -174,7 +176,7 @@ if (cluster.isMaster) {
         context.api = new express.Router();
 
         // Router listens on / and /api
-        app.use('/api', function(request, response, next) {
+        app.use(`/api`, function(request, response, next) {
             // Add the user info, if the user is logged in
             if(request.user){
                 response.locals.user = request.user;
@@ -185,7 +187,7 @@ if (cluster.isMaster) {
             return next();
         }, context.api);
 
-        app.use('/', function(request, response, next) {
+        app.use(`/`, function(request, response, next) {
             if(request.user){
                 response.locals.user = request.user;
             }
@@ -197,38 +199,40 @@ if (cluster.isMaster) {
             return next();
         }, context.router);
 
-        if(process.env.NODE_ENV != 'production'){
+        if(process.env.NODE_ENV != `production`){
             context.router.use(function(request, response, next) {
                 // Log each request to the console if in dev mode
-                console.log("Method:", request.method, "Path", request.path, "Query", request.query);
+                console.log(`Method:`, request.method, `Path`, request.path, `Query`, request.query);
 
                 return next();
             });
         }
 
         // Load all routes
-        context.component('.').module('routes');
+        context.component(`.`).module(`routes`);
 
         // Sync the database --> Write table definitions
-        context.sequelize.sync().then(function() {
-            // Make the process listen to incoming requests
-            app.listen(app.get('port'), function(){
-                console.log("Express server listening on port ", app.get('port'));
-                console.log("According to your configuration, the webapp is reachable at", address);
+        // TODO throw this out, this should only be done once, or when the table is changed
+        // force: true -> drops table and recreates it...
+        // context.dbConnection.sync({force: true}) // this DROPS ALL TABLES and recreates them
+        context.dbConnection.sync()
+            .then(() => app.listen( app.get(`port`), function(){
+                console.log(`Express server listening on port `, app.get(`port`));
+                console.log(`According to your configuration, the webapp is reachable at`, address);
+            })
+            ).catch(function(error) {
+                console.error(`There was an error while syncronizing the tables between the application and the database.`);
+                console.error(error);
+                process.exit(2);
             });
-        }).catch(function(error) {
-            console.error("There was an error while syncronizing the tables between the application and the database.");
-            console.error(error);
-            process.exit(2);
-        });
     });
 
     // Watch in case of file changes, restart worker (basically can keep up server running forever)
-    watch(path.join(__dirname, "app"),{
+    watch(path.join(__dirname, `app`),{
         recursive: true
     }, function(event, filename) {
         if (!/node_modules/.test(filename) && /\.js$/.test(filename)) {
-            console.log(filename + ' changed. Worker is gonna perform harakiri.');
+            console.log(filename + ` changed. Worker is gonna perform harakiri.`);
             cluster.worker.kill(0);
         }
     });
