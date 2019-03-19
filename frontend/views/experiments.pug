@@ -6,6 +6,11 @@ block postStyles
 
 block content
     h3 Experiments
+    .search-header
+        .search-experiment-text Enter an experiment id or name:
+        .search-experiment
+            input(type="text", name="experiment-id", placeholder="Experiment name or ID" value="").field#experiment-search
+
     .description Click onto a experiment to view details for it.
     table.ui.celled.table
         thead
@@ -13,9 +18,23 @@ block content
                 th ID
                 th Name
                 th Uploader
+                th Downloads
         tbody#experiments-list-container
-    
+
     .pagination#pagination-component
+
+    .download-all-buttons
+        .download-all-button-json
+            a.ui.button.download-all-button(href='/api/experiment/raw', download='all_experiments.json')
+                span Download ALL as JSON data
+
+        .download-all-button-tsv
+            a.ui.button.download-all-button(href='/api/experiment/raw?format=tsv', download='all_experiments_TSV.txt')
+                span Download ALL as TSV data
+
+        .download-all-button-csv
+            a.ui.button.download-all-button(href='/api/experiment/raw?format=csv', download='all_experiments_TSV.txt')
+                span Download ALL as CSV data
 
 block settings
     .divider
@@ -30,4 +49,5 @@ block scripts
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
     script(type="text/javascript", src="/public/js/loading-animation.js")
     script(type="text/javascript", src="/public/js/pagination.js")
+    script(type="text/javascript", src="/public/js/helper.js")
     script(type="text/javascript", src="/public/js/experiments.js")
