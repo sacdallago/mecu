@@ -13,7 +13,7 @@ const lAComplexesList = new LoadingAnimation(`#complex-list-container`, {
 });
 
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
-const UNIPROT_REGEX = /[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}/g;
+const UNIPROT_SPLIT = /(,|\s)/g;
 const ITEM_PER_PAGE_COUNT = 12;
 const complexesQuery = {
     search: ``,
@@ -43,7 +43,8 @@ const handleInput = (page, resetOffset) => {
 
     if(resetOffset) complexesQuery.offset = 0;
     const complexNameInputValue = searchInputComplexName.val().trim();
-    const proteinListInputValue = searchInputProteinList.val().trim().match(UNIPROT_REGEX) || [];
+    const proteinListInputValue = searchInputProteinList
+        .val().trim().split(UNIPROT_SPLIT).filter(a => a.length > 0) || [];
 
     complexesQuery.search = {name: complexNameInputValue, proteinList: proteinListInputValue};
 
