@@ -39,8 +39,8 @@ module.exports = (context) => {
             if(proteinList && proteinList.length > 0) {
                 proteinWhereQuery = `  where `;
                 proteinList.forEach((p,i) => {
-                    proteinWhereQuery += ` "uniprotId" = :p${i} `;
-                    replacements[`p`+i] = p;
+                    proteinWhereQuery += ` "uniprotId" like :p${i} `;
+                    replacements[`p`+i] = `%${p}%`;
                     if(i !== proteinList.length - 1) {
                         proteinWhereQuery += ` or `;
                     }
