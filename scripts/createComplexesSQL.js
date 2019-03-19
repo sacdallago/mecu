@@ -114,7 +114,7 @@ const createProteinSql = (proteins) => {
 const createComplexesAndMtoNSQL = (complexes) => {
     let complexes_string = ``;
     let m_to_n_string = ``;
-    let index = 0;
+    let index = 1; // start here, from where the last entry of the complexes is +1
 
     complexes.forEach(complex => {
         complexes_string += `INSERT INTO public.complexes`+
@@ -123,7 +123,7 @@ const createComplexesAndMtoNSQL = (complexes) => {
             `"geneNamesynonyms", "goId", "goDescription", "entrezIds", "subunitsComment", `+
             `"swissprotOrganism", "pubMedId", "funCatId", "funCatDescription", "createdAt", "updatedAt")`+
             ` VALUES (`+
-            `${index+1}, `+
+            `${index}, `+
             `'${complex.name.replace(/\'/g,``)}', `+
             `'${complex.purificationMethod.replace(/\'/g,`^`)}',`+
             `'${complex.comment.replace(/\'/g,`^`)}',`+
@@ -148,18 +148,18 @@ const createComplexesAndMtoNSQL = (complexes) => {
             `'${complex.updatedAt.toUTCString()}'`+
             `) ON CONFLICT DO NOTHING;\n`;
 
-        index++;
-
         complex.proteins.forEach(protein => {
             m_to_n_string += `INSERT INTO public.protein_complexes`+
                 `("uniprotId", "complexId", "createdAt", "updatedAt")`+
                 ` VALUES (` +
                 `'${protein}', `+
-                `${index+1}, `+
+                `${index}, `+
                 `'${complex.createdAt.toUTCString()}',`+
                 `'${complex.updatedAt.toUTCString()}'`+
                 `) ON CONFLICT DO NOTHING;\n`;
         });
+
+        index++;
     });
 
     fs.appendFileSync(`scripts/`+FILE_TO_CREATE_NAME, complexes_string, function (err) {

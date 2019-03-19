@@ -253,6 +253,15 @@ const drawOtherExperimentsSelect = (experiments, complexId, actualExperiment) =>
 
 const drawCombinedProteinCurves = (proteins) => {
     return new Promise((resolve) => {
+        lAComplexCurve.stop();
+        if (proteins.length === 0) {
+            const complexCurvesContainer = document.querySelector(`#curvesGraph`);
+            const noCurvesText = document.createTextNode(`No protein curves for this complex/experiment pair.`);
+            complexCurvesContainer.append(noCurvesText);
+            resolve(true);
+            return;
+        }
+
         // creating data series for highcharts
         let series = [];
         proteins.forEach(protein => {
@@ -276,8 +285,6 @@ const drawCombinedProteinCurves = (proteins) => {
             distance: 30,
             padding: 5
         };
-
-        lAComplexCurve.stop();
 
         Highcharts.chart(`curvesGraph`, highChartsCurvesConfigObject);
 
