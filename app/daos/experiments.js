@@ -59,24 +59,39 @@ module.exports = function(context) {
         },
 
         getExperimentsPaged: function(options, requester) {
+            let whereQuery = {
+                [sequelize.Op.or]: [
+                    {private: false},
+                    {uploader: requester}
+                ]
+            };
+
+            if (options.search && options.search.length > 0) {
+                whereQuery = {
+                    [sequelize.Op.and]: [
+                        {
+                            [sequelize.Op.or]: [
+                                {
+                                    id: options.search
+                                },
+                                {
+                                    name: {
+                                        [sequelize.Op.like]: `%${options.search}%`
+                                    }
+                                }
+                            ]
+                        },
+                        whereQuery
+                    ]
+                };
+            }
+
             // add search if necessary
             return Promise.all([
-                experimentsModel.count({
-                    where: {
-                        [sequelize.Op.or]: [
-                            {private: false},
-                            {uploader: requester}
-                        ]
-                    }
-                }),
+                experimentsModel.count({ where: whereQuery }),
                 experimentsModel.findAll({
                     attributes: [`id`, `name`, `metaData`, `uploader`],
-                    where: {
-                        [sequelize.Op.or]: [
-                            {private: false},
-                            {uploader: requester}
-                        ]
-                    },
+                    where: whereQuery,
                     limit: options.limit,
                     offset: options.offset,
                     order: [
