@@ -1,0 +1,58 @@
+#four-option-holder {
+    /* height: 70%; */
+    padding: 3em;
+}
+@supports (display: grid) {
+    #four-option-holder {
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr 1fr;
+        grid-row-gap: 2em;
+        grid-template-areas:
+            "first-option"
+            "second-option"
+            "third-option"
+            "fourth-option"
+    }
+    @media (min-width:700px) {
+        #four-option-holder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            grid-row-gap: 3em;
+            grid-column-gap: 3em;
+            grid-template-areas:
+                "first-option second-option"
+                "third-option fourth-option"
+        }
+    }
+}
+.option-cube {
+    color: black;
+
+    border-radius: 5px;
+    box-shadow: 4px 4px 8px 2px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+.option-cube:hover {
+    color: black;
+    box-shadow: 4px 4px 8px 6px rgba(0,0,0,0.2);
+}
+.option-cube  .top, .bottom{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.option-cube .top {
+    min-height: 7em;
+
+    font-size: 1.8em;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.option-cube .bottom {
+    min-height: 3em;
+    padding: 0.5em;
+}
+
+#end-of-page-spacing {
+    height: 0px;
+}
