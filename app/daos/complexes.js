@@ -7,6 +7,7 @@ const getAverageComplexDistancePerExperimentSQL = require(`./complexes/getAverag
 module.exports = (context) => {
     // Imports
     const complexesModel = context.component(`models`).module(`complexes`);
+    const temperatureReadsDao = context.component(`daos`).module(`temperatureReads`);
 
     return {
         getComplex: (id) => {
@@ -18,43 +19,53 @@ module.exports = (context) => {
                 .then(([result]) => result || {});
         },
 
-        findComplex: ({limit, offset, sortBy, order, search}) => {
+        findComplex: ({limit, offset, sortBy, order, search}, requester) => {
 
-            const name = search.name || ``;
-            const proteinList = search.proteinList || [];
+            const name = search.value || ``;
+            const experimentId = search.experiment;
 
             const replacements = {
-                name: `%`+name+`%`,
                 limit: limit,
                 offset: offset,
-                sortBy: sortBy
+                searchTerm: `%${name}%`
             };
 
-            let nameWhereQuery = ``;
-            if(search.name.length !== 0) {
-                nameWhereQuery = ` and name like :name `;
-            }
+            const query = findComplexSQL.query(sortBy, order, 1);
 
-            let proteinWhereQuery = ``;
-            if(proteinList && proteinList.length > 0) {
-                proteinWhereQuery = `  where `;
-                proteinList.forEach((p,i) => {
-                    proteinWhereQuery += ` "uniprotId" like :p${i} `;
-                    replacements[`p`+i] = `%${p}%`;
-                    if(i !== proteinList.length - 1) {
-                        proteinWhereQuery += ` or `;
-                    }
-                });
-            }
-
-            const query = findComplexSQL.query(nameWhereQuery, proteinWhereQuery, sortBy, order, proteinList.length || 1);
-
-            return context.dbConnection.query(
-                query,
-                {replacements: replacements},
-                {type: sequelize.QueryTypes.SELECT}
-            )
+            const getComplexes = context.dbConnection.query(
+                    query,
+                    {replacements: replacements},
+                    {type: sequelize.QueryTypes.SELECT}
+                )
                 .then(([result]) => result);
+
+            const getCurveData = (protExpArr, req) => temperatureReadsDao
+                .findAndAggregateTempsByIdAndExperiment(
+                    protExpArr,
+                    req, `findComplex`
+                );
+
+            const getAndAddCurveData = (complex, exp, req) => {
+                const protExpArr = complex.proteins.map(p => ({
+                    uniprotId: p,
+                    experiment: exp
+                }));
+                return getCurveData(protExpArr, req)
+                    .then(reads => {
+                        complex.reads = reads;
+                        return complex;
+                    })
+            }
+
+
+            return Promise.all([Promise.resolve(experimentId), getComplexes])
+                .then(r => ({experiment: r[0], complexes: r[1]}))
+                .then(({experiment, complexes}) =>
+                    Promise.all(complexes.map(complex => getAndAddCurveData(complex, experiment, requester)))
+                )
+                .then(resultComplexes => {
+                    return resultComplexes;
+                });
         },
 
         getComplexWhichHasProtein: (uniprotId) => {
@@ -62,10 +73,10 @@ module.exports = (context) => {
             const query = getComplexWhichHasProteinSQL.query();
 
             return context.dbConnection.query(
-                query,
-                {replacements: {uniprotId: uniprotId}},
-                {type: sequelize.QueryTypes.SELECT}
-            )
+                    query,
+                    {replacements: {uniprotId: uniprotId}},
+                    {type: sequelize.QueryTypes.SELECT}
+                )
                 .then(([result]) => result);
         },
 
