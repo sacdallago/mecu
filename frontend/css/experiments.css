@@ -1,4 +1,39 @@
+.search-header {
+    padding: 0em 0em 1em 0em;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.search-header .search-experiment {
+    width: 70%;
+}
+
+input{
+    width: 100%;
+    border: 0.5px solid silver;
+    z-index: 0;
+    opacity: 0.8;
+    font-size: 1.3em !important;
+
+    padding: 3px;
+}
+.field:focus {
+    outline: none;
+}
+
+
 .table-row:hover {
     background-color: lightgrey;
     cursor: pointer;
+}
+.table-row > *:nth-last-child(-n+2) {
+    cursor: default;
+}
+
+.download-all-buttons {
+    padding: 10px 0px 10px 0px;
+
+    display: flex;
+    justify-content: space-around;
 }

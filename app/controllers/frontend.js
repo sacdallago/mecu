@@ -70,23 +70,6 @@ module.exports = function(context) {
             });
         },
 
-        downloads: function(request, response) {
-            return experimentsDao.getExperiments({}, extractUserGoogleId(request))
-                .then(function(experiments) {
-                    return response.render(`downloads`, {
-                        title: `Download`,
-                        experiments: experiments
-                    });
-                })
-                .catch(function(error) {
-                    return response.status(500).render(`error`, {
-                        title: `Error!`,
-                        message: `There was an unknown error with your request.`,
-                        error: error
-                    });
-                });
-        },
-
         storageProteinsFullscreen: function(request, response) {
             return response.render(`storage-proteins-fullscreen`, {
                 title: `Proteins Fullscreen`

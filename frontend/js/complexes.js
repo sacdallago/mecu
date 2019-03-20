@@ -55,7 +55,6 @@ const handleInput = (page, resetOffset) => {
             drawComplexTable(response);
             drawPaginationComponent(page+1, response.length > 0 ? response[0].total : 0 );
         });
-
 };
 
 const emptyTable = () => {
