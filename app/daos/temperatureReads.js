@@ -4,6 +4,7 @@ const findByUniprotIdAndExperimentSQL = require(`./temperatureReads/findByUnipro
 const findAndAggregateTempsBySimilarUniprotIdSQL = require(`./temperatureReads/findAndAggregateTempsBySimilarUniprotId`);
 const findAndAggregateTempsByIdAndExperimentSQL = require(`./temperatureReads/findAndAggregateTempsByIdAndExperiment`);
 const getSingleProteinXExperimentSQL = require(`./temperatureReads/getSingleProteinXExperiment`);
+const aggregateForExport = require(`./temperatureReads/aggregateForExport`);
 
 module.exports = function(context) {
 
@@ -175,6 +176,25 @@ module.exports = function(context) {
             }
             )
                 .then(data => data.map(d => d.uniprotId));
+        },
+
+        getTemperatureReadsForTSVCSV: function(experimentId, requester) {
+            let experimentClause = ``;
+            if (experimentId && !isNaN(parseInt(experimentId))) {
+                experimentClause = aggregateForExport.createExperimentClause()
+            }
+            const query = aggregateForExport.query(experimentClause);
+
+            return context.dbConnection.query(
+                query,
+                {
+                    replacements: {
+                        experimentId: experimentId,
+                        isPrivate: false,
+                        uploader: requester
+                    }
+                }
+            )
         }
     };
 };

@@ -79,7 +79,6 @@ const drawExperimentsTable = (data) => {
     let tr = $(`<tr />`).addClass(`table-row`);
     let td = $(`<td />`);
     let link = $(`<a />`, {'target':`_blank`});
-    let div = $(`<div />`);
 
     const addExperimentRedirectListener = (element) => {
         element.click(function() {
@@ -106,26 +105,6 @@ const drawExperimentsTable = (data) => {
                     .text(`Google Plus Profile`)
             );
         row.append(userElement);
-
-        const downloadLinksElement = td.clone()
-            .append([
-                div.clone().append(
-                    link.clone()
-                        .attr({'href':`/api/experiment/raw/${exp.id}`, 'download': `${exp.name}.txt`})
-                        .text(`JSON data (Protein + melting curves)`)
-                ),
-                div.clone().append(
-                    link.clone()
-                        .attr({'href':`/api/reads/temperatures/raw?e=${exp.id}&format=tsv`, 'download':`${exp.name}.txt`})
-                        .text(`TSV data`)
-                ),
-                div.clone().append(
-                    link.clone()
-                        .attr({'href':`/api/reads/temperatures/raw?e=${exp.id}&format=csv`, 'download':`${exp.name}.txt`})
-                        .text(`CSV data`)
-                )
-            ]);
-        row.append(downloadLinksElement);
 
         row.data(`row-data`, exp);
 

@@ -11,30 +11,30 @@ block content
         .search-experiment
             input(type="text", name="experiment-id", placeholder="Experiment name or ID" value="").field#experiment-search
 
-    .description Click onto a experiment to view details for it.
+    .download-all-buttons
+        .download-all-button
+            a.ui.button.json(href='/api/reads/temperatures/raw', download='all_experiments.json')
+                span Download ALL as JSON data
+
+        .download-all-button
+            a.ui.button.tsv(href='/api/reads/temperatures/raw/?f=tsv', download='all_experiments.tsv')
+                span Download ALL as TSV data
+
+        .download-all-button
+            a.ui.button.csv(href='/api/reads/temperatures/raw/?f=csv', download='all_experiments.csv')
+                span Download ALL as CSV data
+
+    .description Click onto a experiment to view details for it and download the data.
     table.ui.celled.table
         thead
             tr
                 th ID
                 th Name
                 th Uploader
-                th Downloads
         tbody#experiments-list-container
 
     .pagination#pagination-component
 
-    .download-all-buttons
-        .download-all-button-json
-            a.ui.button.download-all-button(href='/api/experiment/raw', download='all_experiments.json')
-                span Download ALL as JSON data
-
-        .download-all-button-tsv
-            a.ui.button.download-all-button(href='/api/experiment/raw?format=tsv', download='all_experiments_TSV.txt')
-                span Download ALL as TSV data
-
-        .download-all-button-csv
-            a.ui.button.download-all-button(href='/api/experiment/raw?format=csv', download='all_experiments_TSV.txt')
-                span Download ALL as CSV data
 
 block settings
     .divider

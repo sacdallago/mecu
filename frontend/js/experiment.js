@@ -100,6 +100,23 @@ $(`#experiment-form`).form({
 
 $(`.ui.checkbox`).checkbox();
 
+const setDownloadButtonLink = (experiment) => {
+    $('.download-all-button .json').attr({
+        'href': `/api/reads/temperatures/raw/?e=${experiment.id}`,
+        'download': `${experiment.name}.json`
+    });
+
+    $('.download-all-button .tsv').attr({
+        'href': `/api/reads/temperatures/raw/?e=${experiment.id}&f=tsv`,
+        'download': `${experiment.name}.tsv`
+    });
+
+    $('.download-all-button .csv').attr({
+        'href': `/api/reads/temperatures/raw/?e=${experiment.id}&f=csv`,
+        'download': `${experiment.name}.tsv`
+    });
+}
+
 $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
@@ -116,6 +133,7 @@ $(document).ready(() => {
                     drawError(experiment.error);
                 } else {
                     drawExperiment(experiment);
+                    setDownloadButtonLink(experiment);
                 }
             });
     }

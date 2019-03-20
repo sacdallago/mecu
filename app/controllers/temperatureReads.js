@@ -1,5 +1,5 @@
 // External imports
-const json2csv = require(`json2csv`).parse;
+const Json2csv = require(`Json2csv`).Parser;
 
 const extractUserGoogleId = require(`../helper.js`).retrieveUserGoogleId;
 
@@ -48,61 +48,70 @@ module.exports = function(context) {
         },
 
         getTemperaturesRaw: function(request, response) {
-            let experimentId;
 
+            let experimentId;
+            const format = request.query.f;
             if(request.query.e !== undefined){
                 try{
                     experimentId = parseInt(request.query.e);
                 } catch (error){
-                    console.error(error);
-                    return response.status(400).send(error);
+                    console.error(`given experimentId was not parsable to int`, error);
+                    return response.status(400).send(`given experimentId was not parsable to int`);
                 }
             }
 
-            const uniprotId = request.query.p;
-            const format = request.query.format;
-
-            return temperatureReadsDao.findByUniprotIdAndExperiment(uniprotId, experimentId, extractUserGoogleId(request))
+            return temperatureReadsDao.getTemperatureReadsForTSVCSV(experimentId, extractUserGoogleId(request))
                 .then(function(temperatureReads) {
+
+                    temperatureReads = temperatureReads[0];
 
                     if(temperatureReads.length < 1){
                         return response.status(200).send();
                     }
 
-                    temperatureReads = temperatureReads.map(function(read) {
-                        return {
-                            experiment : read.experiment,
-                            uniprotId : read.uniprotId,
-                            temperature : read.temperature,
-                            ratio : read.ratio
-                        };
+                    // find all used temperatures (all of them have to have their own column)
+                    let columns = new Set();
+                    temperatureReads.forEach(read => {
+                        Object.keys(read.obj).forEach(k => columns.add(parseInt(k)));
                     });
+                    columns = Array.from(columns)
+                        .sort((a,b) => a < b ? -1 : (a > b ? 1 : 0))
+                        .map(c => ''+c);
 
-                    let fields = Object.keys(temperatureReads[0]);
+                    // final columns to use for csv/tsv
+                    let fields = ['uniprotId'].concat(columns);
+
+                    temperatureReads = temperatureReads.map(t => {
+                        let ret = {};
+                        Array.from(columns).forEach(k => ret[k] = t.obj[k]);
+                        ret.uniprotId = t.uniprotId;
+                        return ret;
+                    });
 
                     switch(format){
                     case `csv`:
-                        temperatureReads = json2csv({
-                            data: temperatureReads,
-                            quotes: ``,
-                            fields: fields
+                        let csvParser = new Json2csv({
+                            fields: fields,
+                            delimiter: ','
                         });
+                        temperatureReads = csvParser.parse(temperatureReads);
+                        response.set(`Content-Type`, `text/plain`);
                         break;
                     case `tsv`:
-                        temperatureReads = json2csv({
-                            data: temperatureReads,
-                            quotes: ``,
-                            del: `\t`,
-                            fields: fields
+                        let tsvParser = new Json2csv({
+                            fields: fields,
+                            delimiter: '\t'
                         });
+                        temperatureReads = tsvParser.parse(temperatureReads);
+                        response.set(`Content-Type`, `text/plain`);
                         break;
                     default:
                         temperatureReads = JSON.stringify(temperatureReads);
+                        response.set(`Content-Type`, `application/json`);
                         break;
                     }
 
-                    response.set(`Content-Type`, `text/plain`);
-                    return response.status(200).send(new Buffer(temperatureReads));
+                    return response.status(200).send(Buffer.from(temperatureReads));
                 })
                 .catch(function(error){
                     console.error(error);

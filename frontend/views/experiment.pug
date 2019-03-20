@@ -2,6 +2,7 @@ extends base
 
 block postStyles
     link(rel='stylesheet', href='/public/css/pagination.css')
+    link(rel='stylesheet', href='/public/css/experiment.css')
 
 block content
     h3.header
@@ -37,11 +38,29 @@ block content
         .ui.error.message
             .header Error
             p An error occured while updating the experiment. Try again or contact the administrator if it happens again.
+
+
+        .space
+        .space
+        label.download-header.field Downloads
+        .download-all-buttons
+            .download-all-button
+                a.ui.button.json
+                    span Download data as JSON
+
+            .download-all-button
+                a.ui.button.tsv
+                    span Download data as TSV
+
+            .download-all-button
+                a.ui.button.csv
+                    span Download data as CSV
     
     form.ui.form#not-allowed-form(style="dispaly:none")
         .ui.error.message
             .header Error
             p You are not allowed to view this experiment.
+
 
 block settings
     .divider
