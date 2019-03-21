@@ -1,6 +1,5 @@
 #four-option-holder {
-    /* height: 70%; */
-    padding: 3em;
+    padding: 3.5em;
 }
 @supports (display: grid) {
     #four-option-holder {
@@ -47,6 +46,7 @@
 
     font-size: 1.8em;
     border-bottom: 1px solid rgba(0,0,0,0.1);
+    background-color: #fafafd;
 }
 .option-cube .bottom {
     min-height: 3em;
