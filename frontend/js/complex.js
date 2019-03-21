@@ -71,7 +71,7 @@ const enableAnalyzeButton = () => {
     });
 };
 
-const drawComplexMetadata = (complex) => {
+const drawComplexMetadata = (complex, experimentId) => {
     return new Promise((resolve) => {
 
         lAMetaData.stop();
@@ -86,23 +86,76 @@ const drawComplexMetadata = (complex) => {
         const listItem = $(`<div />`).addClass(`list-item`);
 
         // proteins items (+modals)
-        const proteinAndNamesList = $(`<div />`).addClass(`id-and-names-list-container`);
+        const proteinListContainer = $(`<div />`).addClass(`id-and-names-list-container`);
+
         if(complex.proteins && complex.proteins.length > 0) {
-            proteinAndNamesList.append(
-                complex.proteins.map((p,i) =>
-                    $(`<a />`).addClass(`protein-text`).text(` `+p+`, `).on(`click`, () => {
-                        ModalService.createInfoModal(infoModalIdentifier,
-                            `Protein info: `+p,
-                            `<div>Name: ${complex.proteinNames[i]}</div>
-                            <div>Gene: ${complex.geneNames[i]}</div>
-                            <div>Synonym: ${complex.geneNamesynonyms[i]}</div>
-                            <div>Organism: ${complex.swissprotOrganism[i]}</div>
-                            <div><a href="https://www.uniprot.org/uniprot/${p}" target="_blank">Uniprot Link</a></div>`
-                        );
-                        ModalService.openInfoModal(infoModalIdentifier);
+            // table head
+            const table = $(`<table />`).addClass('ui celled table');
+            table.append(
+                $(`<thead />`).append(
+                    $(`<tr />`).append([
+                        $(`<th />`).text('Protein Name'),
+                        $(`<th />`).text('Inspect'),
+                    ])
+                )
+            );
+
+            // table data
+            table.append(
+                $(`<tbody />`).append(
+                    complex.proteins.map((p,i) => {
+                        const proteinName = $(`<td />`)
+                            .text(p)
+                            .addClass('hoverable');
+                        proteinName.on(`click`, () => {
+                            ModalService.createInfoModal(infoModalIdentifier,
+                                `Protein: `+p,
+                                `
+                                <div class="modal-content">
+                                    <div class="row">
+                                        <div class="name">Name</div>
+                                        <div class="value">${complex.proteinNames[i]}</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="name">Gene</div>
+                                        <div class="value">${complex.geneNames[i]}</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="name">Synonym</div>
+                                        <div class="value">${complex.geneNamesynonyms[i]}</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="name">Organism</div>
+                                        <div class="value">${complex.swissprotOrganism[i]}</div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="name"></div>
+                                        <div class="value"><a href="https://www.uniprot.org/uniprot/${p}" target="_blank">Uniprot Link</a></div>
+                                    </div>
+                                </div>
+                                `
+                            );
+                            ModalService.openInfoModal(infoModalIdentifier);
+                        });
+
+                        const inspectTd = $(`<td />`)
+                            .data('object', {protein:p, experiment:experimentId})
+                            .text('Go to protein page.')
+                            .addClass('hoverable');
+                        inspectTd.on(`click`, function() {
+                            const data = $(this).data(`object`);
+                            document.location.href = `/protein?protein=${data.protein}&experiment=${data.experiment}`;
+                        });
+
+                        return $(`<tr />`).append([
+                            proteinName,
+                            inspectTd
+                        ]);
                     })
                 )
             );
+
+            proteinListContainer.append(table);
         }
 
         // gene + names list
@@ -167,16 +220,16 @@ const drawComplexMetadata = (complex) => {
                 value.clone().text(complex.diseaseComment || `-`)
             ]),
             itemContainer.clone().append([
-                text.clone().text(`Proteins`),
-                value.clone().append(proteinAndNamesList)
-            ]),
-            itemContainer.clone().append([
                 text.clone().text(`GO description`),
                 value.clone().append(complex.goDescription)
             ]),
             itemContainer.clone().append([
                 text.clone().text(`Funcat Description`),
                 value.clone().append(complex.funCatDescription)
+            ]),
+            itemContainer.clone().append([
+                text.clone().text(`Proteins`),
+                value.clone().append(proteinListContainer)
             ]),
         ]);
 
@@ -471,7 +524,7 @@ const startLoading = (id, experiment) => {
             return [complex, avgDist];
         })
         .then(([complex, avgDist]) => {
-            drawComplexMetadata(complex);
+            drawComplexMetadata(complex, experiment);
             return Promise.all([
                 avgDist,
                 complex
