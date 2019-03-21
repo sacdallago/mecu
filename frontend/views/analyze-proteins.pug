@@ -60,20 +60,21 @@ block content
     .ppi-table
         h3 4. Distances and Correlations amongst proteins
         .ppi-table-description The first few selected proteins and their distances as well as correlations with each other. To view all of them click 'View in fullscreen'.
-        .table-container
-            .ppi-table-loading-animation
-            table.ui.definition.collapsing.celled.single.line.table
-                thead#ppi-thead
-                tbody#ppi-tbody
+        //.table-container
+        //    .ppi-table-loading-animation
+        //    table.ui.definition.collapsing.celled.single.line.table
+        //        thead#ppi-thead
+        //        tbody#ppi-tbody
+        #protein_heatmap
         .legend
             .distance
                 .color-distance
-                .text-distance Distance(euclidian) of 2 proteins (white: close; green: distant)
+                .text-distance &nbsp Euclidian distance between two proteins (light: further apart; intense: closer)
             .correlation
                 .color-correlation
-                .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
+                .text-correlation &nbsp HIPPIE score of protein-protein interaction (if available) (white: N.A; light: low; intense: high)
         .ui.button#fullscreen-button-ppi(data-content="Limited to 20 experiments x 100 proteins") View in fullscreen
-        .ui.button#relative-absolute-corr-button Relative correlation
+        .ui.button#relative-absolute-corr-button Relative HIPPIE scores
 
     .protein-list
         h3 Proteins
@@ -97,9 +98,11 @@ block scripts
     script(type="text/javascript", src="/public/modules/disi/build/disi.js")
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src="/public/libs/d3.v4.min.js")
     script(type="text/javascript", src="/public/modules/highcharts/highcharts.js")
     script(type="text/javascript", src="/public/js/highchartsConfigObjects.js")
     script(type="text/javascript", src="/public/js/fullscreen-helper.js")
+    script(type="text/javascript", src="/public/js/heatmap.js")
     script(type="text/javascript", src="/public/js/loading-animation.js")
     script(type="text/javascript", src="/public/js/helper.js")
     script(type="text/javascript", src="/public/js/analyze-proteins.js")

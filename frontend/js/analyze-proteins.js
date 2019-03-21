@@ -204,7 +204,9 @@ const drawPPITable = () => {
         return false;
     });
 
-    FullscreenHelper.drawPPITable(`ppi-thead`, `ppi-tbody`, filteredData, ppiTableRelativeCorrelation, MAX_ROW_COLS_PPI_TABLE);
+    // FullscreenHelper.drawPPITable(`ppi-thead`, `ppi-tbody`, filteredData, ppiTableRelativeCorrelation, MAX_ROW_COLS_PPI_TABLE);
+
+    Heatmap.draw(filteredData, "#protein_heatmap", ppiTableRelativeCorrelation)
 };
 
 const populateDropdowns = () => {
@@ -268,15 +270,15 @@ $(`#fullscreen-button-chart`).on(`click`, function() {
 });
 $(`#relative-absolute-corr-button`).on(`click`, function() {
     switch($(`#relative-absolute-corr-button`).text()) {
-    case `Relative correlation`:
+    case `Relative HIPPIE scores`:
         ppiTableRelativeCorrelation = true;
         drawPPITable();
-        $(`#relative-absolute-corr-button`).text(`Absolute Correlation`);
+        $(`#relative-absolute-corr-button`).text(`Absolute HIPPIE scores`);
         break;
-    case `Absolute Correlation`:
+    case `Absolute HIPPIE scores`:
         ppiTableRelativeCorrelation = false;
         drawPPITable();
-        $(`#relative-absolute-corr-button`).text(`Relative correlation`);
+        $(`#relative-absolute-corr-button`).text(`Relative HIPPIE scores`);
         break;
 
     }

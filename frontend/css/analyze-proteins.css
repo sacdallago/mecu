@@ -146,16 +146,16 @@
     flex-wrap: nowrap;
 }
 .color-distance {
-    border: 1px solid lightgrey;
+    /*border: 1px solid lightgrey;*/
     height: 20px;
     width: 50px;
-    background: linear-gradient(to right, white, rgba(0,255,0,1));
+    background: linear-gradient(to right, white, #3b8ab3);
 }
 .color-correlation {
-    border: 1px solid lightgrey;
+    /*border: 1px solid lightgrey;*/
     height: 20px;
     width: 50px;
-    background: linear-gradient(to right, white, rgba(52,152,219,1));
+    background: linear-gradient(to right, white, #b3813d);
 }
 .grid-container {
     min-height: 70px;
