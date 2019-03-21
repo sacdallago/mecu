@@ -82,16 +82,18 @@ const drawOtherExperimentsSelect = (experiments, defaultExperiment) => {
         $(`#experiment-number .dropdown .search`).css({'padding': `11 20px`});
 
         const menuContainer = $(`#experiment-number .dropdown .menu`);
+        $(menuContainer).empty();
         const otherExperiments = [];
         experiments.forEach((experiment, i) => {
             if(i != defaultExperiment) {
                 const experimentEntry = $(`<a />`)
                     .addClass(`item`)
                     .text(experiment.name.slice(0,255))
-                    .data('experiment-id', experiment.id);
+                    .data('experiment-data', {experimentId: experiment.id, index: i});
 
                 experimentEntry.on('click', function() {
-                    currentlySelectedExperiment = $(this).data('experiment-id');
+                    currentlySelectedExperiment = $(this).data('experiment-data').experimentId;
+                    drawOtherExperimentsSelect(experiments.slice(0), $(this).data('experiment-data').index);
                     handleInput(0, true);
                 });
 
