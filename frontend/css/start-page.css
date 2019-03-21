@@ -1,6 +1,5 @@
 #four-option-holder {
-    /* height: 70%; */
-    padding: 3em;
+    padding: 3.5em;
 }
 @supports (display: grid) {
     #four-option-holder {
@@ -8,10 +7,10 @@
         grid-template-rows: 1fr 1fr 1fr 1fr;
         grid-row-gap: 2em;
         grid-template-areas:
-            "first-option"
-            "second-option"
-            "third-option"
-            "fourth-option"
+            "search-proteins"
+            "search-complexes"
+            "search-bulk"
+            "search-experiments"
     }
     @media (min-width:700px) {
         #four-option-holder {
@@ -20,11 +19,28 @@
             grid-template-rows: 1fr 1fr;
             grid-row-gap: 3em;
             grid-column-gap: 3em;
-            grid-template-areas:
-                "first-option second-option"
-                "third-option fourth-option"
+            grid-template-areas:    "search-proteins search-bulk"
+                                    "search-complexes search-experiments"
         }
     }
+}
+#first-option {
+    grid-area: search-proteins;
+}
+#second-option {
+    grid-area: search-complexes;
+}
+#third-opiton {
+    grid-area: search-bulk;
+}
+#fourth-option {
+    grid-area: search-experiments;
+}
+#first-option > .top, #third-option > .top {
+    background-color: #6060ff82;
+}
+#second-option > .top, #fourth-option > .top {
+    background-color: #9c9b9b40;
 }
 .option-cube {
     color: black;
@@ -41,16 +57,23 @@
     display:flex;
     justify-content: center;
     align-items: center;
+
 }
 .option-cube .top {
     min-height: 7em;
+    padding: 0.5em;
 
     font-size: 1.8em;
+    line-height: 1em;
     border-bottom: 1px solid rgba(0,0,0,0.1);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 .option-cube .bottom {
     min-height: 3em;
     padding: 0.5em;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 #end-of-page-spacing {
