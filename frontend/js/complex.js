@@ -4,7 +4,7 @@ const lAMetaData = new LoadingAnimation(`.column-right-loading-animation`);
 const lAComplexCurves = new LoadingAnimation(`#curves-grid .grid`, {size: 50});
 
 
-let showModal = !(StorageManager.getProteins().length === 0);
+let hasProteinExpMemorized = StorageManager.getProteins().length !== 0
 const dropDownSelector = `#experiment-number .dropdown`;
 
 const addProteinModalIdentifier = `#add-protein-modal`;
@@ -30,7 +30,7 @@ proteinCurvesGrid.on(`click`, gridItemIdentifier, function(){
 
     // disable selection of proteins without curves
     if(data.obj.present > 1) {
-        if(showModal && !gridItemHasDot(this)) {
+        if(hasProteinExpMemorized && !gridItemHasDot(this)) {
             ModalService.openProteinAddModalAndWaitForAction(
                 addProteinModalIdentifier,
                 () => {},
@@ -56,7 +56,7 @@ proteinCurvesGrid.on(`click`, gridItemIdentifier, function(){
                 {uniprotId: data.obj.id, experiment: data.obj.experiments[0].experiment},
                 () => gridItemToggleDot(this)
             );
-            showModal = true;
+            hasProteinExpMemorized = true;
             enableAnalyzeButton();
         }
     }
@@ -367,7 +367,7 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
         document.querySelector(selectAllButtonSelector).addEventListener(
             `click`,
             () => {
-                if(showModal) {
+                if(hasProteinExpMemorized) {
                     ModalService.openProteinAddModalAndWaitForAction(
                         addProteinModalIdentifier,
                         () => {},
@@ -396,7 +396,7 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
                         }
                     );
                 } else {
-                    showModal = true;
+                    hasProteinExpMemorized = true;
                     StorageManager.add(
                         proteins.map(p => ({uniprotId: p.uniprotId, experiment: p.experiments[0].experiment})),
                         () => {
@@ -507,6 +507,10 @@ const startLoading = (id, experiment) => {
                 placeholder: `default`
             });
             console.log(`done`, done);
+
+            if(hasProteinExpMemorized) {
+                enableAnalyzeButton()
+            }
         })
         .catch(error => {
             console.error(`loading error`, error);
