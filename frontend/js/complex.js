@@ -454,13 +454,16 @@ const startLoading = (id, experiment) => {
     return experimentsWhichHaveComplex
         .then(exps => {
             console.log(`experiments which have complex`, exps);
+            if ((!experiment || experiment === null) && exps.length > 0) {
+                experiment = exps[0].id;
+            }
             drawOtherExperimentsSelect(exps, id, experiment);
             return exps;
         })
         .then(() => Promise.all([
-            complexData,
-            averageDistanceToOtherExperimentsComplex
-        ])
+                complexData,
+                averageDistanceToOtherExperimentsComplex
+            ])
         )
         .then(([complex, avgDist]) => {
             console.log(`complex`, complex);
