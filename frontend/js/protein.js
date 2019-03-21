@@ -4,7 +4,7 @@ const lAExperimentCurves = new LoadingAnimation(`#experiments-container .grid`, 
 const lARelComplexesCurves = new LoadingAnimation(`#related-complexes-container .grid`, {size: 50});
 const lARelProteinsCurves = new LoadingAnimation(`#related-proteins-container .grid`, {size: 50});
 
-let showModal = !(StorageManager.getProteins().length === 0);
+let hasProteinExpMemorized = StorageManager.getProteins().length !== 0;
 const modalIdentifier = `#add-protein-modal`;
 ModalService.createAddProteinToLocalStorageModalWithNoYesAddButtons(modalIdentifier);
 
@@ -27,7 +27,7 @@ const expWithProteinGrid = $(expWithProteinGridIdentifier).isotope({
 expWithProteinGrid.on(`click`, `.grid-item`, function(){
     const data = $(this).data(`grid-item-contents`);
 
-    if(showModal) {
+    if(hasProteinExpMemorized) {
         ModalService.openProteinAddModalAndWaitForAction(
             modalIdentifier,
             () => {},
@@ -38,7 +38,7 @@ expWithProteinGrid.on(`click`, `.grid-item`, function(){
                     {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
                     () => gridItemToggleDot(this)
                 );
-                showModal = true;
+                hasProteinExpMemorized = true;
                 enableAnalyzeButton();
             },
             () => {
@@ -46,7 +46,7 @@ expWithProteinGrid.on(`click`, `.grid-item`, function(){
                     {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
                     () => gridItemToggleDot(this)
                 );
-                showModal = true;
+                hasProteinExpMemorized = true;
                 enableAnalyzeButton();
             }
         );
@@ -55,7 +55,7 @@ expWithProteinGrid.on(`click`, `.grid-item`, function(){
             {uniprotId: data.obj.uniprotId, experiment: data.experiment.experiment},
             () => gridItemToggleDot(this)
         );
-        showModal = true;
+        hasProteinExpMemorized = true;
         enableAnalyzeButton();
     }
 
@@ -283,7 +283,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
         document.querySelector(selectAllExperimentsButtonSelector).addEventListener(
             `click`,
             () => {
-                if(showModal) {
+                if(hasProteinExpMemorized) {
                     ModalService.openProteinAddModalAndWaitForAction(
                         modalIdentifier,
                         () => {},
@@ -312,7 +312,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
                         }
                     );
                 } else {
-                    showModal = true;
+                    hasProteinExpMemorized = true;
                     StorageManager.add(
                         arr[0].experiments.map(e => ({uniprotId: arr[0].uniprotId, experiment: e.experiment})),
                         () => {
@@ -595,6 +595,9 @@ $(document).ready(() => {
             .then(() => ppi)
             .then(() => console.log(`ppi`))
             .then(() => {
+                if(hasProteinExpMemorized) {
+                    enableAnalyzeButton();
+                }
                 console.log(`done`);
             })
             .catch(error => {
