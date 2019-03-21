@@ -135,3 +135,10 @@ a > .image {
 #end-of-page-spacing {
     height: 150px;
 }
+
+.navigation {
+    display: flex;
+}
+.navigation > * {
+    padding: 0px 10px 0px 10px;
+}
