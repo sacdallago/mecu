@@ -1,5 +1,5 @@
 // External imports
-const Json2csv = require(`Json2csv`).Parser;
+const json2csvLib = require(`json2csv`).Parser;
 
 const extractUserGoogleId = require(`../helper.js`).retrieveUserGoogleId;
 
@@ -90,7 +90,7 @@ module.exports = function(context) {
 
                     switch(format){
                     case `csv`:
-                        let csvParser = new Json2csv({
+                        let csvParser = new json2csvLib({
                             fields: fields,
                             delimiter: ','
                         });
@@ -98,7 +98,7 @@ module.exports = function(context) {
                         response.set(`Content-Type`, `text/plain`);
                         break;
                     case `tsv`:
-                        let tsvParser = new Json2csv({
+                        let tsvParser = new json2csvLib({
                             fields: fields,
                             delimiter: '\t'
                         });
