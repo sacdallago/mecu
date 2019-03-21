@@ -99,7 +99,7 @@ complexesWithProteinGrid.on(`click`, `.grid-item`, function(){
     const data = $(this).data(`grid-item-contents`);
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
-    document.location.href = `/complex?id=${data.obj.id}&experiment=${query.experiment}`;
+    document.location.href = `/complex?id=${data.obj.complexId}&experiment=${query.experiment}`;
 });
 
 // grid for interactions
@@ -235,6 +235,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
 
         const proteinExperimentObject = [];
         arr[0].experiments.forEach((experiment, i) => {
+            experiment.strokeColorId = arr[0].uniprotId+"E-"+actualExperiment;
             proteinExperimentObject.push({
                 uniprotId: arr[0].uniprotId,
                 experiments: [experiment],
@@ -331,7 +332,7 @@ const drawExperimentsWhichHaveProtein = (arr, actualExperiment) => {
 
 };
 
-const drawRelatedComplexes = (complexes) => {
+const drawRelatedComplexes = (complexes, experimentId) => {
     return new Promise((resolve) => {
 
         if(complexes.length === 0) {
@@ -346,8 +347,10 @@ const drawRelatedComplexes = (complexes) => {
         let index = 0;
         complexes.forEach(complex => {
             const obj = {
-                uniprotId: complex.name,
-                id: complex.id,
+                title: complex.name,
+                uniprotId: experimentId,
+                id: experimentId,
+                complexId: complex.id,
                 index: index,
                 proteins: [],
                 experiments: [],
@@ -361,12 +364,14 @@ const drawRelatedComplexes = (complexes) => {
                     protein.experiments.forEach(experiment => {
                         if(obj.experiments) {
                             obj.experiments.push({
+                                strokeColorId: protein.uniprotId+"E-"+experimentId,
                                 experiment: protein.uniprotId,
                                 uniprotId: protein.uniprotId,
                                 reads: experiment.reads
                             });
                         } else {
                             obj.experiments = [{
+                                strokeColorId: protein.uniprotId+"E-"+experimentId,
                                 experiment: protein.uniprotId,
                                 uniprotId: protein.uniprotId,
                                 reads: experiment.reads
@@ -387,12 +392,13 @@ const drawRelatedComplexes = (complexes) => {
                     .css({
                         'position': `absolute`,
                         'text-align': `center`,
+                        'text-shadow': `2px 2px 5px #FFFFFF`,
                         'width': `100%`,
                         'line-height': `35px`,
                         'font-size': `1.2rem`,
                         'z-index': 100
                     })
-                    .text(obj.uniprotId),
+                    .text(obj.title),
                 $(`<div />`)
                     .addClass([`experimentNumber`, `grid-item-text`])
                     .text(obj.present+`/`+obj.total)
@@ -433,6 +439,7 @@ const drawProteinInteractions = (proteinInteractions, proteinsContainedInExperim
 
             if(interaction.interactor2.experiments) {
                 obj.experiments.push({
+                    strokeColorId: interaction.interactor2.uniprotId+"E-"+experimentId,
                     reads: interaction.interactor2.experiments[0].reads,
                     experiment: interaction.interactor2.uniprotId,
                     uniprotId: interaction.interactor2.uniprotId
@@ -566,7 +573,7 @@ $(document).ready(() => {
         const complexes = ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
             .then(complexes => {
                 console.log(`complexes`, complexes);
-                return drawRelatedComplexes(complexes);
+                return drawRelatedComplexes(complexes, query.experiment);
             });
 
             // list of protein interactions, which have this protein
