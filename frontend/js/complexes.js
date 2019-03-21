@@ -1,94 +1,60 @@
-const lAComplexesList = new LoadingAnimation(`#complex-list-container`, {
-    size: 20,
-    subElementCreateFunction: () => {
-        const highestElement = document.createElement(`tr`);
-        const lowestElement = document.createElement(`td`);
-        lowestElement.setAttribute(`colspan`, `1`);
-        lowestElement.style.display = `flex`;
-        lowestElement.style[`justify-content`] = `center`;
-        lowestElement.style[`align-items`] = `center`;
-        highestElement.appendChild(lowestElement);
-        return [highestElement, lowestElement];
-    }
-});
+const loadingAnimation = new LoadingAnimation(`.grid-container`);
+const lAExperimentNumber = new LoadingAnimation(`.experiment-number-loading-animation`, {size: 30});
 
 const DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME = 400;
 const UNIPROT_SPLIT = /(,|\s)/g;
-const ITEM_PER_PAGE_COUNT = 12;
+const ITEM_PER_PAGE_COUNT = 25;
 const complexesQuery = {
-    search: ``,
+    search: {},
     limit: ITEM_PER_PAGE_COUNT,
     offset: 0,
     sortBy: `id`,
     order: `ASC`
 };
+let currentlySelectedExperiment;
 
 // search input field
-const searchInputComplexName = $(`#complex-search`);
-const searchInputProteinList = $(`#protein-list-search`);
+const searchInput = $(`#complex-search`);
 
+const dropDownSelector = `#experiment-number .dropdown`;
 
+const grid = $(`.grid-container`).isotope({
+    // main isotope options
+    itemSelector: `.grid-item`,
+    // set layoutMode
+    layoutMode: `packery`,
+    packery: {
+        gutter: 10
+    }
+});
 
-searchInputComplexName.keydown(function() {
+grid.on(`click`, `.grid-item`, function(){
+    const data = $(this).data(`grid-item-contents`);
+    document.location.href = `/complex?id=${data.obj.id}&experiment=${currentlySelectedExperiment}`;
+});
+
+searchInput.keydown(function() {
     HelperFunctions.delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
 });
-searchInputProteinList.keydown(function() {
-    HelperFunctions.delay(() => handleInput(0, true), DELAY_REQUEST_UNTIL_NO_KEY_PRESSED_FOR_THIS_AMOUNT_OF_TIME);
-});
+
 
 const handleInput = (page, resetOffset) => {
 
-    emptyTable();
-    lAComplexesList.start();
+    loadingAnimation.start();
 
     if(resetOffset) complexesQuery.offset = 0;
-    const complexNameInputValue = searchInputComplexName.val().trim();
-    const proteinListInputValue = searchInputProteinList
-        .val().trim().split(UNIPROT_SPLIT).filter(a => a.length > 0) || [];
+    const complexNameInputValue = searchInput.val().trim();
 
-    complexesQuery.search = {name: complexNameInputValue, proteinList: proteinListInputValue};
+    complexesQuery.search.value = complexNameInputValue;
+    complexesQuery.search.experiment = currentlySelectedExperiment;
 
     ComplexService.findComplex(complexesQuery)
         .then(response => {
             console.log(`response`, response);
-            lAComplexesList.stop();
-            drawComplexTable(response);
+            loadingAnimation.stop();
+            drawComplexCubes(response);
             drawPaginationComponent(page+1, response.length > 0 ? response[0].total : 0 );
         });
-};
-
-const emptyTable = () => {
-    const t = document.querySelector(`#complex-list-container`);
-    while(t.firstChild) {
-        t.removeChild(t.firstChild);
-    }
-};
-
-const drawComplexTable = (data) => {
-
-    emptyTable();
-
-    let table = $(`#complex-list-container`);
-    let tr = $(`<tr />`).addClass(`table-row`);
-    let td = $(`<td />`);
-
-    data.forEach(complex => {
-        let row = tr.clone();
-
-        row.append(
-            td.clone().text(complex.name),
-            td.clone().text(complex.proteins.join(`, `))
-        );
-
-        row.data(`row-data`, complex);
-        row.click(function() {
-            const data = $(this).data(`row-data`);
-            console.log(`row-data`, data);
-            document.location.href = `/complex?id=${data.id}`;
-        });
-
-        table.append(row);
-    });
 };
 
 const drawPaginationComponent = (actualPage, totalPages) => {
@@ -104,8 +70,159 @@ const drawPaginationComponent = (actualPage, totalPages) => {
     );
 };
 
+const changeURIParams = (searchTerm) => {
+    window.history.pushState({search: searchTerm}, `Search for proteins`, `/?search=${searchTerm}`);
+};
+
+const drawOtherExperimentsSelect = (experiments, defaultExperiment) => {
+    return new Promise((resolve) => {
+
+        const dropDownContainer = $(dropDownSelector).addClass([`ui`, `search`, `dropdown`]);
+        dropDownContainer.dropdown({});
+        $(`#experiment-number .dropdown .search`).css({'padding': `11 20px`});
+
+        const menuContainer = $(`#experiment-number .dropdown .menu`);
+        $(menuContainer).empty();
+        const otherExperiments = [];
+        experiments.forEach((experiment, i) => {
+            if(i != defaultExperiment) {
+                const experimentEntry = $(`<a />`)
+                    .addClass(`item`)
+                    .text(experiment.name.slice(0,255))
+                    .data('experiment-data', {experimentId: experiment.id, index: i});
+
+                experimentEntry.on('click', function() {
+                    currentlySelectedExperiment = $(this).data('experiment-data').experimentId;
+                    drawOtherExperimentsSelect(experiments.slice(0), $(this).data('experiment-data').index);
+                    handleInput(0, true);
+                });
+
+                otherExperiments.push(experimentEntry);
+            } else {
+                const experimentEntry = $(`<a />`)
+                    .addClass(`item`)
+                    .attr({'data-value':`default`})
+                    .text(experiment.name.slice(0,255));
+
+                otherExperiments.push(experimentEntry);
+            }
+        });
+        menuContainer.append(otherExperiments);
+
+        lAExperimentNumber.stop();
+
+        $(dropDownSelector).dropdown({
+            match: `both`,
+            fullTextSearch: true,
+            glyphWidth: 3.0
+        });
+
+        resolve(true);
+    });
+};
+
+const drawComplexCubes = (complexes) => {
+    return new Promise((resolve) => {
+
+        if(complexes.length === 0) {
+            loadingAnimation.stop();
+            resolve(true);
+            return;
+        }
+
+        // split up protein/experiments pairs into protein/experiment(single) pairs
+        const proteinExperimentObject = [];
+        let index = 0;
+        complexes.forEach(complex => {
+            const obj = {
+                uniprotId: complex.name,
+                id: complex.id,
+                index: index,
+                proteins: [],
+                experiments: [],
+                experiment: '', // TODO add from experiment select
+                total: complex.proteins.length,
+                present: 0
+            };
+            index++;
+
+            complex.reads.forEach(reads => {
+                if(reads.experiments) {
+                    reads.experiments.forEach(experiment => {
+                        if(obj.experiments) {
+                            obj.experiments.push({
+                                experiment: reads.uniprotId,
+                                uniprotId: reads.uniprotId,
+                                reads: experiment.reads
+                            });
+                        } else {
+                            obj.experiments = [{
+                                experiment: reads.uniprotId,
+                                uniprotId: reads.uniprotId,
+                                reads: experiment.reads
+                            }];
+                        }
+                    });
+                    obj.present++;
+                }
+            });
+            proteinExperimentObject.push(obj);
+        });
+
+        const toAppend = (obj) => {
+            return [
+                $(`<p />`)
+                    .addClass(`grid-item-text`)
+                    .css({
+                        'position': `absolute`,
+                        'text-align': `center`,
+                        'width': `100%`,
+                        'line-height': `35px`,
+                        'font-size': `1.2rem`,
+                        'z-index': 10
+                    })
+                    .text(obj.uniprotId),
+                $(`<div />`)
+                    .addClass([`experimentNumber`, `grid-item-text`])
+                    .text(obj.present+`/`+obj.total)
+            ];
+        };
+
+        HelperFunctions.drawItemsAllExperimentsInOneItem(`.grid-container`, proteinExperimentObject, toAppend);
+
+        resolve(true);
+    });
+};
+
 
 $(document).ready(() => {
-    searchInputComplexName.trigger(`focus`);
-    searchInputComplexName.trigger($.Event(`keydown`));
+    (function(){
+
+        const currentUri = URI(window.location.href);
+        const query = currentUri.search(true);
+
+        if(query.search) {
+            searchInput.val(query.search);
+            handleInput(0, true);
+        }
+
+        searchInput.trigger(`focus`);
+        searchInput.trigger($.Event(`keydown`));
+    })();
+
+    ExperimentService.paginatedExperiments({
+            search: undefined,
+            limit: 100,
+            offset: 0,
+            sortBy: `id`,
+            order: 1
+        })
+        .then(expsResult => {
+            console.log('exps', expsResult);
+            if (expsResult.data.length > 0) {
+                const def = 0;
+                currentlySelectedExperiment = expsResult.data[def].id;
+                return drawOtherExperimentsSelect(expsResult.data, def); // TODO actual experiment
+            }
+        })
 });

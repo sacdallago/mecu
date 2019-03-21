@@ -231,14 +231,14 @@ const drawOtherExperimentsSelect = (experiments, complexId, actualExperiment) =>
                     $(`<a />`)
                         .addClass(`item`)
                         .attr({'data-value':experiment.name, 'href':`/complex?id=${complexId}&experiment=${experiment.id}`})
-                        .text(experiment.name)
+                        .text(experiment.name.slice(0,255))
                 );
             } else {
                 otherExperiments.push(
                     $(`<a />`)
                         .addClass(`item`)
                         .attr({'data-value':`default`})
-                        .text(experiment.name)
+                        .text(experiment.name.slice(0,255))
                 );
             }
         });

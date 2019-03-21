@@ -34,7 +34,7 @@ module.exports = function(context) {
             const start = new Date();
             console.log(`find complex .body`, request.body);
 
-            complexesDao.findComplex(queryParams(request.body))
+            complexesDao.findComplex(queryParams(request.body), extractUserGoogleId(request))
                 .then(result => {
                     console.log(`DURATION find`, (Date.now()-start)/1000);
                     response.status(200).send(result);

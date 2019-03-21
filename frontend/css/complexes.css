@@ -59,3 +59,60 @@ tbody tr {
 tbody tr:hover {
     background-color: lightgrey;
 }
+
+.experiment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.experiment .experiment-info {
+    padding-right: 30px;
+}
+.experiment-number .dropdown {
+    display:flex;
+    justify-content: space-between;
+}
+.experiment-number .dropdown-search {
+    border: 1px solid rgb(224, 225, 226, 0.8);
+    border-radius: 3px;
+    background-color: rgb(224, 225, 226, 0.8);
+}
+.experiment-number .dropdown .dropdown-icon {
+    display: flex;
+    justify-content: center;
+}
+.experiment-number .dropdown .text {
+    height: 40px;
+    padding: 0 20px;
+
+    display:flex;
+    align-items: center;
+}
+.experiment-number .dropdown .menu{
+    width: 100%;
+}
+.experiment-number .dropdown .menu .item {
+    width: 100%;
+}
+.experiment-number .dropdown .menu .item:hover {
+    background-color: lightgrey;
+}
+
+.search-header, .info{
+    padding: 1.5em 0em 1.5em 0em;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.search-header .search {
+    width: 45em;
+    min-width: 20em;
+    z-index: 0;
+    opacity: 0.8;
+}
+
+.grid-container {
+    min-height: 100px ;
+}

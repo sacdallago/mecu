@@ -5,23 +5,31 @@ block postStyles
         link(rel='stylesheet', href='/public/css/pagination.css')
 
 block content
+    .experiment
+        .experiment-info Curves to display from experiment (only visual):
+        .experiment-number#experiment-number
+            .dropdown.dropdown-search
+                .experiment-number-loading-animation
+                input(type='hidden' name='experiments' value='default').text-input
+                .text
+                    .value Select
+                .dropdown-icon
+                    i.dropdown.icon
+                .menu
+
     .search-header
-        .complex-search-text Enter a complex name or part of it:
-        .search-complex-name
+        .complex-search-text Enter a complex name, part of it, or a protein contained in it:
+        .search
             input(type="text", name="complex-name", placeholder="e.g. COP9" value="").field#complex-search
-        .separator or
-        .protein-list-search-text Enter a list of UniProt identifiers:
-        .search-protein-list
-            input(type="text", name="protein-list", placeholder="e.g. P12004 P40692" value="").field#protein-list-search
-    
-    h4 List of found complexes
-    table.ui.celled.table
-        thead
-            tr
-                th Name
-                th Contained Proteins
-        tbody#complex-list-container
-    
+
+    .info Depending on which experiment you have chosen, a complex may or may not shot that it contains protein curves.
+
+    .space
+
+    .grid-container
+
+    .space
+
     .pagination#pagination-component
 
 

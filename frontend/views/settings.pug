@@ -3,7 +3,7 @@
 
 .ui.dropdown.icon.button(style="position: relative; top: -13em;")#menu-button
     i.angle.down.icon
-    .menu#menu-content
+    .menu#menu-content(style="z-index:1000;")
         if user
             -
                 var name = user.get('displayName');
