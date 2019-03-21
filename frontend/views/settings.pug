@@ -1,20 +1,19 @@
-//
-   Created by chdallago on 1/6/17.
-
-.ui.dropdown.icon.button(style="position: relative; top: -13em;")#menu-button
-    i.angle.down.icon
-    .menu#menu-content(style="z-index:1000;")
-        if user
-            -
-                var name = user.get('displayName');
-                name = name.length > 20 ? name.substr(0.15) + "..." : name;
-            .item= name
-            a(href="/upload").item Upload experiment
-            a(href="/upload-experiment-guide").item How to upload an experiment
-            a(href="/auth/logout").item Logout
-        else
-            a(href="/auth/google").item Login
-        block settings
-        .divider
+.navigation(style="position: relative; top: -13em; left: 51em;")
+    .ui.dropdown.button#menu-button
+        .menu-button Menu
+        .menu#menu-content(style="z-index:1000;")
+            if user
+                -
+                    var name = user.get('displayName');
+                    name = name.length > 20 ? name.substr(0.15) + "..." : name;
+                .item= name
+                a(href="/upload").item Upload experiment
+                a(href="/upload-experiment-guide").item How to upload an experiment
+                a(href="/auth/logout").item Logout
+            else
+                a(href="/auth/google").item Login
+            block settings
+            .divider
+            a(href="/about").item.about About
+    .help-button#help-button
         block help-button
-        a(href="/about").item.about About
