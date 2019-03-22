@@ -165,3 +165,11 @@
     display: flex;
     align-items: center;
 }
+
+#protein_heatmap svg {
+    border: .2rem solid rgba(66, 66, 66, 0.57);
+}
+#protein_heatmap svg g{
+    padding-right: 5px;
+    padding-bottom: 5px;
+}

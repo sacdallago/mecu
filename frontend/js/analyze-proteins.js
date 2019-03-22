@@ -194,7 +194,7 @@ const drawProteinsSelect = (proteins) => {
 };
 
 const drawPPITable = () => {
-    const filteredData = ppiTableData.filter(obj => {
+    let filteredData = ppiTableData.filter(obj => {
         if(
             (proteinsToDraw.indexOf(obj.interactor1) > -1 && experimentsToDraw.indexOf(obj.interactor1_experiment) > -1) &&
             (proteinsToDraw.indexOf(obj.interactor2) > -1 && experimentsToDraw.indexOf(obj.interactor2_experiment) > -1)
@@ -204,9 +204,13 @@ const drawPPITable = () => {
         return false;
     });
 
-    // FullscreenHelper.drawPPITable(`ppi-thead`, `ppi-tbody`, filteredData, ppiTableRelativeCorrelation, MAX_ROW_COLS_PPI_TABLE);
+    let boxSize = 500;
+    if (Math.sqrt(filteredData.length) < 5) {
+        boxSize = 250;
+    }
 
-    Heatmap.draw(filteredData, "#protein_heatmap", ppiTableRelativeCorrelation)
+    $('#protein_heatmap').empty();
+    Heatmap.draw(filteredData, "#protein_heatmap", ppiTableRelativeCorrelation, boxSize, {bottom: 6, right: 6})
 };
 
 const populateDropdowns = () => {

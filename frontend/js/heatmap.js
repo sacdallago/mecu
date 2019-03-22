@@ -1,10 +1,12 @@
 Heatmap = {};
 
-Heatmap.draw = (data, elementID, relativeHippie) => {
+Heatmap.draw = (data, elementID, relativeHippie, size = 500, marginUpdates = {}) => {
     // set the dimensions and margins of the graph
-    let margin = {top: 0, right: 0, bottom: 0, left: 0};
-    let width = 500 - margin.left - margin.right;
-    let height = 500 - margin.top - margin.bottom;
+    margin = {top: 0, bottom: 0, left: 0, right: 0};
+    Object.assign(margin, marginUpdates);
+
+    let width = size - margin.left - margin.right;
+    let height = size - margin.top - margin.bottom;
     elementID = elementID || "#protein_heatmap";
 
 // Makes transactions smooth
@@ -12,6 +14,10 @@ Heatmap.draw = (data, elementID, relativeHippie) => {
 
 // append the svg object to the body of the page
     let svg = d3.select(elementID)
+// position heatmap and tooltip
+        .style("display", 'flex')
+        .style("flex-wrap", 'wrap')
+// append svg
         .append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -21,7 +27,7 @@ Heatmap.draw = (data, elementID, relativeHippie) => {
 
 // Labels of row and columns
     let indexes = new Set([
-        ... data.map(e => e.interactor1+"-"+(e.interactor1_experiment)),
+        ...data.map(e => e.interactor1+"-"+(e.interactor1_experiment)),
         ...data.map(e => e.interactor2+"-"+e.interactor2_experiment)
     ]);
 
@@ -69,9 +75,10 @@ Heatmap.draw = (data, elementID, relativeHippie) => {
         .attr("class", "tooltip")
         .style("background-color", "#fbfbfb")
         .style("border", "solid")
-        .style("position", "relative")
-        .style("border-width", .4)
+        .style("border-width", .5)
         .style("width", 300)
+        .style("height", 90)
+        .style("margin", "10px 0px 0px 10px")
         .style("border-radius", "3px")
         .style("padding", "5px");
 
@@ -93,8 +100,8 @@ Heatmap.draw = (data, elementID, relativeHippie) => {
                 "Protein " + d.interactor2 + " in experiment " + d.interactor2_experiment + "<br\>" +
                 "Euc. distance: " + d.distance.toFixed(2) + "<br\>" +
                 "HIPPIE score: " + d.correlation)
-            .style("left", (d3.mouse(this)[0]-50) + "px")
-            .style("top", (d3.mouse(this)[1]-470) + "px")
+            .style("left", (d3.mouse(this)[0]+30) + "px")
+            .style("top", (d3.mouse(this)[1]-size+30) + "px")
     };
 
     let mouseleave = function(d) {
