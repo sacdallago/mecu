@@ -7,7 +7,13 @@ $(document).ready(() => {
             ProteinService.getProteinXProteinDistances(fullScreenData.data.proteinList, fullScreenData.data.experimentList)
                 .then(result => {
                     console.log(`ppiDistances`, result);
-                    FullscreenHelper.drawPPITable(`ppi-thead`, `ppi-tbody`, result, fullScreenData.relativeCorrelation);
+                    Heatmap.draw(
+                        result,
+                        "#heatmap",
+                        fullScreenData.relativeCorrelation,
+                        Math.min($(window).width()-40, $(window).height()-40),
+                        {bottom: 6, right: 6}
+                    );
                 });
         });
 });
