@@ -27,11 +27,11 @@ Heatmap.draw = (data, elementID, relativeHippie, size = 500, marginUpdates = {})
 
 // Labels of row and columns
     let indexes = new Set([
-        ...data.map(e => e.interactor1+"-"+(e.interactor1_experiment)),
-        ...data.map(e => e.interactor2+"-"+e.interactor2_experiment)
+        ...data.map(e => e.interactor1 + "-" + e.interactor1_experiment),
+        ...data.map(e => e.interactor2 + "-" + e.interactor2_experiment)
     ]);
 
-    let proteins = [... indexes];
+    let proteins = [... indexes].sort((a, b) => a.charAt(a.length-1) - b.charAt(b.length-1));
 
 // Build X scales and axis:
     let x = d3.scaleBand()
