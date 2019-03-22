@@ -32,7 +32,7 @@
         "jquery": "^3.3.1",
         "json2csv": "^4.3.5",
         "mecu-graph": "^0.1.7",
-        "mecu-line": "latest",
+        "mecu-line": "^0.1.5",
         "mecu-utils": "^0.1.1",
         "node-uuid": "latest",
         "node-watch": "latest",
