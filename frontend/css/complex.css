@@ -186,3 +186,24 @@
 #curves-grid .grid {
     min-height: 50px;
 }
+
+table .hoverable {
+    cursor: pointer;
+}
+table .hoverable:hover {
+    background-color: #f2f2f2;
+}
+
+#protein-info-modal {
+    width: 25em;
+}
+.modal-content {}
+.modal-content > * {
+    line-height: 1.5em;
+}
+.modal-content .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}

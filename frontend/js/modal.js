@@ -120,7 +120,9 @@ ModalService.openInfoModal = (modalIdentifier) => {
     ModalService.listenForDecision(
         modalIdentifier,
         [`custom-modal-event-close`],
-        () => {$(modalIdentifier).empty();}
+        (e) => {
+            $(modalIdentifier).empty();
+        }
     );
 };
 ModalService.createInfoModal = (identifier, title, htmlContent) => {
