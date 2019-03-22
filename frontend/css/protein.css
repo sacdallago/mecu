@@ -105,14 +105,8 @@
     background-color: lightgrey;
 }
 
-.related-complexes .grid .grid-item svg{
-    opacity: 0.6;
-}
 .related-proteins-container .buttons {
     display:flex;
-}
-.related-proteins-container .grid .grid-item svg {
-    opacity: 0.6;
 }
 .related-proteins-container .correlation {
     position: absolute;

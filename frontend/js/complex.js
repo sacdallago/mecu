@@ -360,7 +360,7 @@ const drawCurvesItems = (proteins, allProteins, experimentId) => {
             if(tmpPrt) {
                 obj.experiments.push({
                     reads: tmpPrt.experiments[0].reads,
-                    experiment: tmpPrt.experiments[0].experiment,
+                    experiment: parseInt(experimentId),
                     uniprotId: protein
                 });
                 obj.present++;

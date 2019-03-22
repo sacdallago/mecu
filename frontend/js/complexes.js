@@ -52,7 +52,7 @@ const handleInput = (page, resetOffset) => {
         .then(response => {
             console.log(`response`, response);
             loadingAnimation.stop();
-            drawComplexCubes(response);
+            drawComplexCubes(response, currentlySelectedExperiment);
             drawPaginationComponent(page+1, response.length > 0 ? response[0].total : 0 );
         });
 };
@@ -121,7 +121,7 @@ const drawOtherExperimentsSelect = (experiments, defaultExperiment) => {
     });
 };
 
-const drawComplexCubes = (complexes) => {
+const drawComplexCubes = (complexes, experimentId) => {
     return new Promise((resolve) => {
 
         if(complexes.length === 0) {
@@ -140,23 +140,25 @@ const drawComplexCubes = (complexes) => {
                 index: index,
                 proteins: [],
                 experiments: [],
-                experiment: '', // TODO add from experiment select
+                experiment: '',
                 total: complex.proteins.length,
                 present: 0
             };
             index++;
 
-            complex.reads.forEach(reads => {
+            complex.reads.forEach((reads,i) => {
                 if(reads.experiments) {
                     reads.experiments.forEach(experiment => {
                         if(obj.experiments) {
                             obj.experiments.push({
+                                strokeColorId: reads.uniprotId+"E-"+experimentId,
                                 experiment: reads.uniprotId,
                                 uniprotId: reads.uniprotId,
                                 reads: experiment.reads
                             });
                         } else {
                             obj.experiments = [{
+                                strokeColorId: reads.uniprotId+"E-"+experimentId,
                                 experiment: reads.uniprotId,
                                 uniprotId: reads.uniprotId,
                                 reads: experiment.reads
