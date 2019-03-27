@@ -12,15 +12,13 @@ block content
         .correlation
             .color-correlation
             .text-correlation Correlation of 2 proteins (data from Hippie) (white: low; blue: high)
-    .table-container
-        table.ui.definition.collapsing.celled.table
-            thead#ppi-thead
-                th Loading...
-            tbody#ppi-tbody
+    #heatmap
 
 block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/modules/semantic-ui-css/semantic.min.js")
     script(type="text/javascript", src="/public/js/helper.js")
+    script(type="text/javascript", src="/public/js/heatmap.js")
+    script(type="text/javascript", src="/public/libs/d3.v4.min.js")
     script(type="text/javascript", src="/public/js/fullscreen-helper.js")
     script(type="text/javascript", src="/public/js/ppi-fullscreen.js")
