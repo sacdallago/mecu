@@ -5,69 +5,79 @@ block postStyles
 
 block content
 
-    h3 Go to
-    ul
-        li
-            a(href='#people').item People
-        li
-            a(href='#additional_sources').item Additional sources
-        li
-            a(href='#cite').item How to cite
+    .goto
+        h3 Go to
+        ul
+            li
+                a(href='#people').item People
+            li
+                a(href='#additional_sources').item Additional sources
+            li
+                a(href='#contribute').item How to contribute
+            li
+                a(href='#cite').item How to cite
+
     -
         var baseUrl = "/public/images/";
         var people = [
             {
+                name: "Chris Soon Heng Tan",
+                image: baseUrl + "chris_soon_heng_tan.jpg",
+                title: "Principal Investigator",
+                description: "Project initiator",
+                webpage: "https://scholar.google.com/citations?user=L6ZWnJ8AAAAJ&hl=en",
+                email: "chris@melting.degree"
+            },
+            {
                 name: "Christian Dallago",
-                image: baseUrl+"christian_dallago.jpg",
-                title: "Lead software developer",
+                image: baseUrl + "christian_dallago.jpg",
+                title: "Doctoral student",
                 description: "Project initiator and maintainer",
                 webpage: "https://christian.dallago.us",
-                email: "christian.dallago@tum.de"
+                email: "christian@melting.degree"
             },
             {
                 name: "Klaus Niedermair",
-                image: baseUrl+"klaus_nie.jpg",
+                image: baseUrl + "klaus_nie.jpg",
                 title: "Software developer",
                 description: "Project contributor and maintainer",
                 webpage: "https://github.com/KlausNie",
-                email: "klaus.niedermair007@gmail.com"
-            },
-            {
-                name: "Chris Soon Heng Tan",
-                image: baseUrl+"chris_soon_heng_tan.jpg",
-                title: "Advisor",
-                description: "Role",
-                webpage: "https://www.a-star.edu.sg/imcb/Science/Scientific-Services/Scientific-Services-Profile/ResearchListID/1162",
-                email: ""
+                email: "klaus@melting.degree"
             },
             {
                 name: "Burkhard Rost",
-                image: baseUrl+"burkhard_rost.jpg",
-                title: "Advisor",
-                description: "Role",
+                image: baseUrl + "burkhard_rost.jpg",
+                title: "Principal Investigator",
+                description: "Advisor",
                 webpage: "https://rostlab.org",
-                email: "assistant@rostlab.org"
+                email: "rost@melting.degree"
             }
         ];
     .people#people
-        h1 People
-        each person in people
-            .ui.card
-                .image
-                    img(src=person.image)
-                .content
-                    .header=person.name
-                    .meta
-                        span.date=person.title
-                    .description=person.description
-                .extra.content
-                    a(href=person.webpage, target="_blank")
-                        i.address.card.icon
-                    a(href="mailto:"+person.email)
-                        i.envelope.icon
+        h1.first People
+        .ui.four.column.stackable.grid
+            each person in people
+                .column
+                    .ui.card
+                        .image
+                            img(src=person.image)
+                        .content
+                            .header=person.name
+                            .meta
+                                span.date=person.title
+                            .description=person.description
+                        .extra.content
+                            a(href=person.webpage, target="_blank")
+                                i.address.card.icon
+                            a(href="mailto:"+person.email)
+                                i.envelope.icon
     .additional-sources#additional_sources
-        | This website makes use of external data source to enable users to discover relationships between proteins easily.
-        | Please, consider citing these source if they are relevant to your publication (find "how to cite" on respective webpages).
+        h1 Additional sources
+        p
+            | This website makes use of external data source to enable a more explorative approach.
+            | We update our external data sources regularly with new releases. To see when our last release was, you can check &nbsp;
+            a(href="https://github.com/sacdallago/mecu/releases" target="_blank") https://github.com/sacdallago/mecu/releases
+            | . Please, consider citing these source if they are relevant to your publication (find "how to cite" on respective webpages).
         -
             var externalDataSources = [
                 {
@@ -83,14 +93,33 @@ block content
             ];
 
         ul.value
-            li
-                a(href='', target="_blank").item HIPPIE, protein-protein interaction data.
-            li
-                a(href='', target="_blank").item HIPPIE, protein-protein interaction data.
+            each source in externalDataSources
+                li
+                    a(href=source.link, target="_blank").item=source.name+", "+source.type
+
+    .contribute#contribute
+        h1 How to contribute
+        h4 Code
+        p This website is written in JavaScript/Node.js. You can contribute to visualization tools or the website by having a look at our repository&nbsp;
+            a(href="https://github.com/sacdallago/mecu") here
+            | . If you have any suggestions or problems, please consider opening an issue on our GitHub repository.
+        h4 Data
+        p To upload data to the webserver, you first need to authorized by us. Please,&nbsp;
+            a(href="mailto:data@melting.degree") email us to request access.
 
 
     .cite#cite
-        a(href=`http://science.sciencemag.org/content/early/2018/02/07/science.aan0346` target="_blank") Chris Soon Heng Tan & colleagues
+        h1 How to cite
+        p This website has originated from an original publication:
+
+        pre
+            a(href=`http://science.sciencemag.org/content/early/2018/02/07/science.aan0346` target="_blank")
+                | Thermal proximity coaggregation for system-wide profiling of protein complex dynamics in cells
+                br
+                | BY CHRIS SOON HENG TAN, KA DIAM GO, XAVIER BISTEAU, LINGYUN DAI, CHERN HAN YONG, NAYANA PRABHU,
+                | MERT BURAK OZTURK, YAN TING LIM, LEKSHMY SREEKUMAR, JOHAN LENGQVIST, VINAY TERGAONKAR,
+                | PHILIPP KALDIS, RADOSLAW M. SOBOTA, PÄR NORDLUND
+                | SCIENCE09 MAR 2018 : 1170-1177
 
 block settings
     .divider
