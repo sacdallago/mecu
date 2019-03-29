@@ -55,7 +55,7 @@
     background-color: #F5F5F5;
 }
 
-.column-right > * {
+.column-right > :not(:last-child) {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
