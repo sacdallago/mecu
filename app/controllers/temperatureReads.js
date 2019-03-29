@@ -79,12 +79,13 @@ module.exports = function(context) {
                         .map(c => ''+c);
 
                     // final columns to use for csv/tsv
-                    let fields = ['uniprotId'].concat(columns);
+                    let fields = ['uniprotId', 'expId'].concat(columns);
 
                     temperatureReads = temperatureReads.map(t => {
                         let ret = {};
                         Array.from(columns).forEach(k => ret[k] = t.obj[k]);
                         ret.uniprotId = t.uniprotId;
+                        ret.expId = t.expid
                         return ret;
                     });
 
