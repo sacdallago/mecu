@@ -175,65 +175,6 @@ module.exports = function(context) {
                 });
         },
 
-        getRawData: function(request, response) {
-            let identifier;
-            const format = request.query.format;
-
-            try {
-                identifier = request.params.id;
-            } catch (error){
-                console.error(error);
-                return response.status(400).send(error);
-            }
-
-            experimentsDao.getRawData(identifier, extractUserGoogleId(request))
-                .then(function(rawData){
-                    if (rawData.constructor !== Array) {
-                        rawData = [rawData];
-                    }
-                    rawData = rawData
-                        .map(function(experiment){
-                            return experiment.get(`rawData`).map(function(proteinData) {
-                                proteinData.experiment = experiment.get(`id`);
-                                return proteinData;
-                            });
-                        })
-                        .reduce(function(previous, current){
-                            return previous.concat(current);
-                        }, []);
-
-                    let fields = Object.keys(rawData[0]);
-
-                    fields.splice(fields.indexOf(`reads`), 1);
-
-                    switch(format){
-                    case `csv`:
-                        rawData = json2csv(rawData, {
-                            quotes: ``,
-                            fields: fields
-                        });
-                        break;
-                    case `tsv`:
-                        rawData = json2csv(rawData, {
-                            quotes: ``,
-                            del: `\t`,
-                            fields: fields
-                        });
-                        break;
-                    default:
-                        rawData = JSON.stringify(rawData);
-                        break;
-                    }
-
-                    response.set(`Content-Type`, `text/plain`);
-                    return response.status(200).send(new Buffer(rawData));
-                })
-                .catch(function(error){
-                    console.error(error);
-                    return response.status(500).send(error);
-                });
-        },
-
         getExperimentsWhichHaveProtein: function(request, response) {
             experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId, extractUserGoogleId(request))
                 .then(result => response.status(200).send(result))
