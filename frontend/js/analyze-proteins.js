@@ -194,15 +194,8 @@ const drawProteinsSelect = (proteins) => {
 };
 
 const drawPPITable = () => {
-    let filteredData = ppiTableData.filter(obj => {
-        if(
-            (proteinsToDraw.indexOf(obj.interactor1) > -1 && experimentsToDraw.indexOf(obj.interactor1_experiment) > -1) &&
-            (proteinsToDraw.indexOf(obj.interactor2) > -1 && experimentsToDraw.indexOf(obj.interactor2_experiment) > -1)
-        ) {
-            return true;
-        }
-        return false;
-    });
+
+    filteredData = ppiTableData.sort((a,b) => a.interactor1_experiment - b.interactor1_experiment);
 
     let boxSize = 500;
     if (Math.sqrt(filteredData.length) < 5) {
