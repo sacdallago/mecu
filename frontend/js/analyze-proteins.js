@@ -272,28 +272,12 @@ $(`#fullscreen-button-chart`).on(`click`, function() {
 
     window.open(`/storage-proteins-fullscreen`, `_blank`);
 });
-$(`#relative-absolute-corr-button`).on(`click`, function() {
-    switch($(`#relative-absolute-corr-button`).text()) {
-    case `Relative HIPPIE scores`:
-        ppiTableRelativeCorrelation = true;
-        drawPPITable();
-        $(`#relative-absolute-corr-button`).text(`Absolute HIPPIE scores`);
-        break;
-    case `Absolute HIPPIE scores`:
-        ppiTableRelativeCorrelation = false;
-        drawPPITable();
-        $(`#relative-absolute-corr-button`).text(`Relative HIPPIE scores`);
-        break;
-
-    }
-});
 $(`#fullscreen-button-ppi`).on(`click`, function() {
 
     // set storage settings for fullscreen
     StorageManager.setFullscreenPPISettings(
         proteinsToDraw,
-        experimentsToDraw,
-        $(`#relative-absolute-corr-button`).text() === `Relative correlation`
+        experimentsToDraw
     );
 
     window.open(`/ppi-fullscreen`, `_blank`);
@@ -399,11 +383,6 @@ TourHelper.attachTour('#help-menu-item', [
     {
         target: '#fullscreen-button-ppi',
         content: 'The table can be viewed in a separate page, which is particularly useful when many proteins are selected.',
-        placement: ['top', 'right', 'bottom']
-    },
-    {
-        target: '#relative-absolute-corr-button',
-        content: 'This button changes the coloring of the HIPPIE scores to absolute (0 lowest, 1 highest) or relative to the maximum and minimum in the current selection.',
         placement: ['top', 'right', 'bottom']
     }
 ]);

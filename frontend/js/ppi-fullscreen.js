@@ -10,7 +10,7 @@ $(document).ready(() => {
                     Heatmap.draw(
                         result,
                         "#heatmap",
-                        fullScreenData.relativeCorrelation,
+                        false,
                         Math.min($(window).width()-40, $(window).height()-40),
                         {bottom: 6, right: 6}
                     );
