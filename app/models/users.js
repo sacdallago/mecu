@@ -15,6 +15,11 @@ module.exports = function(context) {
             allowNull: false,
             defaultValue: false
         },
+        isAdmin: {
+            type: sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
         deletedAt: {
             type: sequelize.DATE(3)
         }
