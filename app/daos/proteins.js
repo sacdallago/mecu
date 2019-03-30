@@ -55,14 +55,6 @@ module.exports = function(context) {
                 });
         },
 
-        findByUniprotIds: function(uniProtIds) {
-            return proteinsModel.find({uniprotId:  uniProtIds})
-                .catch(error => {
-                    console.error(error);
-                    return Promise.reject(error);
-                });
-        },
-
         findProteinExperimentCombinations: function(proteinExperimentPairs, requester) {
 
             if(proteinExperimentPairs.length === 0) {
