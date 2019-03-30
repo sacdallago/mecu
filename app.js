@@ -155,7 +155,7 @@ if (cluster.isMaster) {
         });
 
         passport.deserializeUser(function(googleId, done) {
-            usersDao.findById(googleId)
+            usersDao.findByPk(googleId)
                 .then(function(user) {
                     done(null, user);
                 })
