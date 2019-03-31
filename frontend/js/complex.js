@@ -227,10 +227,7 @@ const drawComplexMetadata = (complex, experimentId) => {
                 text.clone().text(`Funcat Description`),
                 value.clone().append(complex.funCatDescription)
             ]),
-            itemContainer.clone().append([
-                text.clone().text(`Proteins`),
-                value.clone().append(proteinListContainer)
-            ]),
+            proteinListContainer
         ]);
 
         // dataContainer.append(
