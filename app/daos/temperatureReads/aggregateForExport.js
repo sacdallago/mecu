@@ -3,9 +3,9 @@ module.exports = {
 
     query: (experimentClause) => {
         return `
-            select "uniprotId", json_object_agg(temperature, ratio) as obj
+            select "uniprotId", expId, json_object_agg(temperature, ratio) as obj
             from (
-                SELECT p."uniprotId", temperature, ratio
+                SELECT p."uniprotId", temperature, ratio, e.id as expId
                 FROM "temperatureReads" tr, proteins p, experiments e
                 where (e.private = :isPrivate or e.uploader = :uploader) and
                 tr."uniprotId" = p."uniprotId" and
@@ -13,7 +13,7 @@ module.exports = {
                 ${experimentClause}
                 order by p."uniprotId", temperature asc
             ) as tmp
-            group by tmp."uniprotId";
+            group by tmp."uniprotId", expId;
         `;
     }
 };
