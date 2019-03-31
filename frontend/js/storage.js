@@ -188,7 +188,7 @@ StorageManager.clear = function() {
 };
 
 StorageManager.getProteinsRaw = () => store.get(`proteins`) || {};
-StorageManager.setProteinsRaw = (raw) => store.set(`proteins`, raw); 
+StorageManager.setProteinsRaw = (raw) => store.set(`proteins`, raw);
 
 StorageManager.setFullScreenProteinsSettings = (proteins, experiments, coloring) => {
     return store.set(
@@ -205,8 +205,8 @@ StorageManager.getFullScreenProteinsSettings = () => {
     return store.get(`fullscreenProteinSettings`) || ret;
 };
 
-StorageManager.setFullscreenPPISettings = (proteinList, experimentList, relativeCorrelation) => {
-    return store.set(`fullscreenPPISettings`, {data: {proteinList: proteinList, experimentList: experimentList}, relativeCorrelation: relativeCorrelation});
+StorageManager.setFullscreenPPISettings = (proteinList, experimentList) => {
+    return store.set(`fullscreenPPISettings`, {data: {proteinList: proteinList, experimentList: experimentList}});
 };
 StorageManager.getFullScreenPPISettings = () => {
     const ret = {data:{proteinList: [], experimentList: []}, relativeCorrelation: true};
