@@ -1,9 +1,3 @@
-/**
- * Entry point
- *
- * Created by Christian Dallago on 20160416 .
- */
-
 const Sequelize = require(`sequelize`);
 const path = require(`path`);
 
@@ -16,9 +10,7 @@ module.exports = {
 
         // Initialize the context
         context = {
-            constants: {
-                seedComplexes: process.env.SEED_COMPLEXES || false
-            }
+            constants: {}
         };
 
         // Function to load all components from the respective folders (models, controllers, services, daos, utils)
@@ -31,7 +23,7 @@ module.exports = {
                 module: function(moduleName) {
                     if (!context[componentName][moduleName]) {
                         console.log(`Loading component ` + componentName);
-                        context[componentName][moduleName] = require(path.join(__dirname, `app`, componentName, moduleName))(context,
+                        context[componentName][moduleName] = require(path.join(`../..`, `app`, componentName, moduleName))(context,
                             componentName, moduleName);
                         console.log(`LOADED ` + componentName + `.` + moduleName);
                     }
@@ -48,11 +40,11 @@ module.exports = {
         const context   = this.start();
         let req;
         try {
-            req = require(__dirname+`/private/config`);
+            req = require(`../../private/config`);
         } catch(e) {
             console.warn(`No private/config.js found... continuing with default config`);
         }
-        const config    = Object.assign({}, require(__dirname + `/config`), req );
+        const config    = Object.assign({}, require(`../../config`), req );
 
         context.config  = config;
 
