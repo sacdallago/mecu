@@ -5,6 +5,7 @@ module.exports = function(context) {
         .get(`/search`, frontendController.search)
         .get(`/error`, frontendController.error)
         .get(`/about`, frontendController.about)
+        .get(`/users`, frontendController.users)
         .get(`/upload`, frontendController.uploadExperiment)
         .get(`/analyze-proteins`, frontendController.analyzeProteins)
         .get(`/bulkSearch`, frontendController.bulkSearch)

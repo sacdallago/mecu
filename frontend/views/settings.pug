@@ -9,6 +9,8 @@
                 .item= name
                 a(href="/upload").item Upload experiment
                 a(href="/upload-experiment-guide").item How to upload an experiment
+                if user.isAdmin === true
+                    a(href="/users").item Usermanagement
                 a(href="/auth/logout").item Logout
             else
                 a(href="/auth/google").item Login
