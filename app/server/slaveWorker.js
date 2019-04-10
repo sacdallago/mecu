@@ -128,7 +128,7 @@ module.exports = () => {
         });
 
         passport.deserializeUser(function(googleId, done) {
-            usersDao.findByPk(googleId)
+            usersDao.findById(googleId)
                 .then(function(user) {
                     done(null, user);
                 })
@@ -137,12 +137,19 @@ module.exports = () => {
                 });
         });
 
-        app.get(`/auth/google`, passport.authenticate(`google`, { scope: [`profile`] }));
+        app.get(`/auth/google`,
+            (req, res, next) =>
+                passport.authenticate(`google`, { scope: [`profile`, `email`] })(req,res,next)
+        );
 
-        app.get(`/auth/google/callback`, passport.authenticate(`google`, { failureRedirect: `/error` }), function(request, response) {
-            // Successful authentication, redirect home.
-            response.redirect(`/`);
-        });
+        app.get(
+            `/auth/google/callback`,
+            passport.authenticate(`google`, { failureRedirect: `/error` }),
+            function(request, response) {
+                // Successful authentication, redirect home.
+                response.redirect(`/`);
+            }
+        );
 
         // Create routers
         context.router = new express.Router();
