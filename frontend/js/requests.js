@@ -201,6 +201,53 @@ ComplexService.findComplex = (query) => {
         });
 };
 
+UserService = {};
+UserService.findUsers = (query) => {
+    return fetch(
+            `/api/users`,
+            {
+                method: `POST`,
+                headers: {
+                    'Content-Type': `application/json; charset=utf-8`,
+                },
+                body: JSON.stringify(query)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error(`Request error for UserService.findUser: `, query, error);
+            return [];
+        });
+};
+UserService.allowUserToPost = (googleId) => {
+    return fetch(`/api/user/${googleId}/allowPost`)
+        .catch(error => {
+            console.error(`Request error for UserService.allowUserToPost: `, error, googleId);
+            return {};
+        });
+};
+UserService.disallowUserToPost = (googleId) => {
+    return fetch(`/api/user/${googleId}/disallowUserPost`)
+        .catch(error => {
+            console.error(`Request error for UserService.disallowUserToPost: `, error, googleId);
+            return {};
+        });
+};
+UserService.makeAdmin = (googleId) => {
+    return fetch(`/api/user/${googleId}/makeAdmin`)
+        .catch(error => {
+            console.error(`Request error for UserService.makeAdmin: `, error, googleId);
+            return {};
+        });
+};
+UserService.removeAdminRights = (googleId) => {
+    return fetch(`/api/user/${googleId}/removeAdminRights`)
+        .catch(error => {
+            console.error(`Request error for UserService.removeAdminRights: `, error, googleId);
+            return {};
+        });
+};
+
 ExternalService = {};
 ExternalService.getUniprotIdsFromText = (text) => {
     const limit = 10;

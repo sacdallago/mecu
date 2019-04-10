@@ -10,4 +10,5 @@ module.exports = function(context) {
     context.component(`services`).module(`experiments`);
     context.component(`services`).module(`temperatureReads`);
     context.component(`services`).module(`complexes`);
+    context.component(`services`).module(`usermanagement`);
 };
