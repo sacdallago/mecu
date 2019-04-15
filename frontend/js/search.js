@@ -178,7 +178,7 @@ const drawPaginationComponent = (actualPage, totalPages) => {
 };
 
 const changeURIParams = (searchTerm) => {
-    window.history.pushState({search: searchTerm}, `Search for proteins`, `/?search=${searchTerm}`);
+    window.history.pushState({search: searchTerm}, `Search for proteins`, `/search?search=${searchTerm}`);
 };
 
 TourHelper.attachTour('#help-menu-item', [
