@@ -4,6 +4,31 @@
 #spacedText > * {
     margin-bottom: 20px;
 }
-.creators, .data-courtesy {
-    text-align: center;
+.goto ul, h3{
+    margin-bottom: 0 !important;
+    list-style-type: none;
+    padding: 0;
+}
+
+h1:before {
+    content:' ';
+    display:block;
+    margin-top: 4em;
+}
+
+h1:after {
+    content: ' ';
+    display: block;
+    border: 2px solid black;
+}
+
+h1.first:after {
+    border: none;
+}
+h1.first:before {
+    margin-top: 0;
+}
+
+p {
+    font-size: 1.1em;
 }
