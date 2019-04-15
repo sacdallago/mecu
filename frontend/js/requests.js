@@ -1,15 +1,15 @@
 TemperatureService = {};
 TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
     return fetch(
-        `/api/protein/search/exp/`,
-        {
-            method: `POST`,
-            headers: {
-                'Content-Type': `application/json; charset=utf-8`
-            },
-            body: JSON.stringify(pairs)
-        }
-    )
+            `/api/protein/search/exp/`,
+            {
+                method: `POST`,
+                headers: {
+                    'Content-Type': `application/json; charset=utf-8`
+                },
+                body: JSON.stringify(pairs)
+            }
+        )
         .then(resp => resp.json())
         .catch(error => {
             console.error(`Request error for TemperatureService.temperatureReadsToProteinsAndExperimentPairs: `, error, pairs);
@@ -18,13 +18,13 @@ TemperatureService.temperatureReadsToProteinsAndExperimentPairs = (pairs) => {
 };
 TemperatureService.queryUniprotIdReceiveTemperatureReads = (query) => {
     return fetch(`/api/reads/temperature/search`, {
-        headers: {
-            'Accept': `application/json`,
-            'Content-Type': `application/json`
-        },
-        method: `POST`,
-        body: JSON.stringify(query)
-    })
+            headers: {
+                'Accept': `application/json`,
+                'Content-Type': `application/json`
+            },
+            method: `POST`,
+            body: JSON.stringify(query)
+        })
         .then(resp => resp.json())
         .catch(error => {
             console.error(`Request error for TemperatureService.queryUniprotIdReceiveTemperatureReads: `, error, query);
@@ -35,13 +35,13 @@ TemperatureService.queryUniprotIdReceiveTemperatureReads = (query) => {
 ExperimentService = {};
 ExperimentService.uploadExperiment = (formData) => {
     return fetch( // edge and IE do not support https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams , consider polyfills?
-        `/api/experiment`,
-        {
-            method: `POST`,
-            // headers: {'Content-Type': `multipart/form-data`},
-            body: formData
-        }
-    )
+            `/api/experiment`,
+            {
+                method: `POST`,
+                // headers: {'Content-Type': `multipart/form-data`},
+                body: formData
+            }
+        )
         .then(resp => resp.json())
         .catch(err => {
             console.log(err);
@@ -65,15 +65,15 @@ ExperimentService.paginatedExperiments = (queryObj) => {
 };
 ExperimentService.updateExperiment = (id, experiment) => {
     return fetch( // edge and IE do not support https://developer.mozilla.org/en-US/docs/Web/API/URL/searchParams , consider polyfills?
-        `/api/experiment/${id}`,
-        {
-            method: `POST`,
-            headers: {
-                'Content-Type': `application/json; charset=utf-8`,
-            },
-            body: JSON.stringify(experiment)
-        }
-    )
+            `/api/experiment/${id}`,
+            {
+                method: `POST`,
+                headers: {
+                    'Content-Type': `application/json; charset=utf-8`,
+                },
+                body: JSON.stringify(experiment)
+            }
+        )
         .then(resp => resp.json())
         .catch(error => {
             console.error(`Request error for ExperimentService.updateExperiment: `, error, id, experiment);
@@ -125,15 +125,15 @@ ProteinService.getProteinInteractions = (uniprotId, expId) => {
 };
 ProteinService.getProteinExperimentCombinations = (proteinExperimentArr) => {
     return fetch(
-        `/api//protein/experimentcombinations`,
-        {
-            method: `POST`,
-            headers: {
-                'Content-Type': `application/json; charset=utf-8`,
-            },
-            body: JSON.stringify(proteinExperimentArr)
-        }
-    )
+            `/api//protein/experimentcombinations`,
+            {
+                method: `POST`,
+                headers: {
+                    'Content-Type': `application/json; charset=utf-8`,
+                },
+                body: JSON.stringify(proteinExperimentArr)
+            }
+        )
         .then(resp => resp.json())
         .catch(error => {
             console.error(`Request error for ProteinService.getProteinInteractions: `, error, proteinExperimentArr);
@@ -142,15 +142,15 @@ ProteinService.getProteinExperimentCombinations = (proteinExperimentArr) => {
 };
 ProteinService.getProteinXProteinDistances = (proteinList, experimentList) => {
     return fetch(
-        `/api/protein/proteinxproteindistances`,
-        {
-            method: `POST`,
-            headers: {
-                'Content-Type': `application/json; charset=utf-8`,
-            },
-            body: JSON.stringify({proteinList: proteinList, experimentList: experimentList})
-        }
-    )
+            `/api/protein/proteinxproteindistances`,
+            {
+                method: `POST`,
+                headers: {
+                    'Content-Type': `application/json; charset=utf-8`,
+                },
+                body: JSON.stringify({proteinList: proteinList, experimentList: experimentList})
+            }
+        )
         .then(resp => resp.json())
         .catch(error => {
             console.error(`Request error for ProteinService.getProteinXProteinDistances: `, error, proteinList, experimentList);
@@ -185,19 +185,66 @@ ComplexService.getAverageDistancesToOtherExperiments = (complexId) => {
 };
 ComplexService.findComplex = (query) => {
     return fetch(
-        `/api/complex/find`,
-        {
-            method: `POST`,
-            headers: {
-                'Content-Type': `application/json; charset=utf-8`,
-            },
-            body: JSON.stringify(query)
-        }
-    )
+            `/api/complex/find`,
+            {
+                method: `POST`,
+                headers: {
+                    'Content-Type': `application/json; charset=utf-8`,
+                },
+                body: JSON.stringify(query)
+            }
+        )
         .then(resp => resp.json())
         .catch(error => {
             console.error(`Request error for ComplexService.findComplex: `, query, error);
             return [];
+        });
+};
+
+UserService = {};
+UserService.findUsers = (query) => {
+    return fetch(
+            `/api/users`,
+            {
+                method: `POST`,
+                headers: {
+                    'Content-Type': `application/json; charset=utf-8`,
+                },
+                body: JSON.stringify(query)
+            }
+        )
+        .then(resp => resp.json())
+        .catch(error => {
+            console.error(`Request error for UserService.findUser: `, query, error);
+            return [];
+        });
+};
+UserService.allowUserToPost = (googleId) => {
+    return fetch(`/api/user/${googleId}/allowPost`)
+        .catch(error => {
+            console.error(`Request error for UserService.allowUserToPost: `, error, googleId);
+            return {};
+        });
+};
+UserService.disallowUserToPost = (googleId) => {
+    return fetch(`/api/user/${googleId}/disallowUserPost`)
+        .catch(error => {
+            console.error(`Request error for UserService.disallowUserToPost: `, error, googleId);
+            return {};
+        });
+};
+UserService.makeAdmin = (googleId) => {
+    return fetch(`/api/user/${googleId}/makeAdmin`)
+        .catch(error => {
+            console.error(`Request error for UserService.makeAdmin: `, error, googleId);
+            return {};
+        });
+};
+UserService.removeAdminRights = (googleId) => {
+    return fetch(`/api/user/${googleId}/removeAdminRights`)
+        .catch(error => {
+            console.error(`Request error for UserService.removeAdminRights: `, error, googleId);
+            return {};
         });
 };
 

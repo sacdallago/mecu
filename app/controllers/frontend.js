@@ -18,6 +18,12 @@ module.exports = function(context) {
             });
         },
 
+        users: function(request, response) {
+            return response.render(`users`, {
+                title: `Users`
+            });
+        },
+
         error: function(request, response) {
             return response.render(`error`, {
                 title: `Error`,
