@@ -92,6 +92,7 @@ const drawOtherExperimentsSelect = (experiments, defaultExperiment) => {
                     .data('experiment-data', {experimentId: experiment.id, index: i});
 
                 experimentEntry.on('click', function() {
+                    $(`.page_container`).click()
                     currentlySelectedExperiment = $(this).data('experiment-data').experimentId;
                     drawOtherExperimentsSelect(experiments.slice(0), $(this).data('experiment-data').index);
                     handleInput(0, true);
@@ -103,6 +104,10 @@ const drawOtherExperimentsSelect = (experiments, defaultExperiment) => {
                     .addClass(`item`)
                     .attr({'data-value':`default`})
                     .text(experiment.name.slice(0,255));
+
+                experimentEntry.on('click', function() {
+                    $(`.page_container`).click()
+                });
 
                 otherExperiments.push(experimentEntry);
             }
