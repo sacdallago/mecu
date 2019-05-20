@@ -1,4 +1,4 @@
-const {seedMainUsersWithPostPermissions} = require('./seedings');
+const {seedMainUsersWithPostPermissions, seedProteinXProtein} = require('./seedings');
 const {
     createVersionTable,
     getTableVersion,
@@ -28,7 +28,10 @@ module.exports = (dbConnection) => Promise.resolve(dbConnection)
 const doSeeding = (version, dbConnection) => {
     let p = Promise.resolve();
     if (!version) {
-        p.then(() => seedMainUsersWithPostPermissions(dbConnection)).catch(e => console.error('e', e));
+        p
+            .then(() => seedMainUsersWithPostPermissions(dbConnection))
+            .then(() => seedProteinXProtein(dbConnection))
+            .catch(e => console.error('e', e));
         console.log('seeding: seedMainUsersWithPostPermissions');
     }
 
