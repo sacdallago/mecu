@@ -7,6 +7,26 @@ const seedLocations = {
     complexDistances: 'http://maintenance.dallago.us/public/mecu/3_COMPLEX_DISTANCES.sql'
 };
 
+const downloadSQLandQueryIt = (dbConnection, url) => new Promise((resolve, _) => {
+    request.get(url, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+            console.log(`downloaded ${url}`);
+            dbConnection
+                .query(body).then(r => {
+                    console.log(`successfully loaded and seeded: ${url}`)
+                    resolve(r);
+                })
+                .catch(e => {
+                    console.error(`could not query ${url}`, e)
+                    resolve();
+                });
+        } else {
+            console.warn('Could not get ' + url);
+            resolve();
+        }
+    });
+});
+
 module.exports = {
     seedMainUsersWithPostPermissions: (dbConnection) => dbConnection.query(
         `
@@ -20,16 +40,15 @@ module.exports = {
             `
     ),
 
-    seedProteinXProtein: (dbConnection) => {
-        return new Promise((resolve, _) => {
-            request.get(seedLocations.proteinXProtein, (error, response, body) => {
-                if (!error && response.statusCode === 200) {
-                    dbConnection.query(body).then(r => resolve(r));
-                } else {
-                    console.warn('Could not get ' + seedLocations.proteinXProtein);
-                    resolve();
-                }
-            });
-        });
-    }
+    seedProteinXProtein: (dbConnection) =>
+        downloadSQLandQueryIt(dbConnection, seedLocations.proteinXProtein),
+
+    seedComplexes: (dbConnection) =>
+        downloadSQLandQueryIt(dbConnection, seedLocations.complexes),
+
+    seedCohesionIndex: (dbConnection) =>
+        downloadSQLandQueryIt(dbConnection, seedLocations.cohestionIndex),
+
+    seedComplexDistances: (dbConnection) =>
+        downloadSQLandQueryIt(dbConnection, seedLocations.complexDistances),
 }
