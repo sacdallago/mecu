@@ -175,6 +175,23 @@ module.exports = function(context) {
                 });
         },
 
+        getExperimentStatistics: async function(request, response) {
+            try {
+                let numberOfProteins = await experimentsDao.getProteinCountsInExperiments();
+                let experimentProteinStatistics = await experimentsDao.getExperimentStatistics(extractUserGoogleId(request));
+
+                let answer = {
+                    experimentStatistics: experimentProteinStatistics,
+                    totalUniqueProteins: numberOfProteins
+                };
+
+                return response.status(200).send(answer)
+            } catch(error) {
+                console.error(`getExperiments`, error);
+                return response.status(500).send(error);
+            }
+        },
+
         getExperimentsWhichHaveProtein: function(request, response) {
             experimentsDao.getExperimentsWhichHaveProtein(request.params.uniprotId, extractUserGoogleId(request))
                 .then(result => response.status(200).send(result))

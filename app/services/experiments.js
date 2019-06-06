@@ -10,5 +10,6 @@ module.exports = function(context) {
         .get(`/experiments/proteins/:id`, experimentsController.getProteinsInExperiment)
         .get(`/experiments/containing/complex/:complexId`, experimentsController.getExperimentsWhichHaveComplex)
         .get(`/experiments/containing/protein/:uniprotId`, experimentsController.getExperimentsWhichHaveProtein)
+        .get(`/experiments/statistics`, experimentsController.getExperimentStatistics)
     ;
 };

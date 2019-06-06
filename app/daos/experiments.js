@@ -2,11 +2,13 @@ const sequelize = require(`sequelize`);
 
 const getExperimentsWhichHaveProteinSQL = require(`./experiments/getExperimentsWhichHaveProtein`);
 const getExperimentsWhichHaveComplexSQL = require(`./experiments/getExperimentsWhichHaveComplex`);
+const getStatisticsOnExperiment = require('./experiments/getStatisticsOnExperiments');
 
 module.exports = function(context) {
 
     // Imports
     const experimentsModel = context.component(`models`).module(`experiments`);
+    const proteinXExperimentModel = context.component(`models`).module(`proteinXexperiments`);
 
     return {
         create: function(item, options) {
@@ -24,6 +26,29 @@ module.exports = function(context) {
                 }
             });
         },
+
+        getExperimentStatistics: async function(requester){
+            const query = getStatisticsOnExperiment.query();
+
+            return context.dbConnection.query(
+                query,
+                {
+                    replacements: {
+                        uploader: requester
+                    }
+                },
+                {type: sequelize.QueryTypes.SELECT}
+            )
+                .then(result => result[0]);
+        },
+
+        getProteinCountsInExperiments: async function(){
+            return proteinXExperimentModel.count({
+                col: `uniprotId`,
+                distinct: true
+            });
+        },
+
 
         findExperiment: function(id, requester) {
             return experimentsModel.findAll({
