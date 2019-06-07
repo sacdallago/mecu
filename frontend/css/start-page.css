@@ -98,3 +98,8 @@ h1.first:after {
 h1.first:before {
     margin-top: 0;
 }
+
+.ui.statistics {
+    margin: auto;
+    width: fit-content;
+}

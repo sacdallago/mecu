@@ -5,8 +5,17 @@ block postStyles
     link(rel='stylesheet', href='/public/css/start-page.css')
 
 block content
-    
+
     .space
+
+    .statistics_container
+        .ui.statistics
+            .statistic.orange
+                .value#number-of-proteins -
+                .label Proteins
+            .statistic.blue
+                .value#number-of-experiments -
+                .label Experiments
 
     //.explore#explore
     //    h1.first Explore
@@ -36,15 +45,10 @@ block content
             .bottom
                 .content View list of experiments.
 
-    .database-statistics#statistics
-        h1 Statistics
-        .ui.statistics
-            .statistic
-                .value#number-of-proteins -
-                .label Proteins
-            .statistic
-                .value#number-of-experiments -
-                .label Experiments
+    // A possible section
+    //.database-statistics#statistics
+    //  h1 Statistics
+
 
 
 block settings
