@@ -22,7 +22,7 @@ module.exports = {
             return {
                 module: function(moduleName) {
                     if (!context[componentName][moduleName]) {
-                        console.log(`Loading component ` + componentName);
+                        console.log(`Loading component ` + componentName + `.` + moduleName);
                         context[componentName][moduleName] = require(path.join(`../..`, `app`, componentName, moduleName))(context,
                             componentName, moduleName);
                         console.log(`LOADED ` + componentName + `.` + moduleName);
