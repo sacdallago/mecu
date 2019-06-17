@@ -1,5 +1,4 @@
 const consoleStamp = require(`console-stamp`);
-const cluster = require(`cluster`);
 
 const loadComponentsAndConnectToDb = require(`./loadComponentsAndConnectToDb`);
 const migrateDb = require(`./migration/migrateDb`);

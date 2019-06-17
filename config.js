@@ -2,8 +2,8 @@ module.exports = {
     "database" : {
         "username": process.env.databaseuser,
         "password": process.env.databasepassword,
-        "port": process.env.databaseport || `5432`,
-        "uri": process.env.databaseuri || `localhost`,
+        "port": process.env.databaseport,
+        "uri": process.env.databaseuri,
         "collection": process.env.databasecollection || `mecu`,
         "logging": process.env.databaselogging || false
     },

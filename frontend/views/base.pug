@@ -1,6 +1,6 @@
 html(lang="en")
     head
-        title= "MeCu - " + title
+        title= "Protein Melting Degree Database - " + title
         block preStyles
         link(rel='stylesheet', href='/public/modules/semantic-ui-css/semantic.min.css')
         link(rel='stylesheet', href='/public/css/style.css')
@@ -11,9 +11,9 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
 
         //- Classic meta
-        meta(name="title", content="CellMap")
-        meta(name="description", content="Protein localization and protein-protein interaction visualizer.")
-        meta(name="keywords", content="cell,map,protein,interactions,PPI,localization")
+        meta(name="title", content="Protein Melting Degree Database")
+        meta(name="description", content="Database of meltomes.")
+        meta(name="keywords", content="melting,proteins,melting degree, meltome, proteome")
         meta(name="author", content="Christian Dallago")
         meta(name="copyright", content="Christian Dallago 2016")
         meta(http-equiv="Reply-to", content="code@dallago.us")
@@ -27,16 +27,16 @@ html(lang="en")
 
         //- Open Graph Meta Tags
         meta(property="og:type", content="website")
-        meta(property="og:title", content="CellMap")
-        meta(property="og:description", content="Protein localization and protein-protein interaction visualizer.")
-        meta(property="og:site_name", content="CellMap")
-        meta(property="og:url", content="http://cell.dallago.us/")
+        meta(property="og:title", content="Protein Melting Degree Database")
+        meta(property="og:description", content="Database of meltomes.")
+        meta(property="og:site_name", content="Protein Melting Degree Database")
+        meta(property="og:url", content="http://protein.melting.degree/")
         meta(property="og:locale", content="en_US")
 
         //- Twitter Card Meta Tags
         meta(name="twitter:card", content="summary")
-        meta(name="twitter:title", content="CellMap")
-        meta(name="twitter:description", content="Protein localization and protein-protein interaction visualizer.")
+        meta(name="twitter:title", content="Protein Melting Degree Database")
+        meta(name="twitter:description", content="Database of meltomes.")
     body
         #progressBarContainer
         .wrapper
@@ -47,9 +47,11 @@ html(lang="en")
                         div(style="height: 100%;")
                             .ui.main.container
                                 #title
-                                    // a(href="/") MeCu
-                                    a(href="/").logo
-                                        img(src="/public/images/mecu.png").image
+                                    a(href="/").logo Protein Melting Degree
+                                    br
+                                    br
+                                    br
+                                    | Database
                                     include settings
 
                                 #spacedText

@@ -5,9 +5,21 @@ block postStyles
     link(rel='stylesheet', href='/public/css/start-page.css')
 
 block content
-    
+
     .space
-    
+
+    .statistics_container
+        .ui.statistics
+            .statistic.orange
+                .value#number-of-proteins -
+                .label Proteins
+            .statistic.blue
+                .value#number-of-experiments -
+                .label Experiments
+
+    //.explore#explore
+    //    h1.first Explore
+
     #four-option-holder
         a(href='/search')#first-option.option-cube
             .top
@@ -33,6 +45,11 @@ block content
             .bottom
                 .content View list of experiments.
 
+    // A possible section
+    //.database-statistics#statistics
+    //  h1 Statistics
+
+
 
 block settings
     .divider
@@ -46,3 +63,5 @@ block scripts
     - var delta = 50
     script(type="text/javascript", src="/public/libs/isotope/isotope.js")
     script(type="text/javascript", src="/public/libs/isotope/packery.js")
+    script(type="text/javascript", src='/public/js/start-page.js')
+

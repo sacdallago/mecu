@@ -79,3 +79,27 @@
 #end-of-page-spacing {
     height: 0px;
 }
+
+h1:before {
+    content:' ';
+    display:block;
+    margin-top: 4em;
+}
+
+h1:after {
+    content: ' ';
+    display: block;
+    border: 2px solid black;
+}
+
+h1.first:after {
+    border: none;
+}
+h1.first:before {
+    margin-top: 0;
+}
+
+.ui.statistics {
+    margin: auto;
+    width: fit-content;
+}
