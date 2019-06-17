@@ -33,21 +33,32 @@ module.exports = (dbConnection) => Promise.resolve(dbConnection)
 
 const doSeeding = (version, dbConnection) => {
     let p = Promise.resolve();
-    if (!version) {
-        p = p.then(() => seedMainUsersWithPostPermissions(dbConnection))
-    }
 
-    if (version < 2) {
-        p = p
-            .then(() => seedProteinXProtein(dbConnection))
-            .then(() => seedComplexes(dbConnection))
-            .then(() => seedCohesionIndex(dbConnection))
-            .then(() => seedComplexDistances(dbConnection))
+    switch(version){
+        // If undefined: from the beginning to the end, do all seedings
+        case undefined:
+            p = p.then(() => seedMainUsersWithPostPermissions(dbConnection));
+            // fallthrough
+        case 0:
+            // fallthrough
+        case 1:
+            p = p
+                .then(() => seedProteinXProtein(dbConnection))
+                .then(() => seedComplexes(dbConnection))
+                .then(() => seedCohesionIndex(dbConnection))
+                .then(() => seedComplexDistances(dbConnection));
+            // fallthrough
+        case 2:
+            // Last known
+            break;
+        default:
+            console.error("No seeding target!!");
     }
 
     // additional migrations or more seedings with a new version
+    // fallthrough in the switch!
     // do not forget to inncrease the SEEDING_VERSION
-    // if (version < 3) {
+    // case (version < 3) {
     //
     // }
 
