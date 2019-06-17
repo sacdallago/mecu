@@ -2,6 +2,7 @@ const consoleStamp = require(`console-stamp`);
 
 const loadComponentsAndConnectToDb = require(`./loadComponentsAndConnectToDb`);
 const migrateDb = require(`./migration/migrateDb`);
+const loadModels = require(`../models/loadModels`);
 
 module.exports = () => {
 
@@ -17,7 +18,8 @@ module.exports = () => {
     });
 
     return loadComponentsAndConnectToDb.connect(function(context) {
-        return migrateDb(context.dbConnection);
-    });
-
+        return Promise.resolve(loadModels(context))
+            .then(() => context.dbConnection.sync())
+            .then(() => migrateDb(context.dbConnection));
+        });
 }
