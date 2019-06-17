@@ -9,7 +9,6 @@ COPY ./app /usr/src/app/app
 COPY ./frontend /usr/src/app/frontend
 COPY ./app.js /usr/src/app/
 COPY ./config.* /usr/src/app/
-COPY ./index.js /usr/src/app/
 COPY ./package.* /usr/src/app/
 
 # Use defaults or ENV file
