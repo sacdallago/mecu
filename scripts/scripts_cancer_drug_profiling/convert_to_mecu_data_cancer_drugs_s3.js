@@ -53,25 +53,7 @@ const start = function(filePath) {
     const headerLine = lines[0].split(',');
     lines.splice(0, 1);
 
-    // the base array all experiments will use
-    // const array = ["Uniprot_id", "description", undefined, undefined, undefined, undefined, undefined, undefined, undefined];
-    /*
-    gene_name,
-    Uniprot_id,
-    description,
-    location,
-    norm_signal_sum_NP40_rep1_126,
-    norm_signal_sum_NP40_rep2_127L,
-    norm_signal_sum_NP40_rep3_127H,
-    norm_signal_sum_NP40_rep4_128L,
-    norm_signal_sum_SDS_rep1_129L,
-    norm_signal_sum_SDS_rep2_129H,
-    norm_signal_sum_SDS_rep3_130L,
-    norm_signal_sum_SDS_rep4_130H,
-    median_ratio
-*/
-
-    const experimentHeaderArray = [[
+    const experimentHeaderArray = [
         "Uniprot_id", "description", undefined, undefined,
         "norm_signal_sum_NP40_rep1_126",
         "norm_signal_sum_NP40_rep2_127L",
@@ -81,58 +63,56 @@ const start = function(filePath) {
         "norm_signal_sum_SDS_rep2_129H",
         "norm_signal_sum_SDS_rep3_130L",
         "norm_signal_sum_SDS_rep4_130H"
-    ]];
+    ];
 
-    const experimentHeaders = []
-    for(let i=0; i<experimentHeaderArray.length; i++) {
-        experimentHeaders.push(indizesOfDataToExtract(headerLine, experimentHeaderArray[i]));
-    }
+    const experimentHeaders = indizesOfDataToExtract(headerLine, experimentHeaderArray);
+    console.log('asdf', experimentHeaders);
 
 
-    const experimentResultStrings = new Array(experimentHeaders.length)
-        .fill(resultHeader);
-
-    // iterate over all the lines
-    for(let lineIndex=0; lineIndex<lines.length; lineIndex++) {
-
-        // line currently working on
-        const line = lines[lineIndex].split(',');
-
-        // for each line, extract experiment data
-        experimentHeaders.forEach((experimentHeaderIndizes, experimentIndex) => {
-
-            let lineString = "";
-            experimentHeaderIndizes.forEach((index, idx) => {
-                let tmpInsertStr = line[index];
-                if (tmpInsertStr == undefined) {
-                    tmpInsertStr = resultHeaderFieldTypes[index] == 0 ? "" : 0;
-                }
-                lineString +=  tmpInsertStr;
-                if(idx != experimentHeaderIndizes.length-1) {
-                    lineString += "\t";
-                }
-            });
-
-            experimentResultStrings[experimentIndex] += (lineString + "\n");
-
-        });
-    }
-
-    console.log(experimentResultStrings[0].split('\n')[0]);
-
-    // tests
-
-    const parsed = mecuUtils.parse(experimentResultStrings[0]);
-    console.debug(`Test Experiment: `, parsed[0]);
-
-    // write to files
-    experimentResultStrings.forEach((str, i) => {
-        fs.writeFileSync(`scripts/experiment_`+i+'.txt', str, {flag: `w`}, function (err) {
-            if (err) {
-                console.log(`appending error`, err);
-            }
-        });
-    });
+    // const experimentResultStrings = new Array(experimentHeaders.length)
+    //     .fill(resultHeader);
+    //
+    // // iterate over all the lines
+    // for(let lineIndex=0; lineIndex<lines.length; lineIndex++) {
+    //
+    //     // line currently working on
+    //     const line = lines[lineIndex].split(',');
+    //
+    //     // for each line, extract experiment data
+    //     experimentHeaders.forEach((experimentHeaderIndizes, experimentIndex) => {
+    //
+    //         let lineString = "";
+    //         experimentHeaderIndizes.forEach((index, idx) => {
+    //             let tmpInsertStr = line[index];
+    //             if (tmpInsertStr == undefined) {
+    //                 tmpInsertStr = resultHeaderFieldTypes[index] == 0 ? "" : 0;
+    //             }
+    //             lineString +=  tmpInsertStr;
+    //             if(idx != experimentHeaderIndizes.length-1) {
+    //                 lineString += "\t";
+    //             }
+    //         });
+    //
+    //         experimentResultStrings[experimentIndex] += (lineString + "\n");
+    //
+    //     });
+    // }
+    //
+    // console.log(experimentResultStrings[0].split('\n')[0]);
+    //
+    // // tests
+    //
+    // const parsed = mecuUtils.parse(experimentResultStrings[0]);
+    // console.debug(`Test Experiment: `, parsed[0]);
+    //
+    // // write to files
+    // experimentResultStrings.forEach((str, i) => {
+    //     fs.writeFileSync(`scripts/experiment_`+i+'.txt', str, {flag: `w`}, function (err) {
+    //         if (err) {
+    //             console.log(`appending error`, err);
+    //         }
+    //     });
+    // });
 }
 
 
