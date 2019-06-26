@@ -36,15 +36,28 @@ const indizesOfDataToExtract = (dataHeader, experimentHeader) => {
     return returnArray;
 }
 
+const createMap = (mappingString) => {
+    const lines = mappingString.split("\n");
+    lines.splice(0, 1);
+    const retObj = {};
+    lines.forEach(l => {
+        const lineArr = l.split(',');
+        retObj[lineArr[0]] = lineArr[1];
+    });
+    return retObj;
+}
 
-const start = function(filePath) {
+
+const start = function(filePath, mappingFilePath) {
 
     // result header data
-    const resultHeader = "Accession	Description	GeneName	Peptides	PSMs	AAs	MW.kDA	pI	QuantifyingPSMs	T37	T40	T47	T53	T63	T69	T75	T81\n";
+    const resultHeader = "Accession	Description	GeneName	Peptides	PSMs	AAs	MW.kDA	pI	QuantifyingPSMs	T25	T41	T44	T47	T50	T53	T56	T59	T63	T67\n";
     const resultHeaderFieldTypes = [0, 0, 0,  1,  0, 0, 0, 0, 0,  1, 1, 1, 1, 1,  1, 1, 1, 1, 1]
 
     // load file as string
     const content = readFile(filePath);
+
+    const mapping = createMap(readFile(mappingFilePath));
 
     // split into lines
     let lines = content.split('\n');
@@ -53,74 +66,101 @@ const start = function(filePath) {
     const headerLine = lines[0].split(',');
     lines.splice(0, 1);
 
-    const experimentHeaderArray = [
-        "Uniprot_id", "description", undefined, undefined,
-        "norm_signal_sum_NP40_rep1_126",
-        "norm_signal_sum_NP40_rep2_127L",
-        "norm_signal_sum_NP40_rep3_127H",
-        "norm_signal_sum_NP40_rep4_128L",
-        "norm_signal_sum_SDS_rep1_129L",
-        "norm_signal_sum_SDS_rep2_129H",
-        "norm_signal_sum_SDS_rep3_130L",
-        "norm_signal_sum_SDS_rep4_130H"
-    ];
+    // the base array all experiments will use
+    const array = ["IPI acc. no.", undefined, undefined, "undefined", undefined, undefined, undefined, undefined, undefined];
+    const upm = ["upm_Vehicle_1", "upm_Vehicle_2", "upm_ATP_1", "upm_ATP_2"];
+    // construct temperature strings, which should be extracted
+    // Vehicle_1_25C_norm
+    // ATP_1_25C_norm
+    // Vehicle_2_25C_norm
+    // ATP_2_25C_norm
+    const tempStrConstructor = (z1, z2) => `Vehicle_${z2}_${z1}_norm`;
+    const tempStrConstructor2 = (z1, z2) => `ATP_${z2}_${z1}_norm`;
+    const fcs = ["25C", "41C", "44C", "47C", "50C", "53C", "56C", "59C", "63C", "67C"];
+    let experimentHeaderArray = createExperimentHeaderArrays(array, tempStrConstructor, [1,2], fcs);
+    experimentHeaderArray = experimentHeaderArray
+        .concat(createExperimentHeaderArrays(array, tempStrConstructor2, [1,2], fcs));
 
-    const experimentHeaders = indizesOfDataToExtract(headerLine, experimentHeaderArray);
-    console.log('asdf', experimentHeaders);
+    console.log('experimentHeaderArray', experimentHeaderArray);
+
+    const experimentHeaders = []
+    for(let i=0; i<experimentHeaderArray.length; i++) {
+        experimentHeaderArray[i][3] = upm[i];
+        experimentHeaders.push(indizesOfDataToExtract(headerLine, experimentHeaderArray[i]));
+    }
+
+    const experimentResultStrings = new Array(experimentHeaders.length)
+        .fill(resultHeader);
+
+    // iterate over all the lines
+    for(let lineIndex=0; lineIndex<lines.length; lineIndex++) {
+
+        // line currently working on
+        const line = lines[lineIndex].split(',');
+
+        // for each line, extract experiment data
+        experimentHeaders.forEach((experimentHeaderIndizes, experimentIndex) => {
+
+            let lineString = "";
+            let skipThisLine = false;
+            for(const [idx, index] of experimentHeaderIndizes.entries()) {
+                let tmpInsertStr = line[index]
+                console.log(idx, tmpInsertStr);
+                if (tmpInsertStr == undefined || tmpInsertStr.length == 0) {
+                    if (idx >= 9) {
+                        skipThisLine = true;
+                        break;
+                    }
+                    tmpInsertStr = resultHeaderFieldTypes[index] == 0 ? "" : 0;
+                }
+                if (idx == 0) {
+                    const newUniProtId = mapping[tmpInsertStr.split('.')[0]];
+                    if (newUniProtId == undefined) {
+                        skipThisLine = true;
+                        break;
+                    }
+                    lineString += newUniProtId;
+                } else {
+                    lineString += tmpInsertStr;
+                }
+                if(idx != experimentHeaderIndizes.length-1) {
+                    lineString += "\t";
+                }
+            };
+
+            if (skipThisLine != true) {
+                experimentResultStrings[experimentIndex] += (lineString + "\n");
+            }
+
+        });
+    }
+
+    console.log(experimentResultStrings[0].split('\n')[0]);
 
 
-    // const experimentResultStrings = new Array(experimentHeaders.length)
-    //     .fill(resultHeader);
-    //
-    // // iterate over all the lines
-    // for(let lineIndex=0; lineIndex<lines.length; lineIndex++) {
-    //
-    //     // line currently working on
-    //     const line = lines[lineIndex].split(',');
-    //
-    //     // for each line, extract experiment data
-    //     experimentHeaders.forEach((experimentHeaderIndizes, experimentIndex) => {
-    //
-    //         let lineString = "";
-    //         experimentHeaderIndizes.forEach((index, idx) => {
-    //             let tmpInsertStr = line[index];
-    //             if (tmpInsertStr == undefined) {
-    //                 tmpInsertStr = resultHeaderFieldTypes[index] == 0 ? "" : 0;
-    //             }
-    //             lineString +=  tmpInsertStr;
-    //             if(idx != experimentHeaderIndizes.length-1) {
-    //                 lineString += "\t";
-    //             }
-    //         });
-    //
-    //         experimentResultStrings[experimentIndex] += (lineString + "\n");
-    //
-    //     });
-    // }
-    //
-    // console.log(experimentResultStrings[0].split('\n')[0]);
-    //
-    // // tests
-    //
-    // const parsed = mecuUtils.parse(experimentResultStrings[0]);
-    // console.debug(`Test Experiment: `, parsed[0]);
-    //
-    // // write to files
-    // experimentResultStrings.forEach((str, i) => {
-    //     fs.writeFileSync(`scripts/experiment_`+i+'.txt', str, {flag: `w`}, function (err) {
-    //         if (err) {
-    //             console.log(`appending error`, err);
-    //         }
-    //     });
-    // });
+    // tests
+    experimentResultStrings.forEach((str, i) => {
+        // console.log(str);
+        const parsed = mecuUtils.parse(str);
+        console.debug(`Test Experiment ${i}: `, parsed[0]);
+    });
+
+    // write to files
+    experimentResultStrings.forEach((str, i) => {
+        fs.writeFileSync(`experiment-data/cancer_drugs/experiment_3_`+i+'.txt', str, {flag: `w`}, function (err) {
+            if (err) {
+                console.log(`appending error`, err);
+            }
+        });
+    });
 }
 
 
 const argv = process.argv;
 if(argv.length >= 3) {
-    start(process.argv[2]);
+    start(process.argv[2], process.argv[3]);
 } else {
-    console.error(`e.g.: node scripts/convert_to_mecu_data.js private/experiment_data/thermal_proteom_profiling_in_bacteria_data`);
+    console.error(`e.g.: node scripts/scripts_cancer_drug_profiling/convert_to_mecu_data_cancer_drugs_s3.js private/experiment_data/cancer_drugs/Table_S3_Thermal_Profiling_ATP_cell_extract.csv private/experiment_data/cancer_drugs/ipi_uniprot_mapping.csv`);
 }
 
 // Accession	Description	GeneName	Peptides	PSMs	AAs	MW.kDA	pI	QuantifyingPSMs	T37	T40	T43	T46	T49	T52	T55	T58	T61	T64
