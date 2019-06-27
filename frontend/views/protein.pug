@@ -8,8 +8,8 @@ block content
     .modal#add-protein-modal
 
     .protein-header
-        .protein
         .experiment
+            p Selected Experiment:
             .experiment-number#experiment-number
                 .dropdown.dropdown-search
                     .experiment-number-loading-animation
@@ -84,7 +84,7 @@ block content
             a.ui.disabled.button.analyze-button(href='/analyze-proteins')
                 i.eye.icon
                 span Analyze
-        .info Click to select
+        .info Click to add to analysis. Switch experiments on the top right of this page. Use the help in the menu for further instructions.
         .grid
     
     .related-complexes#related-complexes-container
@@ -94,7 +94,8 @@ block content
     .related-proteins-container#related-proteins-container
         h3 Protein Interactions
         .header
-            .info Each cube shows the interaction of the protein of the page with the protein in the cube. Shown are the top 20 interactions.
+            .info Below a list of the top 19 interaction partners according to our protein-protein interaction datasource.
+            .info Click to navigate to a different protein.
             .buttons
                 .select-all-button
                     a.ui.button#select-all-ppi-button
