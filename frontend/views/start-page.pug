@@ -17,8 +17,19 @@ block content
                 .value#number-of-experiments -
                 .label Experiments
 
-    //.explore#explore
-    //    h1.first Explore
+    .space
+
+    p(style="font-size:1.3em;")
+        | Welcome to the protein melting degree database! This database aims to be the one stop for &nbsp;
+        a(href="https://en.wikipedia.org/wiki/Thermal_shift_assay", target="_blank") thermal shift assay &nbsp;
+        | experiments. Here you can find and download data generated from thermal assays for a variety of cell lines across different conditions.
+
+    p(style="font-size:1.3em;")
+        | You can click on the following boxes to explore the database. We encourage novel users to use the coloured options below &nbsp;
+        | The options in gray allow you to quickly analyze multiple proteins across different conditions. &nbsp;
+
+    p(style="font-size:1.3em;")
+        | If you ever need help, you can access an interactive help through the menu.
 
     #four-option-holder
         a(href='/search')#first-option.option-cube
@@ -31,8 +42,8 @@ block content
             .top
                 .content P12005, Q23478, O01012
             .bottom
-                .content Search by UniProt accessors in bulk.
-        
+                .content Search by UniProt accession in bulk.
+
         a(href='/complexes')#third-option.option-cube
             .top
                 .content CASK-LIN7C-APBA1 complex

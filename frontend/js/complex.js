@@ -94,8 +94,8 @@ const drawComplexMetadata = (complex, experimentId) => {
             table.append(
                 $(`<thead />`).append(
                     $(`<tr />`).append([
-                        $(`<th />`).text('Protein Name'),
-                        $(`<th />`).text('Inspect'),
+                        $(`<th />`).text('UniProt accession'),
+                        $(`<th />`).text('Navigate to protein page'),
                     ])
                 )
             );

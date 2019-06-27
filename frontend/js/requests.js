@@ -104,6 +104,14 @@ ExperimentService.allProteinsContainedInExperiment = (experimentId) => {
             return [];
         });
 };
+ExperimentService.getStatistics = () => {
+    return fetch(`/api/experiments/statistics`)
+        .then((resp) => resp.json())
+        .catch(error => {
+            console.error(`Request error for ExperimentService.getStatistics: `, error);
+            return {};
+        });
+};
 
 
 ProteinService = {};

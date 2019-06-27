@@ -6,16 +6,21 @@ block postStyles
     link(rel='stylesheet', href='/public/modules/tour/dist/tour.css')
 
 block content
+
+    .descriptive-info-box
+        p(style="font-size:1.3em;").descriptive-info
+            | You can query the database using UniProt Accession numbers. &nbsp;
+    .space
     .search-header
         .search
             input(type="text", name="prot", placeholder="e.g. P12004" value="")#search-field.field
-    .space
-
     .descriptive-info-box
-        .descriptive-info This page allows you to search for specific proteins with an UniProt identifier (eg. P12004) or the full name of a protein. 
-            | In the menu (top right) you can also search for a specific list of proteins, complexes or experiments.
-            | Once you have selected some protein (indicated by a green dot), you can view all selected proteins and have them analyzed together on the 'Analyze' page.
+        p.descriptive-info
+            | If you are unaware of the accession for your protein or gene of interest, you can look it up on &nbsp;
+            a(href="https://www.uniprot.org/", target="_blank") UniProt
+            | .
 
+    .space
     .space
 
     .grid-container
