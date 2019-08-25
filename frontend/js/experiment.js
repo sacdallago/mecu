@@ -28,7 +28,7 @@ const drawExperimentConstant = (experiment) => {
     cbLysate.setAttribute(`disabled`, `disabled`);
 
     Object.keys(experiment.metaData.additionalFields || {}).forEach(key => {
-        drawNewAdditionalField(false, key, experiment.metaData.additionalFields[key]);
+        drawNewAdditionalFieldLineConstant(key, experiment.metaData.additionalFields[key]);
     });
 
     document.querySelector('.additional-fields-container .additional-fields .new-field-button')
@@ -66,13 +66,16 @@ const drawNewAdditionalField = (mutable = true, key, value) => {
     keyField.setAttribute('name', 'key');
     keyField.setAttribute('type', 'text');
     keyField.setAttribute('placeholder', 'Key');
+    keyField.classList.add('key');
     if (!!key) keyField.setAttribute('value', key);
 
-    const valueField = document.createElement('input');
+    const valueField = document.createElement('textarea');
     valueField.setAttribute('name', 'value');
     valueField.setAttribute('type', 'text');
     valueField.setAttribute('placeholder', 'Value');
-    if (!!value) valueField.setAttribute('value', value);
+    valueField.setAttribute('rows', '2');
+    valueField.classList.add('value');
+    if (!!value) valueField.value = value;
 
     const removeRowButton = document.createElement('input');
     removeRowButton.setAttribute('type', 'button');
@@ -89,6 +92,34 @@ const drawNewAdditionalField = (mutable = true, key, value) => {
     } else {
         row.appendChild(removeRowButton);
     }
+
+    container.appendChild(row);
+}
+
+const drawNewAdditionalFieldLineConstant = (key, value) => {
+    const container = document.querySelector('.additional-fields .fields');
+
+    const row = document.createElement('div');
+    row.classList.add('additional-field-row');
+    row.classList.add('constant');
+
+    const keyField = document.createElement('div');
+    keyField.setAttribute('name', 'key');
+    keyField.setAttribute('type', 'text');
+    keyField.setAttribute('placeholder', 'Key');
+    keyField.classList.add('key');
+    if (!!key) keyField.innerHTML = key;
+
+    const valueField = document.createElement('div');
+    valueField.setAttribute('name', 'value');
+    valueField.setAttribute('type', 'text');
+    valueField.setAttribute('placeholder', 'Value');
+    valueField.setAttribute('rows', '2');
+    valueField.classList.add('value');
+    if (!!value) valueField.innerHTML = value;
+
+    row.appendChild(keyField);
+    row.appendChild(valueField);
 
     container.appendChild(row);
 }

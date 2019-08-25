@@ -22,12 +22,27 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+#experiment-form .additional-fields .fields .additional-field-row.constant {
+    border: 1px solid silver;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 2px;
 }
 
 #experiment-form .additional-fields .fields .additional-field-row > * {
     margin-right: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+#experiment-form .additional-fields .fields .additional-field-row .key {
+    width: 20%;
+}
+#experiment-form .additional-fields .fields .additional-field-row .value {
+    width: 75%;
 }
 
 #experiment-form .additional-fields .fields .additional-field-row .remove-button {
