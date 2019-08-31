@@ -42,7 +42,7 @@
         "pg-hstore": "^2.3.3",
         "pug": "^2.0.4",
         "semantic-ui-css": "^2.4.1",
-        "sequelize": "^5.2.7",
+        "sequelize": "^5.18.0",
         "serve-favicon": "latest",
         "store": "^2.0.12",
         "tour": "^2.0.3",
