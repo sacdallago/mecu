@@ -38,7 +38,7 @@
         "node-watch": "^0.6.3",
         "passport": "latest",
         "passport-google-oauth2": "latest",
-        "pg": "latest",
+        "pg": "^7.12.1",
         "pg-hstore": "^2.3.3",
         "pug": "^2.0.4",
         "semantic-ui-css": "^2.4.1",
