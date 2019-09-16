@@ -533,10 +533,52 @@ $(document).ready(() => {
     const currentUri = URI(window.location.href);
     const query = currentUri.search(true);
     console.log(`query`, query);
-    if(query.protein && query.experiment) {
+    if(query.protein) {
+
+        // list of experiments which have this protein
+        const otherExperimentsAndSelect = ExperimentService.experimentsWhichHaveProtein(query.protein)
+            .then(exps => {
+                console.log(`exps`, exps);
+
+                if ((!query.experiment || query.experiment === null) && exps.length > 0) {
+                    query.experiment = exps[0].experimentId;
+                }
+
+                return Promise.all([
+                    // list of experiments, which ahve this protein, but not the actual experiment
+                    drawOtherExperimentsSelect(exps, query.protein, query.experiment),
+                    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
+                            exps.map(exp =>
+                                ({
+                                    uniprotId: query.protein,
+                                    experiment: exp.experimentId
+                                })
+                            )
+                        )
+                        .then(reads => {
+                            console.log(`reads`, reads);
+                            // protein curves of other experiments
+                            return drawExperimentsWhichHaveProtein(reads, query.experiment);
+                        })
+                ])
+                .then(() => proteinCurveAndMetaData(query.experiment))
+                .then(() => console.log(`proteinCurveAndMetaData`))
+                .then(() => complexes(query.experiment))
+                .then(() => console.log(`complexes`))
+                .then(() => ppi(query.experiment))
+                .then(() => console.log(`ppi`))
+                .then(() => {
+                    if(hasProteinExpMemorized) {
+                        enableAnalyzeButton();
+                    }
+                    console.log(`done`);
+                })
+
+                ;
+            });
 
         // data for protein curve and meta data
-        const proteinCurveAndMetaData = ProteinService.getSpecificProtein(query.protein, query.experiment)
+        const proteinCurveAndMetaData = (experiment) => ProteinService.getSpecificProtein(query.protein, experiment)
             .then(proteinData => {
                 console.log(`proteinCurveData`, proteinData);
                 if(Object.keys(proteinData).length > 0) {
@@ -546,45 +588,22 @@ $(document).ready(() => {
                 }
             });
 
-            // list of experiments which have this protein
-        const otherExperimentsAndSelect = ExperimentService.experimentsWhichHaveProtein(query.protein)
-            .then(exps => {
-                console.log(`exps`, exps);
-                return Promise.all([
-                    // list of experiments, which ahve this protein, but not the actual experiment
-                    drawOtherExperimentsSelect(exps, query.protein, query.experiment),
-                    TemperatureService.temperatureReadsToProteinsAndExperimentPairs(
-                        exps.map(exp =>
-                            ({
-                                uniprotId: query.protein,
-                                experiment: exp.experimentId
-                            })
-                        )
-                    )
-                        .then(reads => {
-                            console.log(`reads`, reads);
-                            // protein curves of other experiments
-                            return drawExperimentsWhichHaveProtein(reads, query.experiment);
-                        })
-                ]);
-            });
-
-            // list of complexes which have this protein
-        const complexes = ComplexService.getAllComplexesWhichContainProtein(query.protein, query.experiment)
+        // list of complexes which have this protein
+        const complexes = (experiment) => ComplexService.getAllComplexesWhichContainProtein(query.protein, experiment)
             .then(complexes => {
                 console.log(`complexes`, complexes);
-                return drawRelatedComplexes(complexes, query.experiment);
+                return drawRelatedComplexes(complexes, experiment);
             });
 
-            // list of protein interactions, which have this protein
-        const ppi = Promise.all([
-            ProteinService.getProteinInteractions(query.protein, query.experiment),
-            ExperimentService.allProteinsContainedInExperiment(query.experiment)
-        ])
+        // list of protein interactions, which have this protein
+        const ppi = (experiment) => Promise.all([
+                ProteinService.getProteinInteractions(query.protein, experiment),
+                ExperimentService.allProteinsContainedInExperiment(experiment)
+            ])
             .then(([proteinInteractions, proteinsContainedInExperiment]) => {
                 console.log(`proteinInteractions`, proteinInteractions);
                 console.log(`proteinsContainedInExperiment`, proteinsContainedInExperiment);
-                return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, query.experiment);
+                return drawProteinInteractions(proteinInteractions, proteinsContainedInExperiment, experiment);
             });
 
         lAExperimentNumber.start();
@@ -593,20 +612,9 @@ $(document).ready(() => {
         lARelComplexesCurves.start();
         lARelProteinsCurves.start();
 
-        proteinCurveAndMetaData
-            .then(() => console.log(`proteinCurveAndMetaData`))
-            .then(() => otherExperimentsAndSelect)
+
+        otherExperimentsAndSelect
             .then(() => console.log(`otherExperimentsAndSelect`))
-            .then(() => complexes)
-            .then(() => console.log(`complexes`))
-            .then(() => ppi)
-            .then(() => console.log(`ppi`))
-            .then(() => {
-                if(hasProteinExpMemorized) {
-                    enableAnalyzeButton();
-                }
-                console.log(`done`);
-            })
             .catch(error => {
                 console.error(`loading error`, error);
             });
