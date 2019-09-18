@@ -40,9 +40,11 @@
 
 #experiment-form .additional-fields .fields .additional-field-row .key {
     width: 20%;
+    min-width:100px;
 }
 #experiment-form .additional-fields .fields .additional-field-row .value {
-    width: 75%;
+    width: 60%;
+    min-width:100px;
 }
 
 #experiment-form .additional-fields .fields .additional-field-row .remove-button {
