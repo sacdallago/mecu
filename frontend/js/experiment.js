@@ -27,6 +27,13 @@ const drawExperimentConstant = (experiment) => {
     cbPrivate.checked = experiment.private === true;
     cbLysate.setAttribute(`disabled`, `disabled`);
 
+    Object.keys(experiment.metaData.additionalFields || {}).forEach(key => {
+        drawNewAdditionalFieldLineConstant(key, experiment.metaData.additionalFields[key]);
+    });
+
+    document.querySelector('.additional-fields-container .additional-fields .new-field-button')
+        .remove()
+
     document.querySelector(`#submit-button`).style.display = `none`;
 };
 
@@ -43,7 +50,90 @@ const drawExperimentMutable = (experiment) => {
     description.value = experiment.metaData.description;
     const cbLysate = document.querySelector(`#cb-lysate`);
     cbLysate.checked = experiment.metaData.lysate === true;
+
+    Object.keys(experiment.metaData.additionalFields || {}).forEach(key => {
+        drawNewAdditionalField(true, key, experiment.metaData.additionalFields[key]);
+    })
 };
+
+const drawNewAdditionalField = (mutable = true, key, value) => {
+    const container = document.querySelector('.additional-fields .fields');
+
+    const row = document.createElement('div');
+    row.classList.add('additional-field-row');
+
+    const keyField = document.createElement('input');
+    keyField.setAttribute('name', 'key');
+    keyField.setAttribute('type', 'text');
+    keyField.setAttribute('placeholder', 'Key');
+    keyField.classList.add('key');
+    if (!!key) keyField.setAttribute('value', key);
+
+    const valueField = document.createElement('textarea');
+    valueField.setAttribute('name', 'value');
+    valueField.setAttribute('type', 'text');
+    valueField.setAttribute('placeholder', 'Value');
+    valueField.setAttribute('rows', '2');
+    valueField.classList.add('value');
+    if (!!value) valueField.value = value;
+
+    const removeRowButton = document.createElement('input');
+    removeRowButton.setAttribute('type', 'button');
+    removeRowButton.setAttribute('value', 'Remove Entry');
+    removeRowButton.classList.add('remove-button');
+    removeRowButton.addEventListener('click', event => { row.remove(); });
+
+    row.appendChild(keyField);
+    row.appendChild(valueField);
+
+    if (!mutable) {
+        keyField.setAttribute(`disabled`, `disabled`);
+        valueField.setAttribute(`disabled`, `disabled`);
+    } else {
+        row.appendChild(removeRowButton);
+    }
+
+    container.appendChild(row);
+}
+
+const drawNewAdditionalFieldLineConstant = (key, value) => {
+    const container = document.querySelector('.additional-fields .fields');
+
+    const row = document.createElement('div');
+    row.classList.add('additional-field-row');
+    row.classList.add('constant');
+
+    const keyField = document.createElement('div');
+    keyField.setAttribute('name', 'key');
+    keyField.setAttribute('type', 'text');
+    keyField.setAttribute('placeholder', 'Key');
+    keyField.classList.add('key');
+    if (!!key) keyField.innerHTML = key;
+
+    const valueField = document.createElement('div');
+    valueField.setAttribute('name', 'value');
+    valueField.setAttribute('type', 'text');
+    valueField.setAttribute('placeholder', 'Value');
+    valueField.setAttribute('rows', '2');
+    valueField.classList.add('value');
+    if (!!value) valueField.innerHTML = value;
+
+    row.appendChild(keyField);
+    row.appendChild(valueField);
+
+    container.appendChild(row);
+}
+
+const extractKeyValues = () => {
+    const returnMap = {};
+    const listOfRows = document.querySelectorAll('.additional-fields .fields .additional-field-row');
+    listOfRows.forEach(row => {
+        if (row.children[0].value.length != 0) {
+            returnMap[row.children[0].value] = row.children[1].value;
+        }
+    })
+    return returnMap;
+}
 
 const drawError = () => {
     document.querySelector(`#experiment-form`).style.display = `none`;
@@ -53,9 +143,7 @@ const drawError = () => {
 
 
 $(`#experiment-form`).form({
-    fields: {
-        'experiment-name': `minLength[10]`
-    },
+    fields: { 'experiment-name': `minLength[10]` },
     on: `change`,
     revalidate: true,
     inline: true,
@@ -67,7 +155,8 @@ $(`#experiment-form`).form({
             private: fields[`cb-private`] === `on`,
             metaData: {
                 lysate: fields[`cb-lysate`] === `on`,
-                description: fields[`description`]
+                description: fields[`description`],
+                additionalFields: extractKeyValues()
             }
         };
 
@@ -116,6 +205,10 @@ const setDownloadButtonLink = (experiment) => {
         'download': `${experiment.name}.tsv`
     });
 }
+
+$('#add-new-field').on('click', function() {
+    drawNewAdditionalField();
+});
 
 $(document).ready(() => {
     const currentUri = URI(window.location.href);

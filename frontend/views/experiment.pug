@@ -28,6 +28,14 @@ block content
             .ui.slider.checkbox
                 input(type="checkbox" tabindex="0" class="hidden" name="cb-lysate")#cb-lysate
                 label Lysate
+
+        .additional-fields-container
+            label
+                b Additional Fields
+            .additional-fields
+                .fields
+                .new-field-button
+                    input(type="button" value="New Keyvalue Element")#add-new-field
         
         .space
         input(type="submit" value="Submit").ui.button#submit-button
