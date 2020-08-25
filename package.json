@@ -28,7 +28,7 @@
         "express-session": "latest",
         "formidable": "latest",
         "gridfs-stream": "latest",
-        "highcharts": "^6.2.0",
+        "highcharts": "^7.2.2",
         "jquery": "^3.3.1",
         "json2csv": "^4.3.5",
         "mecu-graph": "^0.1.7",
