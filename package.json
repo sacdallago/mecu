@@ -40,7 +40,7 @@
         "passport-google-oauth2": "latest",
         "pg": "latest",
         "pg-hstore": "latest",
-        "pug": "^2.0.0",
+        "pug": "^3.0.1",
         "semantic-ui-css": "^2.4.1",
         "sequelize": "^5.2.7",
         "serve-favicon": "latest",
